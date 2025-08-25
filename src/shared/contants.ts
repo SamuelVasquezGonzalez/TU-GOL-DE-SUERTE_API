@@ -1,0 +1,19 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+export const ALLOWED_ORIGINS = ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"];
+export const ALLOWED_METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"];
+
+export const GLOBAL_ENV = {
+    MONGODB_URI: process.env.MONGODB_URI as string,
+
+    PORT: process.env.PORT as string,
+
+    CLOUD_NAME: process.env.CLOUD_NAME as string,
+    API_KEY_CLOUDINARY: process.env.API_KEY_CLOUDINARY as string,
+    API_SECRET_CLOUDINARY: process.env.API_SECRET_CLOUDINARY as string,
+
+    JWT_SECTRET: process.env.JWT_SECTRET as string,
+
+    FRONT_DOMAIN: process.env.FRONT_DOMAIN as string,
+};
