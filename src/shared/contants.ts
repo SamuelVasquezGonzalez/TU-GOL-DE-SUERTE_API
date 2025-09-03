@@ -17,3 +17,9 @@ export const GLOBAL_ENV = {
 
     FRONT_DOMAIN: process.env.FRONT_DOMAIN as string,
 };
+
+
+export const DEFAULT_PROFILE_AVATAR = {
+    url: "https://res.cloudinary.com/dym9kg3vx/image/upload/v1725175200/default_profile_avatar.png",
+    public_id: "",
+}

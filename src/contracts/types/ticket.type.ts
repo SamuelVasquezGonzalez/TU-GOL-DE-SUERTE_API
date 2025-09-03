@@ -1,0 +1,1 @@
+export type TicketStatus = 'pending' | 'won' | 'lost'
