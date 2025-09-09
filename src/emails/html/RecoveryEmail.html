@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recuperación de Contraseña - Tu Gol de Suerte</title>
+    <style>
+      /* Reset básico para emails */
+      body,
+      table,
+      td,
+      p,
+      a,
+      li,
+      blockquote {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+
+      table,
+      td {
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+      }
+
+      img {
+        -ms-interpolation-mode: bicubic;
+        border: 0;
+        height: auto;
+        line-height: 100%;
+        outline: none;
+        text-decoration: none;
+      }
+
+      /* Estilos WOW para emails */
+      .gradient-bg {
+        background: #0f172a;
+        background: -webkit-linear-gradient(
+          135deg,
+          #0f172a 0%,
+          #1e293b 25%,
+          #334155 50%,
+          #1e293b 75%,
+          #0f172a 100%
+        );
+        background: linear-gradient(
+          135deg,
+          #0f172a 0%,
+          #1e293b 25%,
+          #334155 50%,
+          #1e293b 75%,
+          #0f172a 100%
+        );
+      }
+
+      .hero-gradient {
+        background: #1e293b;
+        background: -webkit-linear-gradient(
+          135deg,
+          #1e293b 0%,
+          #334155 50%,
+          #475569 100%
+        );
+        background: linear-gradient(
+          135deg,
+          #1e293b 0%,
+          #334155 50%,
+          #475569 100%
+        );
+      }
+
+      .card-gradient {
+        background: #334155;
+        background: -webkit-linear-gradient(135deg, #334155 0%, #475569 100%);
+        background: linear-gradient(135deg, #334155 0%, #475569 100%);
+      }
+
+      .accent-gradient {
+        background: #3b82f6;
+        background: -webkit-linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      }
+
+      .success-gradient {
+        background: #10b981;
+        background: -webkit-linear-gradient(135deg, #10b981 0%, #059669 100%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      }
+
+      .warning-gradient {
+        background: #f59e0b;
+        background: -webkit-linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      }
+
+      .danger-gradient {
+        background: #ef4444;
+        background: -webkit-linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      }
+
+      .glow-text {
+        text-shadow: 0 0 20px rgba(59, 130, 246, 0.5),
+          0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .card-shadow {
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
+          0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      .button-glow {
+        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4),
+          0 4px 16px rgba(59, 130, 246, 0.2);
+      }
+
+      .code-glow {
+        box-shadow: 0 0 30px rgba(59, 130, 246, 0.3),
+          inset 0 0 20px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Media queries para responsive */
+      @media only screen and (max-width: 600px) {
+        .container {
+          width: 100% !important;
+          max-width: 100% !important;
+        }
+
+        .content-table {
+          width: 100% !important;
+        }
+
+        .header-cell {
+          padding: 20px 15px !important;
+        }
+
+        .content-cell {
+          padding: 20px 15px !important;
+        }
+
+        .footer-cell {
+          padding: 20px 15px !important;
+        }
+
+        .button {
+          display: block !important;
+          width: 100% !important;
+          text-align: center !important;
+        }
+      }
+    </style>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #0f172a;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    "
+  >
+    <!-- Contenedor principal -->
+    <table
+      role="presentation"
+      cellspacing="0"
+      cellpadding="0"
+      border="0"
+      width="100%"
+      class="gradient-bg"
+    >
+      <tr>
+        <td align="center" style="padding: 40px 20px">
+          <!-- Contenedor del email -->
+          <table
+            class="container"
+            role="presentation"
+            cellspacing="0"
+            cellpadding="0"
+            border="0"
+            width="600"
+            style="
+              max-width: 600px;
+              background-color: #1e293b;
+              border-radius: 20px;
+              box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            "
+          >
+            <!-- Header Hero -->
+            <tr>
+              <td
+                class="header-cell hero-gradient"
+                style="
+                  padding: 50px 40px;
+                  text-align: center;
+                  border-radius: 20px 20px 0 0;
+                  position: relative;
+                "
+              >
+                <!-- Decoración de fondo -->
+                <table
+                  role="presentation"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                  width="100%"
+                  style="position: relative"
+                >
+                  <tr>
+                    <td align="center" style="position: relative">
+                      <!-- Icono principal con efecto WOW -->
+                      <div
+                        style="
+                          width: 120px;
+                          height: 120px;
+                          background: rgba(239, 68, 68, 0.1);
+                          border: 3px solid #ef4444;
+                          border-radius: 50%;
+                          margin: 0 auto 30px auto;
+                          display: table;
+                          text-align: center;
+                          vertical-align: middle;
+                          box-shadow: 0 0 40px rgba(239, 68, 68, 0.3),
+                            inset 0 0 20px rgba(239, 68, 68, 0.1);
+                        "
+                      >
+                        <span
+                          style="
+                            display: table-cell;
+                            vertical-align: middle;
+                            font-size: 48px;
+                            color: #f87171;
+                            text-shadow: 0 0 20px rgba(248, 113, 113, 0.8);
+                          "
+                          >🔐</span
+                        >
+                      </div>
+
+                      <h1
+                        class="glow-text"
+                        style="
+                          margin: 0;
+                          color: #f8fafc;
+                          font-size: 42px;
+                          font-weight: 800;
+                          letter-spacing: 2px;
+                          text-transform: uppercase;
+                        "
+                      >
+                        Tu Gol de Suerte
+                      </h1>
+
+                      <!-- Línea decorativa con gradiente -->
+                      <div
+                        style="
+                          width: 100px;
+                          height: 4px;
+                          background: linear-gradient(
+                            90deg,
+                            #ef4444,
+                            #f87171,
+                            #ef4444
+                          );
+                          margin: 20px auto;
+                          border-radius: 2px;
+                          box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+                        "
+                      ></div>
+
+                      <p
+                        style="
+                          margin: 0;
+                          color: #cbd5e1;
+                          font-size: 20px;
+                          font-weight: 600;
+                          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                        "
+                      >
+                        Recuperación de Contraseña
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Contenido principal -->
+            <tr>
+              <td class="content-cell" style="padding: 40px">
+                <table
+                  class="content-table"
+                  role="presentation"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                  width="100%"
+                >
+                  <!-- Saludo -->
+                  <tr>
+                    <td style="text-align: center; padding-bottom: 40px">
+                      <h2
+                        style="
+                          margin: 0;
+                          color: #f8fafc;
+                          font-size: 32px;
+                          font-weight: 700;
+                          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                        "
+                      >
+                        Recuperación de Contraseña
+                      </h2>
+                      <p
+                        style="
+                          margin: 20px 0 0 0;
+                          color: #cbd5e1;
+                          font-size: 18px;
+                          line-height: 1.6;
+                          max-width: 500px;
+                          margin: 20px auto 0 auto;
+                        "
+                      >
+                        ¡Hola
+                        <strong
+                          style="
+                            color: #f87171;
+                            text-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
+                          "
+                          >Peche</strong
+                        >! Recibimos una solicitud para restablecer tu
+                        contraseña
+                      </p>
+                    </td>
+                  </tr>
+
+                  <!-- Información de la solicitud -->
+                  <tr>
+                    <td style="padding-bottom: 40px">
+                      <table
+                        role="presentation"
+                        cellspacing="0"
+                        cellpadding="0"
+                        border="0"
+                        width="100%"
+                        class="card-shadow"
+                        style="border-radius: 16px; overflow: hidden"
+                      >
+                        <!-- Header de la sección -->
+                        <tr>
+                          <td
+                            class="card-gradient"
+                            style="
+                              padding: 30px;
+                              text-align: center;
+                              position: relative;
+                            "
+                          >
+                            <!-- Icono decorativo -->
+                            <div
+                              style="
+                                width: 70px;
+                                height: 70px;
+                                background: rgba(239, 68, 68, 0.2);
+                                border: 2px solid #ef4444;
+                                border-radius: 50%;
+                                margin: 0 auto 20px auto;
+                                display: table;
+                                text-align: center;
+                                vertical-align: middle;
+                                box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+                              "
+                            >
+                              <span
+                                style="
+                                  display: table-cell;
+                                  vertical-align: middle;
+                                  font-size: 28px;
+                                  color: #f87171;
+                                "
+                                >📋</span
+                              >
+                            </div>
+
+                            <h3
+                              style="
+                                margin: 0;
+                                color: #f8fafc;
+                                font-size: 24px;
+                                font-weight: 700;
+                                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                              "
+                            >
+                              Detalles de la Solicitud
+                            </h3>
+                          </td>
+                        </tr>
+
+                        <!-- Contenido de la información -->
+                        <tr>
+                          <td style="padding: 30px; background-color: #334155">
+                            <table
+                              role="presentation"
+                              cellspacing="0"
+                              cellpadding="0"
+                              border="0"
+                              width="100%"
+                            >
+                              <tr>
+                                <td
+                                  style="
+                                    padding: 15px 0;
+                                    border-bottom: 1px solid #475569;
+                                  "
+                                >
+                                  <table
+                                    role="presentation"
+                                    cellspacing="0"
+                                    cellpadding="0"
+                                    border="0"
+                                    width="100%"
+                                  >
+                                    <tr>
+                                      <td
+                                        style="
+                                          color: #94a3b8;
+                                          font-size: 16px;
+                                          font-weight: 600;
+                                          width: 30%;
+                                        "
+                                      >
+                                        Usuario:
+                                      </td>
+                                      <td
+                                        style="
+                                          color: #f8fafc;
+                                          font-size: 16px;
+                                          font-weight: 700;
+                                        "
+                                      >
+                                        peche
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td
+                                  style="
+                                    padding: 15px 0;
+                                    border-bottom: 1px solid #475569;
+                                  "
+                                >
+                                  <table
+                                    role="presentation"
+                                    cellspacing="0"
+                                    cellpadding="0"
+                                    border="0"
+                                    width="100%"
+                                  >
+                                    <tr>
+                                      <td
+                                        style="
+                                          color: #94a3b8;
+                                          font-size: 16px;
+                                          font-weight: 600;
+                                          width: 30%;
+                                        "
+                                      >
+                                        Email:
+                                      </td>
+                                      <td
+                                        style="
+                                          color: #f8fafc;
+                                          font-size: 16px;
+                                          font-weight: 700;
+                                        "
+                                      >
+                                        peche@ejemplo.com
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 15px 0">
+                                  <table
+                                    role="presentation"
+                                    cellspacing="0"
+                                    cellpadding="0"
+                                    border="0"
+                                    width="100%"
+                                  >
+                                    <tr>
+                                      <td
+                                        style="
+                                          color: #94a3b8;
+                                          font-size: 16px;
+                                          font-weight: 600;
+                                          width: 30%;
+                                        "
+                                      >
+                                        Fecha:
+                                      </td>
+                                      <td
+                                        style="
+                                          color: #f8fafc;
+                                          font-size: 16px;
+                                          font-weight: 700;
+                                        "
+                                      >
+                                        15 de Diciembre, 2024
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+
+                  <!-- Código de recuperación -->
+                  <tr>
+                    <td style="padding-bottom: 40px">
+                      <table
+                        role="presentation"
+                        cellspacing="0"
+                        cellpadding="0"
+                        border="0"
+                        width="100%"
+                        style="
+                          background: linear-gradient(
+                            135deg,
+                            #1e293b 0%,
+                            #0f172a 100%
+                          );
+                          border-radius: 16px;
+                          border: 2px solid #3b82f6;
+                          position: relative;
+                          box-shadow: 0 0 25px rgba(59, 130, 246, 0.2);
+                        "
+                      >
+                        <tr>
+                          <td style="padding: 40px; text-align: center">
+                            <!-- Icono de código -->
+                            <div
+                              style="
+                                width: 80px;
+                                height: 80px;
+                                background: rgba(59, 130, 246, 0.2);
+                                border: 2px solid #3b82f6;
+                                border-radius: 50%;
+                                margin: 0 auto 25px auto;
+                                display: table;
+                                text-align: center;
+                                vertical-align: middle;
+                                box-shadow: 0 0 25px rgba(59, 130, 246, 0.3);
+                              "
+                            >
+                              <span
+                                style="
+                                  display: table-cell;
+                                  vertical-align: middle;
+                                  font-size: 32px;
+                                  color: #60a5fa;
+                                "
+                                >🔑</span
+                              >
+                            </div>
+
+                            <h3
+                              style="
+                                margin: 0 0 20px 0;
+                                color: #60a5fa;
+                                font-size: 24px;
+                                font-weight: 700;
+                                text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+                              "
+                            >
+                              Código de Recuperación
+                            </h3>
+
+                            <!-- Código con diseño especial -->
+                            <div
+                              class="code-glow"
+                              style="
+                                background: #0f172a;
+                                padding: 30px;
+                                border-radius: 15px;
+                                border: 2px solid #3b82f6;
+                                margin: 20px 0;
+                                position: relative;
+                              "
+                            >
+                              <p
+                                style="
+                                  margin: 0;
+                                  color: #f8fafc;
+                                  font-size: 48px;
+                                  font-weight: 800;
+                                  letter-spacing: 12px;
+                                  font-family: 'Courier New', monospace;
+                                  text-shadow: 0 0 20px rgba(248, 250, 252, 0.5);
+                                "
+                              >
+                                4 7 2 9 1 8
+                              </p>
+                            </div>
+
+                            <p
+                              style="
+                                margin: 20px 0 0 0;
+                                color: #cbd5e1;
+                                font-size: 16px;
+                                line-height: 1.6;
+                                font-weight: 500;
+                              "
+                            >
+                              Usa este código para restablecer tu contraseña. El
+                              código expira en
+                              <strong
+                                style="
+                                  color: #f59e0b;
+                                  text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+                                "
+                                >15 minutos</strong
+                              >.
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+
+                  <!-- Botón de acción -->
+                  <tr>
+                    <td style="text-align: center; padding-bottom: 40px">
+                      <table
+                        role="presentation"
+                        cellspacing="0"
+                        cellpadding="0"
+                        border="0"
+                        style="margin: 0 auto"
+                      >
+                        <tr>
+                          <td
+                            class="button button-glow"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                #3b82f6 0%,
+                                #1d4ed8 100%
+                              );
+                              border-radius: 15px;
+                              text-align: center;
+                              border: 2px solid #60a5fa;
+                            "
+                          >
+                            <a
+                              href="#"
+                              style="
+                                display: inline-block;
+                                padding: 20px 50px;
+                                color: #ffffff;
+                                text-decoration: none;
+                                font-size: 20px;
+                                font-weight: 700;
+                                border-radius: 13px;
+                                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                                letter-spacing: 1px;
+                                text-transform: uppercase;
+                              "
+                            >
+                              🔐 Restablecer Contraseña
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <!-- Texto adicional debajo del botón -->
+                      <p
+                        style="
+                          margin: 20px 0 0 0;
+                          color: #94a3b8;
+                          font-size: 16px;
+                          text-align: center;
+                          font-weight: 500;
+                        "
+                      >
+                        Haz clic para restablecer tu contraseña
+                      </p>
+                    </td>
+                  </tr>
+
+                  <!-- Pasos para restablecer -->
+                  <tr>
+                    <td style="padding-bottom: 40px">
+                      <!-- Header de la sección -->
+                      <div style="text-align: center; margin-bottom: 30px">
+                        <div
+                          style="
+                            width: 80px;
+                            height: 80px;
+                            background: rgba(59, 130, 246, 0.2);
+                            border: 3px solid #3b82f6;
+                            border-radius: 50%;
+                            margin: 0 auto 20px auto;
+                            display: table;
+                            text-align: center;
+                            vertical-align: middle;
+                            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+                          "
+                        >
+                          <span
+                            style="
+                              display: table-cell;
+                              vertical-align: middle;
+                              font-size: 32px;
+                              color: #60a5fa;
+                              text-shadow: 0 0 15px rgba(96, 165, 250, 0.8);
+                            "
+                            >📝</span
+                          >
+                        </div>
+
+                        <h3
+                          style="
+                            margin: 0;
+                            color: #f8fafc;
+                            font-size: 28px;
+                            font-weight: 700;
+                            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                          "
+                        >
+                          Cómo Restablecer tu Contraseña
+                        </h3>
+
+                        <div
+                          style="
+                            width: 80px;
+                            height: 3px;
+                            background: linear-gradient(
+                              90deg,
+                              #3b82f6,
+                              #60a5fa,
+                              #3b82f6
+                            );
+                            margin: 15px auto;
+                            border-radius: 2px;
+                            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+                          "
+                        ></div>
+                      </div>
+
+                      <table
+                        role="presentation"
+                        cellspacing="0"
+                        cellpadding="0"
+                        border="0"
+                        width="100%"
+                      >
+                        <tr>
+                          <td style="padding: 20px 0">
+                            <table
+                              role="presentation"
+                              cellspacing="0"
+                              cellpadding="0"
+                              border="0"
+                              width="100%"
+                              style="
+                                background: linear-gradient(
+                                  135deg,
+                                  #334155 0%,
+                                  #475569 100%
+                                );
+                                border-radius: 15px;
+                                border: 1px solid #475569;
+                                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+                              "
+                            >
+                              <tr>
+                                <td style="padding: 25px">
+                                  <table
+                                    role="presentation"
+                                    cellspacing="0"
+                                    cellpadding="0"
+                                    border="0"
+                                    width="100%"
+                                  >
+                                    <tr>
+                                      <td
+                                        style="
+                                          width: 60px;
+                                          vertical-align: top;
+                                          text-align: center;
+                                        "
+                                      >
+                                        <div
+                                          style="
+                                            width: 45px;
+                                            height: 45px;
+                                            background: rgba(59, 130, 246, 0.2);
+                                            border: 2px solid #3b82f6;
+                                            border-radius: 50%;
+                                            display: table;
+                                            text-align: center;
+                                            vertical-align: middle;
+                                            margin: 0 auto;
+                                            box-shadow: 0 0 15px
+                                              rgba(59, 130, 246, 0.3);
+                                          "
+                                        >
+                                          <span
+                                            style="
+                                              display: table-cell;
+                                              vertical-align: middle;
+                                              color: #60a5fa;
+                                              font-size: 18px;
+                                              font-weight: 700;
+                                            "
+                                            >1</span
+                                          >
+                                        </div>
+                                      </td>
+                                      <td
+                                        style="
+                                          vertical-align: middle;
+                                          padding-left: 20px;
+                                        "
+                                      >
+                                        <p
+                                          style="
+                                            margin: 0;
+                                            color: #cbd5e1;
+                                            font-size: 17px;
+                                            line-height: 1.5;
+                                          "
+                                        >
+                                          <strong
+                                            style="
+                                              color: #f8fafc;
+                                              font-size: 18px;
+                                              text-shadow: 0 1px 2px
+                                                rgba(0, 0, 0, 0.3);
+                                            "
+                                            >Haz clic</strong
+                                          >
+                                          <br />
+                                          <span
+                                            style="
+                                              color: #94a3b8;
+                                              font-size: 15px;
+                                            "
+                                            >en el botón "Restablecer
+                                            Contraseña"</span
+                                          >
+                                        </p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 20px 0">
+                            <table
+                              role="presentation"
+                              cellspacing="0"
+                              cellpadding="0"
+                              border="0"
+                              width="100%"
+                              style="
+                                background: linear-gradient(
+                                  135deg,
+                                  #334155 0%,
+                                  #475569 100%
+                                );
+                                border-radius: 15px;
+                                border: 1px solid #475569;
+                                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+                              "
+                            >
+                              <tr>
+                                <td style="padding: 25px">
+                                  <table
+                                    role="presentation"
+                                    cellspacing="0"
+                                    cellpadding="0"
+                                    border="0"
+                                    width="100%"
+                                  >
+                                    <tr>
+                                      <td
+                                        style="
+                                          width: 60px;
+                                          vertical-align: top;
+                                          text-align: center;
+                                        "
+                                      >
+                                        <div
+                                          style="
+                                            width: 45px;
+                                            height: 45px;
+                                            background: rgba(59, 130, 246, 0.2);
+                                            border: 2px solid #3b82f6;
+                                            border-radius: 50%;
+                                            display: table;
+                                            text-align: center;
+                                            vertical-align: middle;
+                                            margin: 0 auto;
+                                            box-shadow: 0 0 15px
+                                              rgba(59, 130, 246, 0.3);
+                                          "
+                                        >
+                                          <span
+                                            style="
+                                              display: table-cell;
+                                              vertical-align: middle;
+                                              color: #60a5fa;
+                                              font-size: 18px;
+                                              font-weight: 700;
+                                            "
+                                            >2</span
+                                          >
+                                        </div>
+                                      </td>
+                                      <td
+                                        style="
+                                          vertical-align: middle;
+                                          padding-left: 20px;
+                                        "
+                                      >
+                                        <p
+                                          style="
+                                            margin: 0;
+                                            color: #cbd5e1;
+                                            font-size: 17px;
+                                            line-height: 1.5;
+                                          "
+                                        >
+                                          <strong
+                                            style="
+                                              color: #f8fafc;
+                                              font-size: 18px;
+                                              text-shadow: 0 1px 2px
+                                                rgba(0, 0, 0, 0.3);
+                                            "
+                                            >Ingresa el código</strong
+                                          >
+                                          <br />
+                                          <span
+                                            style="
+                                              color: #94a3b8;
+                                              font-size: 15px;
+                                            "
+                                            >de 6 dígitos que aparece
+                                            arriba</span
+                                          >
+                                        </p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 20px 0">
+                            <table
+                              role="presentation"
+                              cellspacing="0"
+                              cellpadding="0"
+                              border="0"
+                              width="100%"
+                              style="
+                                background: linear-gradient(
+                                  135deg,
+                                  #334155 0%,
+                                  #475569 100%
+                                );
+                                border-radius: 15px;
+                                border: 1px solid #475569;
+                                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+                              "
+                            >
+                              <tr>
+                                <td style="padding: 25px">
+                                  <table
+                                    role="presentation"
+                                    cellspacing="0"
+                                    cellpadding="0"
+                                    border="0"
+                                    width="100%"
+                                  >
+                                    <tr>
+                                      <td
+                                        style="
+                                          width: 60px;
+                                          vertical-align: top;
+                                          text-align: center;
+                                        "
+                                      >
+                                        <div
+                                          style="
+                                            width: 45px;
+                                            height: 45px;
+                                            background: rgba(59, 130, 246, 0.2);
+                                            border: 2px solid #3b82f6;
+                                            border-radius: 50%;
+                                            display: table;
+                                            text-align: center;
+                                            vertical-align: middle;
+                                            margin: 0 auto;
+                                            box-shadow: 0 0 15px
+                                              rgba(59, 130, 246, 0.3);
+                                          "
+                                        >
+                                          <span
+                                            style="
+                                              display: table-cell;
+                                              vertical-align: middle;
+                                              color: #60a5fa;
+                                              font-size: 18px;
+                                              font-weight: 700;
+                                            "
+                                            >3</span
+                                          >
+                                        </div>
+                                      </td>
+                                      <td
+                                        style="
+                                          vertical-align: middle;
+                                          padding-left: 20px;
+                                        "
+                                      >
+                                        <p
+                                          style="
+                                            margin: 0;
+                                            color: #cbd5e1;
+                                            font-size: 17px;
+                                            line-height: 1.5;
+                                          "
+                                        >
+                                          <strong
+                                            style="
+                                              color: #f8fafc;
+                                              font-size: 18px;
+                                              text-shadow: 0 1px 2px
+                                                rgba(0, 0, 0, 0.3);
+                                            "
+                                            >Crea una nueva contraseña</strong
+                                          >
+                                          <br />
+                                          <span
+                                            style="
+                                              color: #94a3b8;
+                                              font-size: 15px;
+                                            "
+                                            >segura</span
+                                          >
+                                        </p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+
+                  <!-- Mensaje de seguridad -->
+                  <tr>
+                    <td style="padding-bottom: 0">
+                      <table
+                        role="presentation"
+                        cellspacing="0"
+                        cellpadding="0"
+                        border="0"
+                        width="100%"
+                        style="
+                          background: linear-gradient(
+                            135deg,
+                            #1e293b 0%,
+                            #0f172a 100%
+                          );
+                          border-radius: 16px;
+                          border: 2px solid #f59e0b;
+                          position: relative;
+                          box-shadow: 0 0 25px rgba(245, 158, 11, 0.2);
+                        "
+                      >
+                        <tr>
+                          <td style="padding: 30px; text-align: center">
+                            <!-- Icono de seguridad -->
+                            <div
+                              style="
+                                width: 60px;
+                                height: 60px;
+                                background: rgba(245, 158, 11, 0.2);
+                                border: 2px solid #f59e0b;
+                                border-radius: 50%;
+                                margin: 0 auto 20px auto;
+                                display: table;
+                                text-align: center;
+                                vertical-align: middle;
+                                box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+                              "
+                            >
+                              <span
+                                style="
+                                  display: table-cell;
+                                  vertical-align: middle;
+                                  font-size: 24px;
+                                  color: #f59e0b;
+                                "
+                                >⚠️</span
+                              >
+                            </div>
+
+                            <h4
+                              style="
+                                margin: 0 0 15px 0;
+                                color: #f59e0b;
+                                font-size: 20px;
+                                font-weight: 700;
+                                text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+                              "
+                            >
+                              Importante
+                            </h4>
+
+                            <div
+                              style="
+                                width: 60px;
+                                height: 3px;
+                                background: linear-gradient(
+                                  90deg,
+                                  #f59e0b,
+                                  #d97706,
+                                  #f59e0b
+                                );
+                                margin: 0 auto 20px auto;
+                                border-radius: 2px;
+                                box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+                              "
+                            ></div>
+
+                            <p
+                              style="
+                                margin: 0;
+                                color: #cbd5e1;
+                                font-size: 16px;
+                                line-height: 1.6;
+                                max-width: 450px;
+                                margin: 0 auto;
+                                font-weight: 500;
+                              "
+                            >
+                              Si no solicitaste este cambio, ignora este email.
+                              Tu cuenta permanecerá segura. Nunca compartas este
+                              código con nadie.
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                class="footer-cell"
+                style="
+                  padding: 30px 40px;
+                  text-align: center;
+                  background-color: #0f172a;
+                  border-radius: 0 0 20px 20px;
+                "
+              >
+                <table
+                  role="presentation"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                  width="100%"
+                >
+                  <tr>
+                    <td style="text-align: center">
+                      <p
+                        style="
+                          margin: 0 0 15px 0;
+                          color: #94a3b8;
+                          font-size: 16px;
+                          font-weight: 500;
+                        "
+                      >
+                        Este email fue enviado a peche@ejemplo.com.
+                      </p>
+                      <p
+                        style="
+                          margin: 0 0 15px 0;
+                          color: #94a3b8;
+                          font-size: 16px;
+                          font-weight: 500;
+                        "
+                      >
+                        Si tienes alguna pregunta, contacta nuestro soporte.
+                      </p>
+                      <p
+                        style="
+                          margin: 0;
+                          color: #64748b;
+                          font-size: 14px;
+                          font-weight: 400;
+                        "
+                      >
+                        © 2024 Tu Gol de Suerte. Todos los derechos reservados.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
