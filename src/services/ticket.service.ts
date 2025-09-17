@@ -4,6 +4,7 @@ import { SoccerGameService } from "./soccer_game.service";
 import { UserService } from "./user.service";
 import { CurvaEntity } from "@/contracts/types/soccer_games.type";
 import { TicketStatus } from "@/contracts/types/ticket.type";
+import { send_ticket_purchase_email, send_ticket_status_update_email } from "@/emails/email-main";
 
 export class TicketService {
     // methods
@@ -47,6 +48,39 @@ export class TicketService {
         }
     }
 
+    public async get_tickets_by_user_id({user_id}: {user_id: string}) {
+        try {
+            const tickets = await TicketModel.find({user_id}).lean();
+            if(!tickets) throw new ResponseError(404, "No se encontraron boletas para este usuario");
+            return tickets;
+        } catch (err) {
+            if(err instanceof ResponseError) throw err;
+            throw new ResponseError(500, "Error al obtener las boletas del usuario");
+        }
+    }
+
+    public async get_tickets_by_curva_id({curva_id}: {curva_id: string}) {
+        try {
+            const tickets = await TicketModel.find({curva_id}).lean();
+            if(!tickets) throw new ResponseError(404, "No se encontraron boletas para esta curva");
+            return tickets;
+        } catch (err) {
+            if(err instanceof ResponseError) throw err;
+            throw new ResponseError(500, "Error al obtener las boletas de la curva");
+        }
+    }
+
+    public async get_all_tickets() {
+        try {
+            const tickets = await TicketModel.find().lean();
+            if(!tickets) throw new ResponseError(404, "No se encontraron boletas");
+            return tickets;
+        } catch (err) {
+            if(err instanceof ResponseError) throw err;
+            throw new ResponseError(500, "Error al obtener todas las boletas");
+        }
+    }
+
     // POST
 
     public async create_new_ticket({
@@ -67,7 +101,7 @@ export class TicketService {
             const game_info = await game_service.get_soccer_game_by_id({id: game_id});
 
             const user_service = new UserService();
-            await user_service.get_user_by_id({id: customer_id});
+            const customer_info = await user_service.get_user_by_id({id: customer_id});
 
             let curva_info: CurvaEntity | null = null;
 
@@ -107,8 +141,10 @@ export class TicketService {
 
             const payed_amount = ticket_price * quantity;
 
+            const ticket_number = await this.generate_ticket_number();
+
             await TicketModel.create({
-                ticket_number: await this.generate_ticket_number(),
+                ticket_number: ticket_number,
                 soccer_game_id: game_id,
                 user_id: customer_id,
                 results_purchased: selected_results,
@@ -118,7 +154,20 @@ export class TicketService {
                 created_date: new Date()
             });
 
-            // * TODO: Enviar correo de compra de boleta
+            
+            await send_ticket_purchase_email({
+                user_name: customer_info.name,
+                user_email: customer_info.email,
+                ticket_number: ticket_number,
+                game_info: {
+                    team1: "Equipo Local", // Este valor debería venir de la información real del juego
+                    team2: "Equipo Visitante", // Este valor debería venir de la información real del juego
+                    date: game_info.start_date.toLocaleDateString('es-ES'),
+                    tournament: game_info.tournament
+                },
+                results_purchased: selected_results,
+                total_amount: payed_amount
+            });
 
         }
         catch (err) {
@@ -129,12 +178,33 @@ export class TicketService {
 
     public async change_ticket_status({ticket_id, status}: {ticket_id: string, status: TicketStatus}) {
         try {
-            const ticket = await TicketModel.findById(ticket_id).lean();
+            const ticket = await TicketModel.findById(ticket_id);
             if(!ticket) throw new ResponseError(404, "No se encontró la boleta");
+            
+            const old_status = ticket.status;
             ticket.status = status;
             await ticket.save();
 
-            // * TODO: Informar al usuario del cambio de estado de la boleta
+            // Obtener información del usuario y del juego para el email
+            const user_service = new UserService();
+            const game_service = new SoccerGameService();
+            
+            const customer_info = await user_service.get_user_by_id({id: ticket.user_id});
+            const game_info = await game_service.get_soccer_game_by_id({id: ticket.soccer_game_id});
+
+            // Enviar correo de actualización de estado
+            await send_ticket_status_update_email({
+                user_name: customer_info.name,
+                user_email: customer_info.email,
+                ticket_number: ticket.ticket_number,
+                old_status: old_status,
+                new_status: status,
+                game_info: {
+                    team1: "Equipo Local", // Este valor debería venir de la información real del juego
+                    team2: "Equipo Visitante", // Este valor debería venir de la información real del juego
+                    date: game_info.start_date.toLocaleDateString('es-ES')
+                }
+            });
         } catch (err) {
             if(err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al cambiar el estado de la boleta");

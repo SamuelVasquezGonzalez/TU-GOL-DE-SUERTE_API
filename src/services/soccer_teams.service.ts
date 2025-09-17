@@ -1,5 +1,4 @@
 import { SoccerTeamModel } from "@/models/soccer_team.model";
-import { MediaType } from "@/contracts/types/global.type";
 import { ResponseError } from "@/utils/errors.util";
 import { delete_image, upload_image } from "@/utils/cloudinary.util";
 
@@ -44,10 +43,11 @@ export class SoccerTeamsService {
 
     // POST
 
-    public async create_new_soccer_team({name, avatar, color}: {name: string, avatar: MediaType, color: string}) {
+    public async create_new_soccer_team({name, avatar, color}: {name: string, avatar: Express.Multer.File, color: string}) {
         try {
             await this.verify_exist_name({name});
-            const soccer_team = await SoccerTeamModel.create({name, avatar, color, created: new Date()});
+            const new_image = await upload_image({image: avatar});
+            const soccer_team = await SoccerTeamModel.create({name, avatar: {url: new_image.url, public_id: new_image.public_id}, color, created: new Date()});
             if(!soccer_team) throw new ResponseError(400, "Error al crear el equipo de futbol");
             return soccer_team;
         } catch (err) {
@@ -65,7 +65,9 @@ export class SoccerTeamsService {
 
             if(name && name !== soccer_team.name) await this.verify_exist_name({name});
 
-            if(avatar) await delete_image({public_id: soccer_team.avatar.public_id});
+            if(avatar) {
+                await delete_image({public_id: soccer_team.avatar.public_id});
+            }
             const new_image = await upload_image({image: avatar});
 
             soccer_team.avatar = {

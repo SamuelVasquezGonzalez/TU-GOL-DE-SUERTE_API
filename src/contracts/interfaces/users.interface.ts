@@ -16,7 +16,7 @@ export interface IUser extends Document {
     
     created_at: Date;
 
-    avatar: MediaType
+    avatar?: MediaType
     
 }
 

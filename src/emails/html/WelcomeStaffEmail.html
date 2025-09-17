@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bienvenido a Tu Gol de Suerte</title>
+    <title>Bienvenido Staff - Tu Gol de Suerte</title>
     <style>
       /* Reset básico para emails */
       body,
@@ -75,26 +75,26 @@
         background: linear-gradient(135deg, #334155 0%, #475569 100%);
       }
 
-      .accent-gradient {
-        background: #3b82f6;
-        background: -webkit-linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      .staff-gradient {
+        background: #f59e0b;
+        background: -webkit-linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
       }
 
-      .success-gradient {
+      .accent-gradient {
         background: #10b981;
         background: -webkit-linear-gradient(135deg, #10b981 0%, #059669 100%);
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       }
 
       .warning-gradient {
-        background: #f59e0b;
-        background: -webkit-linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        background: #ef4444;
+        background: -webkit-linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
       }
 
       .glow-text {
-        text-shadow: 0 0 20px rgba(59, 130, 246, 0.5),
+        text-shadow: 0 0 20px rgba(245, 158, 11, 0.5),
           0 2px 4px rgba(0, 0, 0, 0.3);
       }
 
@@ -104,8 +104,8 @@
       }
 
       .button-glow {
-        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4),
-          0 4px 16px rgba(59, 130, 246, 0.2);
+        box-shadow: 0 8px 32px rgba(245, 158, 11, 0.4),
+          0 4px 16px rgba(245, 158, 11, 0.2);
       }
 
       .pulse-animation {
@@ -216,15 +216,15 @@
                         style="
                           width: 120px;
                           height: 120px;
-                          background: rgba(59, 130, 246, 0.1);
-                          border: 3px solid #3b82f6;
+                          background: rgba(245, 158, 11, 0.1);
+                          border: 3px solid #f59e0b;
                           border-radius: 50%;
                           margin: 0 auto 30px auto;
                           display: table;
                           text-align: center;
                           vertical-align: middle;
-                          box-shadow: 0 0 40px rgba(59, 130, 246, 0.3),
-                            inset 0 0 20px rgba(59, 130, 246, 0.1);
+                          box-shadow: 0 0 40px rgba(245, 158, 11, 0.3),
+                            inset 0 0 20px rgba(245, 158, 11, 0.1);
                         "
                       >
                         <span
@@ -232,10 +232,10 @@
                             display: table-cell;
                             vertical-align: middle;
                             font-size: 48px;
-                            color: #60a5fa;
-                            text-shadow: 0 0 20px rgba(96, 165, 250, 0.8);
+                            color: #fbbf24;
+                            text-shadow: 0 0 20px rgba(251, 191, 36, 0.8);
                           "
-                          >🎯</span
+                          >⭐</span
                         >
                       </div>
 
@@ -260,13 +260,13 @@
                           height: 4px;
                           background: linear-gradient(
                             90deg,
-                            #3b82f6,
-                            #60a5fa,
-                            #3b82f6
+                            #f59e0b,
+                            #fbbf24,
+                            #f59e0b
                           );
                           margin: 20px auto;
                           border-radius: 2px;
-                          box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+                          box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
                         "
                       ></div>
 
@@ -279,7 +279,7 @@
                           text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
                         "
                       >
-                        ¡Bienvenido a la mejor plataforma de apuestas!
+                        ¡Bienvenido al Equipo de Staff!
                       </p>
                     </td>
                   </tr>
@@ -310,7 +310,7 @@
                           text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
                         "
                       >
-                        ¡Bienvenido!
+                        ¡Bienvenido al Staff!
                       </h2>
                       <p
                         style="
@@ -325,12 +325,12 @@
                         ¡Hola
                         <strong
                           style="
-                            color: #60a5fa;
-                            text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+                            color: #fbbf24;
+                            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
                           "
-                          >Peche</strong
-                        >! Nos emociona que te hayas unido a la mejor plataforma
-                        de apuestas deportivas del mundo
+                          >{{staff_name}}</strong
+                        >! Te damos la bienvenida como miembro del staff de
+                        la plataforma de apuestas más emocionante
                       </p>
                     </td>
                   </tr>
@@ -362,14 +362,14 @@
                               style="
                                 width: 70px;
                                 height: 70px;
-                                background: rgba(59, 130, 246, 0.2);
-                                border: 2px solid #3b82f6;
+                                background: rgba(245, 158, 11, 0.2);
+                                border: 2px solid #f59e0b;
                                 border-radius: 50%;
                                 margin: 0 auto 20px auto;
                                 display: table;
                                 text-align: center;
                                 vertical-align: middle;
-                                box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+                                box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
                               "
                             >
                               <span
@@ -377,9 +377,9 @@
                                   display: table-cell;
                                   vertical-align: middle;
                                   font-size: 28px;
-                                  color: #60a5fa;
+                                  color: #fbbf24;
                                 "
-                                >📋</span
+                                >🏷️</span
                               >
                             </div>
 
@@ -392,7 +392,7 @@
                                 text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
                               "
                             >
-                              Información de tu Cuenta
+                              Credenciales de Staff
                             </h3>
                           </td>
                         </tr>
@@ -430,7 +430,7 @@
                                           width: 30%;
                                         "
                                       >
-                                        Usuario:
+                                        Nombre:
                                       </td>
                                       <td
                                         style="
@@ -439,14 +439,19 @@
                                           font-weight: 700;
                                         "
                                       >
-                                        peche
+                                        {{staff_name}}
                                       </td>
                                     </tr>
                                   </table>
                                 </td>
                               </tr>
                               <tr>
-                                <td style="padding: 15px 0">
+                                <td
+                                  style="
+                                    padding: 15px 0;
+                                    border-bottom: 1px solid #475569;
+                                  "
+                                >
                                   <table
                                     role="presentation"
                                     cellspacing="0"
@@ -472,7 +477,41 @@
                                           font-weight: 700;
                                         "
                                       >
-                                        peche@ejemplo.com
+                                        {{staff_email}}
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 15px 0">
+                                  <table
+                                    role="presentation"
+                                    cellspacing="0"
+                                    cellpadding="0"
+                                    border="0"
+                                    width="100%"
+                                  >
+                                    <tr>
+                                      <td
+                                        style="
+                                          color: #94a3b8;
+                                          font-size: 16px;
+                                          font-weight: 600;
+                                          width: 30%;
+                                        "
+                                      >
+                                        Rol:
+                                      </td>
+                                      <td
+                                        style="
+                                          color: #fbbf24;
+                                          font-size: 16px;
+                                          font-weight: 700;
+                                          text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+                                        "
+                                      >
+                                        ⭐ STAFF
                                       </td>
                                     </tr>
                                   </table>
@@ -516,7 +555,7 @@
                                     display: table-cell;
                                     vertical-align: middle;
                                     font-size: 20px;
-                                    color: #f59e0b;
+                                    color: #fbbf24;
                                   "
                                   >🔑</span
                                 >
@@ -525,16 +564,16 @@
                               <p
                                 style="
                                   margin: 0 0 10px 0;
-                                  color: #f59e0b;
+                                  color: #fbbf24;
                                   font-size: 16px;
                                   font-weight: 700;
                                   text-align: center;
                                   text-transform: uppercase;
                                   letter-spacing: 1px;
-                                  text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+                                  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
                                 "
                               >
-                                Contraseña Temporal
+                                Contraseña Temporal de Staff
                               </p>
 
                               <div
@@ -560,7 +599,7 @@
                                       rgba(248, 250, 252, 0.3);
                                   "
                                 >
-                                  SuMamáEsMeraGueva
+                                  {{temp_staff_pssw}}
                                 </p>
                               </div>
                             </div>
@@ -570,7 +609,7 @@
                     </td>
                   </tr>
 
-                  <!-- Pasos siguientes -->
+                  <!-- Responsabilidades del staff -->
                   <tr>
                     <td style="padding-bottom: 40px">
                       <!-- Header de la sección -->
@@ -579,14 +618,14 @@
                           style="
                             width: 80px;
                             height: 80px;
-                            background: rgba(59, 130, 246, 0.2);
-                            border: 3px solid #3b82f6;
+                            background: rgba(245, 158, 11, 0.2);
+                            border: 3px solid #f59e0b;
                             border-radius: 50%;
                             margin: 0 auto 20px auto;
                             display: table;
                             text-align: center;
                             vertical-align: middle;
-                            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+                            box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
                           "
                         >
                           <span
@@ -594,10 +633,10 @@
                               display: table-cell;
                               vertical-align: middle;
                               font-size: 32px;
-                              color: #60a5fa;
-                              text-shadow: 0 0 15px rgba(96, 165, 250, 0.8);
+                              color: #fbbf24;
+                              text-shadow: 0 0 15px rgba(251, 191, 36, 0.8);
                             "
-                            >🚀</span
+                            >🎯</span
                           >
                         </div>
 
@@ -610,7 +649,7 @@
                             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
                           "
                         >
-                          Próximos Pasos
+                          Responsabilidades del Staff
                         </h3>
 
                         <div
@@ -619,13 +658,13 @@
                             height: 3px;
                             background: linear-gradient(
                               90deg,
-                              #3b82f6,
-                              #60a5fa,
-                              #3b82f6
+                              #f59e0b,
+                              #fbbf24,
+                              #f59e0b
                             );
                             margin: 15px auto;
                             border-radius: 2px;
-                            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+                            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
                           "
                         ></div>
                       </div>
@@ -677,26 +716,26 @@
                                           style="
                                             width: 45px;
                                             height: 45px;
-                                            background: rgba(59, 130, 246, 0.2);
-                                            border: 2px solid #3b82f6;
+                                            background: rgba(245, 158, 11, 0.2);
+                                            border: 2px solid #f59e0b;
                                             border-radius: 50%;
                                             display: table;
                                             text-align: center;
                                             vertical-align: middle;
                                             margin: 0 auto;
                                             box-shadow: 0 0 15px
-                                              rgba(59, 130, 246, 0.3);
+                                              rgba(245, 158, 11, 0.3);
                                           "
                                         >
                                           <span
                                             style="
                                               display: table-cell;
                                               vertical-align: middle;
-                                              color: #60a5fa;
+                                              color: #fbbf24;
                                               font-size: 18px;
                                               font-weight: 700;
                                             "
-                                            >1</span
+                                            >📞</span
                                           >
                                         </div>
                                       </td>
@@ -721,7 +760,7 @@
                                               text-shadow: 0 1px 2px
                                                 rgba(0, 0, 0, 0.3);
                                             "
-                                            >Inicia sesión</strong
+                                            >Atención al Cliente</strong
                                           >
                                           <br />
                                           <span
@@ -729,7 +768,7 @@
                                               color: #94a3b8;
                                               font-size: 15px;
                                             "
-                                            >con tus credenciales</span
+                                            >Brindar soporte a usuarios y resolver consultas</span
                                           >
                                         </p>
                                       </td>
@@ -780,26 +819,26 @@
                                           style="
                                             width: 45px;
                                             height: 45px;
-                                            background: rgba(59, 130, 246, 0.2);
-                                            border: 2px solid #3b82f6;
+                                            background: rgba(245, 158, 11, 0.2);
+                                            border: 2px solid #f59e0b;
                                             border-radius: 50%;
                                             display: table;
                                             text-align: center;
                                             vertical-align: middle;
                                             margin: 0 auto;
                                             box-shadow: 0 0 15px
-                                              rgba(59, 130, 246, 0.3);
+                                              rgba(245, 158, 11, 0.3);
                                           "
                                         >
                                           <span
                                             style="
                                               display: table-cell;
                                               vertical-align: middle;
-                                              color: #60a5fa;
+                                              color: #fbbf24;
                                               font-size: 18px;
                                               font-weight: 700;
                                             "
-                                            >2</span
+                                            >🎫</span
                                           >
                                         </div>
                                       </td>
@@ -824,7 +863,7 @@
                                               text-shadow: 0 1px 2px
                                                 rgba(0, 0, 0, 0.3);
                                             "
-                                            >Cambia tu contraseña</strong
+                                            >Gestión de Boletas</strong
                                           >
                                           <br />
                                           <span
@@ -832,7 +871,7 @@
                                               color: #94a3b8;
                                               font-size: 15px;
                                             "
-                                            >por una más segura</span
+                                            >Verificar boletas y procesar reembolsos</span
                                           >
                                         </p>
                                       </td>
@@ -883,26 +922,26 @@
                                           style="
                                             width: 45px;
                                             height: 45px;
-                                            background: rgba(59, 130, 246, 0.2);
-                                            border: 2px solid #3b82f6;
+                                            background: rgba(245, 158, 11, 0.2);
+                                            border: 2px solid #f59e0b;
                                             border-radius: 50%;
                                             display: table;
                                             text-align: center;
                                             vertical-align: middle;
                                             margin: 0 auto;
                                             box-shadow: 0 0 15px
-                                              rgba(59, 130, 246, 0.3);
+                                              rgba(245, 158, 11, 0.3);
                                           "
                                         >
                                           <span
                                             style="
                                               display: table-cell;
                                               vertical-align: middle;
-                                              color: #60a5fa;
+                                              color: #fbbf24;
                                               font-size: 18px;
                                               font-weight: 700;
                                             "
-                                            >3</span
+                                            >📋</span
                                           >
                                         </div>
                                       </td>
@@ -927,7 +966,7 @@
                                               text-shadow: 0 1px 2px
                                                 rgba(0, 0, 0, 0.3);
                                             "
-                                            >¡Comienza a apostar!</strong
+                                            >Monitoreo de Eventos</strong
                                           >
                                           <br />
                                           <span
@@ -935,7 +974,7 @@
                                               color: #94a3b8;
                                               font-size: 15px;
                                             "
-                                            >y gana grandes premios</span
+                                            >Supervisar eventos y reportar incidencias</span
                                           >
                                         </p>
                                       </td>
@@ -966,12 +1005,12 @@
                             style="
                               background: linear-gradient(
                                 135deg,
-                                #3b82f6 0%,
-                                #1d4ed8 100%
+                                #f59e0b 0%,
+                                #d97706 100%
                               );
                               border-radius: 15px;
                               text-align: center;
-                              border: 2px solid #60a5fa;
+                              border: 2px solid #fbbf24;
                             "
                           >
                             <a
@@ -989,7 +1028,7 @@
                                 text-transform: uppercase;
                               "
                             >
-                              🎯 Iniciar Sesión
+                              ⭐ Acceder al Panel Staff
                             </a>
                           </td>
                         </tr>
@@ -1005,7 +1044,7 @@
                           font-weight: 500;
                         "
                       >
-                        Haz clic para acceder a tu cuenta
+                        Haz clic para acceder a tu área de trabajo
                       </p>
                     </td>
                   </tr>
@@ -1026,9 +1065,9 @@
                             #0f172a 100%
                           );
                           border-radius: 16px;
-                          border: 2px solid #f59e0b;
+                          border: 2px solid #10b981;
                           position: relative;
-                          box-shadow: 0 0 25px rgba(245, 158, 11, 0.2);
+                          box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
                         "
                       >
                         <tr>
@@ -1038,14 +1077,14 @@
                               style="
                                 width: 60px;
                                 height: 60px;
-                                background: rgba(245, 158, 11, 0.2);
-                                border: 2px solid #f59e0b;
+                                background: rgba(16, 185, 129, 0.2);
+                                border: 2px solid #10b981;
                                 border-radius: 50%;
                                 margin: 0 auto 20px auto;
                                 display: table;
                                 text-align: center;
                                 vertical-align: middle;
-                                box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+                                box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
                               "
                             >
                               <span
@@ -1053,22 +1092,22 @@
                                   display: table-cell;
                                   vertical-align: middle;
                                   font-size: 24px;
-                                  color: #f59e0b;
+                                  color: #34d399;
                                 "
-                                >🔒</span
+                                >🤝</span
                               >
                             </div>
 
                             <h4
                               style="
                                 margin: 0 0 15px 0;
-                                color: #f59e0b;
+                                color: #34d399;
                                 font-size: 20px;
                                 font-weight: 700;
-                                text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+                                text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
                               "
                             >
-                              Importante
+                              Compromiso del Staff
                             </h4>
 
                             <div
@@ -1077,13 +1116,13 @@
                                 height: 3px;
                                 background: linear-gradient(
                                   90deg,
-                                  #f59e0b,
-                                  #d97706,
-                                  #f59e0b
+                                  #10b981,
+                                  #34d399,
+                                  #10b981
                                 );
                                 margin: 0 auto 20px auto;
                                 border-radius: 2px;
-                                box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+                                box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
                               "
                             ></div>
 
@@ -1098,9 +1137,9 @@
                                 font-weight: 500;
                               "
                             >
-                              Por seguridad, cambia tu contraseña temporal lo
-                              antes posible. Mantén tus credenciales seguras y
-                              nunca las compartas.
+                              Como miembro del staff, eres parte esencial de nuestro equipo. 
+                              Cambia tu contraseña temporal inmediatamente y mantén siempre 
+                              la confidencialidad de la información de los usuarios.
                             </p>
                           </td>
                         </tr>
@@ -1139,7 +1178,7 @@
                           font-weight: 500;
                         "
                       >
-                        Este email fue enviado a peche@ejemplo.com.
+                        Este email fue enviado a {{staff_email}}.
                       </p>
                       <p
                         style="
@@ -1149,7 +1188,7 @@
                           font-weight: 500;
                         "
                       >
-                        Si tienes alguna pregunta, contacta nuestro soporte.
+                        Si tienes alguna pregunta, contacta a tu supervisor.
                       </p>
                       <p
                         style="

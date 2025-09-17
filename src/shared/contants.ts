@@ -14,6 +14,7 @@ export const GLOBAL_ENV = {
     API_SECRET_CLOUDINARY: process.env.API_SECRET_CLOUDINARY as string,
 
     JWT_SECTRET: process.env.JWT_SECTRET as string,
+    RESEND_API_KEY: process.env.RESEND_API_KEY as string,
 
     FRONT_DOMAIN: process.env.FRONT_DOMAIN as string,
 };

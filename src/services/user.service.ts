@@ -1,83 +1,73 @@
+import bcrypt from "bcrypt";
 import { UserPayload } from "@/contracts/interfaces/users.interface";
-import { UserIdentity, UserRole } from "@/contracts/types/user.type";
+import { UserIdentity, UserRole, UserTokenPayload } from "@/contracts/types/user.type";
 import { UserModel } from "@/models/user.model";
 import { delete_image, upload_image } from "@/utils/cloudinary.util";
 import { ResponseError } from "@/utils/errors.util";
 import { generate_random_password, generate_recover_code, hash_password } from "@/utils/generate.util";
+import { GLOBAL_ENV } from "@/shared/contants";
+import jwt from "jsonwebtoken";
+import { send_welcome_email, send_welcome_admin_email, send_welcome_staff_email, send_recovery_email } from "@/emails/email-main";
 
 export class UserService {
     // methods
 
     // GET
-    public async get_all_users({type_user}: {type_user?: UserRole}) {
+    public async get_all_users({ type_user }: { type_user?: UserRole }) {
         try {
-            const users = await UserModel.find(type_user ? {role: type_user} : {});
-            if(!users) throw new ResponseError(404, "No se encontraron usuarios");
+            const users = await UserModel.find(type_user ? { role: type_user } : {});
+            if (!users) throw new ResponseError(404, "No se encontraron usuarios");
             return users;
-        }
-        catch (err) {
-            if(err instanceof ResponseError) throw err;
+        } catch (err) {
+            if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al obtener los usuarios");
         }
     }
 
-    public async get_user_by_id({id}: {id: string}) {
+    public async get_user_by_id({ id }: { id: string }) {
         try {
             const user = await UserModel.findById(id);
-            if(!user) throw new ResponseError(404, "No se encontró el usuario");
+            if (!user) throw new ResponseError(404, "No se encontró el usuario");
             return user;
-        }
-        catch (err) {
-            if(err instanceof ResponseError) throw err;
+        } catch (err) {
+            if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al obtener el usuario");
         }
     }
 
-    public async get_users_by_param({param}: {param: string}) {
+    public async get_users_by_param({ param }: { param: string }) {
         try {
-
             // param puede ser name, email, phone o identity
-            
+
             const users = await UserModel.find({
-                $or: [{name: {$regex: param, $options: "i"}}, 
-                    {email: {$regex: param, $options: "i"}}, 
-                    {phone: {$regex: param, $options: "i"}}, 
-                    {identity: {$regex: param, $options: "i"}}]
+                $or: [{ name: { $regex: param, $options: "i" } }, { email: { $regex: param, $options: "i" } }, { phone: { $regex: param, $options: "i" } }, { identity: { $regex: param, $options: "i" } }],
             });
-            if(!users) throw new ResponseError(404, "No se encontraron usuarios");
+            if (!users) throw new ResponseError(404, "No se encontraron usuarios");
             return users;
-        }
-        catch (err) {
-            if(err instanceof ResponseError) throw err;
+        } catch (err) {
+            if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al obtener los usuarios");
         }
     }
     // POST
 
-    public async create_new_user({
-        name,
-        email,
-        identity,
-        phone,
-        role,
-        pin
-    }: UserPayload) {
+    public async create_new_user({ name, email, identity, phone, role, pin }: UserPayload) {
         try {
-            await this.verify_exist_email({email});
-            await this.verify_exist_phone({phone});
-            await this.verify_exist_identity({identity});
+            await this.verify_exist_email({ email });
+            await this.verify_exist_phone({ phone });
+            await this.verify_exist_identity({ identity });
 
-            const recover_code = generate_recover_code({length: 6});
-            const plane_password = generate_random_password({length: 8});
+            const recover_code = generate_recover_code({ length: 6 });
+            const plane_password = generate_random_password({ length: 8 });
             const hashed_password = await hash_password(plane_password);
 
-            let pin_generated = generate_recover_code({length: 6});
-            let result_pin = await this.verify_exist_pin({pin: pin_generated});
+            let pin_generated = generate_recover_code({ length: 6 });
+            let result_pin = await this.verify_exist_pin({ pin: pin_generated });
 
             // Seguir generando PINs hasta encontrar uno que no esté en uso
-            while(result_pin.exist) {
-                pin_generated = generate_recover_code({length: 6});
-                result_pin = await this.verify_exist_pin({pin: pin_generated});
+            while (result_pin.exist) {
+                pin_generated = generate_recover_code({ length: 6 });
+                result_pin = await this.verify_exist_pin({ pin: pin_generated });
             }
 
             await UserModel.create({
@@ -88,93 +78,138 @@ export class UserService {
                 role,
                 recover_code,
                 password: hashed_password,
-                pin: pin ? pin_generated : null
-            })
+                pin: pin ? pin_generated : null,
+            });
 
-            // * TODO: Enviar correo de bienvenida
-            
+            // Enviar correo de bienvenida según el rol
+            if (role === "admin") {
+                await send_welcome_admin_email({
+                    admin_name: name,
+                    admin_email: email,
+                    temp_admin_pssw: plane_password
+                });
+            } else if (role === "staff") {
+                await send_welcome_staff_email({
+                    staff_name: name,
+                    staff_email: email,
+                    temp_staff_pssw: plane_password
+                });
+            } else {
+                await send_welcome_email({
+                    name: name,
+                    email: email,
+                    temp_pssw: plane_password
+                });
+            }
         } catch (err) {
-            if(err instanceof ResponseError) throw err;
+            if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al crear el administrador");
         }
     }
 
-    public async request_recover_password({email, identity}: {email?: string, identity?: UserIdentity}) {
+    public async request_recover_password({ email, identity }: { email?: string; identity?: UserIdentity }) {
         try {
+            if (!email && !identity) throw new ResponseError(400, "Se debe proporcionar un correo o una identificacion");
 
-            if(!email && !identity) throw new ResponseError(400, "Se debe proporcionar un correo o una identificacion");
-            
+            const user = await UserModel.findOne({ $or: [{ email }, { identity }] });
 
-            const user = await UserModel.findOne({$or: [{email}, {identity}]});
-
-            if(!user) throw new ResponseError(404, "Usuario no encontrado");
+            if (!user) throw new ResponseError(404, "Usuario no encontrado");
 
             const recover_code = user.recover_code;
-            console.log(recover_code);
 
-            // * TODO: Enviar correo de recuperación => recover_code
-
+            // Enviar correo de recuperación
+            await send_recovery_email({
+                user_name: user.name,
+                user_email: user.email,
+                recover_code: recover_code
+            });
         } catch (err) {
-            if(err instanceof ResponseError) throw err;
+            if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al solicitar el codigo de recuperación");
         }
     }
 
-    public async verify_recover_code({email, identity, code}: {email?: string, identity?: UserIdentity, code: number}) {
+    public async verify_recover_code({ email, identity, code }: { email?: string; identity?: UserIdentity; code: number }) {
         try {
-            if(!email && !identity && !code) throw new ResponseError(400, "Se debe proporcionar un correo o una identificacion y un codigo de recuperación");
+            if (!email && !identity && !code) throw new ResponseError(400, "Se debe proporcionar un correo o una identificacion y un codigo de recuperación");
 
-            const user = await UserModel.findOne({$or: [{email}, {identity}]});
+            const user = await UserModel.findOne({ $or: [{ email }, { identity }] });
 
-            if(!user) throw new ResponseError(404, "Usuario no encontrado");
-            if(user.recover_code !== code) throw new ResponseError(400, "Codigo de recuperación incorrecto");
-
-        }
-        catch (err) {
-            if(err instanceof ResponseError) throw err;
+            if (!user) throw new ResponseError(404, "Usuario no encontrado");
+            if (user.recover_code !== code) throw new ResponseError(400, "Codigo de recuperación incorrecto");
+        } catch (err) {
+            if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al verificar el codigo de recuperación");
         }
     }
 
-    public async verify_successful_recover_password({email, identity, code, new_password}: {email?: string, identity?: UserIdentity, code: number, new_password: string}) {
+    public async verify_successful_recover_password({ email, identity, code, new_password }: { email?: string; identity?: UserIdentity; code: number; new_password: string }) {
         try {
-            if(!email && !identity && !code && !new_password) throw new ResponseError(400, "Se debe proporcionar un correo o una identificacion, un codigo de recuperación y una nueva contraseña");
-            const user = await UserModel.findOne({$or: [{email}, {identity}]});
-            if(!user) throw new ResponseError(404, "Usuario no encontrado");
-            if(user.recover_code !== code) throw new ResponseError(400, "Codigo de recuperación incorrecto");
-            
+            if (!email && !identity && !code && !new_password) throw new ResponseError(400, "Se debe proporcionar un correo o una identificacion, un codigo de recuperación y una nueva contraseña");
+            const user = await UserModel.findOne({ $or: [{ email }, { identity }] });
+            if (!user) throw new ResponseError(404, "Usuario no encontrado");
+            if (user.recover_code !== code) throw new ResponseError(400, "Codigo de recuperación incorrecto");
 
             user.password = await hash_password(new_password);
-            user.recover_code = generate_recover_code({length: 6});
+            user.recover_code = generate_recover_code({ length: 6 });
             await user.save();
 
             return user;
-
-            // * TODO: Enviar correo de recuperación => recover_code
-        }
-        catch (err) {
-            if(err instanceof ResponseError) throw err;
+        } catch (err) {
+            if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al verificar el codigo de recuperación");
+        }
+    }
+
+    public async login_user({ email, password, pin }: { email?: string; password?: string; pin?: number }) {
+        try {
+            if (!email && !password && !pin) throw new ResponseError(400, "Se debe proporcionar un correo o una contraseña o un pin");
+
+            const user = await UserModel.findOne({ $or: [{ email }, { pin }] });
+            if (!user) throw new ResponseError(404, "Usuario no encontrado");
+
+            let used_password = password && !(await this.verify_hashed_password({ password, hashed_password: user.password }));
+            let used_pin = pin && user.pin !== pin;
+
+            if (used_password || used_pin) {
+                const access_token = await this.generate_access_token(
+                    { payload: 
+                        { 
+                            _id: user.id, 
+                            avatar: user.avatar || undefined, 
+                            role: user.role 
+                        } 
+                    }
+                );
+                return {
+                    access_token,
+                };
+            } else {
+                throw new ResponseError(400, "Correo o pin incorrecto");
+            }
+        } catch (err) {
+            if (err instanceof ResponseError) throw err;
+            throw new ResponseError(500, "Error al iniciar sesión");
         }
     }
 
     // PUT
 
-    public async update_user_profile({user_id, payload, avatar}: {user_id: string, payload: UserPayload, avatar?: Express.Multer.File}) {
+    public async update_user_profile({ user_id, payload, avatar }: { user_id: string; payload: UserPayload; avatar?: Express.Multer.File }) {
         try {
             const { name, email, identity, phone } = payload;
-            
-            const user = await this.get_user_by_id({id: user_id});
 
-            if(avatar) {
+            const user = await this.get_user_by_id({ id: user_id });
+
+            if (avatar) {
                 const old_public_id = user.avatar?.public_id;
-                if(old_public_id) {
-                    await delete_image({public_id: old_public_id});
+                if (old_public_id) {
+                    await delete_image({ public_id: old_public_id });
                 }
-                const new_image = await upload_image({image: avatar});
+                const new_image = await upload_image({ image: avatar });
                 user.avatar = {
                     url: new_image.url,
-                    public_id: new_image.public_id
+                    public_id: new_image.public_id,
                 };
             }
 
@@ -183,78 +218,182 @@ export class UserService {
             user.identity = identity;
             user.phone = phone;
 
-            if(!user) throw new ResponseError(404, "Usuario no encontrado");
-            
-            
+            await user.save();
+            return user;
         } catch (err) {
-            if(err instanceof ResponseError) throw err;
+            if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al actualizar el perfil del usuario");
         }
     }
 
-    
-
-    
-    
-    
-    
-    // private methods
-
-
-    private async verify_exist_email({email}: {email: string}) {  
+    public async change_password({ user_id, current_password, new_password }: { user_id: string; current_password: string; new_password: string }) {
         try {
-            const user = await UserModel.findOne({email});
-            
-            if(user) {
-                throw new ResponseError(400, "El correo ya pertenece a un usuario");
+            const user = await this.get_user_by_id({ id: user_id });
+
+            // Verificar contraseña actual
+            const is_valid_password = await this.verify_hashed_password({ 
+                password: current_password, 
+                hashed_password: user.password 
+            });
+
+            if (!is_valid_password) {
+                throw new ResponseError(400, "La contraseña actual es incorrecta");
             }
 
+            // Hashear nueva contraseña
+            const hashed_new_password = await hash_password(new_password);
+            user.password = hashed_new_password;
+            
+            // Generar nuevo código de recuperación por seguridad
+            user.recover_code = generate_recover_code({ length: 6 });
+            
+            await user.save();
+            return user;
         } catch (err) {
-            if(err instanceof ResponseError) throw err;
+            if (err instanceof ResponseError) throw err;
+            throw new ResponseError(500, "Error al cambiar la contraseña");
+        }
+    }
+
+    public async upload_profile_image({ user_id, image }: { user_id: string; image: Express.Multer.File }) {
+        try {
+            const user = await this.get_user_by_id({ id: user_id });
+
+            // Eliminar imagen anterior si existe
+            if (user.avatar?.public_id) {
+                await delete_image({ public_id: user.avatar.public_id });
+            }
+
+            // Subir nueva imagen
+            const new_image = await upload_image({ image });
+            user.avatar = {
+                url: new_image.url,
+                public_id: new_image.public_id,
+            };
+
+            await user.save();
+            return user;
+        } catch (err) {
+            if (err instanceof ResponseError) throw err;
+            throw new ResponseError(500, "Error al subir la imagen de perfil");
+        }
+    }
+
+    public async delete_profile_image({ user_id }: { user_id: string }) {
+        try {
+            const user = await this.get_user_by_id({ id: user_id });
+
+            if (!user.avatar?.public_id) {
+                throw new ResponseError(404, "El usuario no tiene imagen de perfil");
+            }
+
+            // Eliminar imagen de Cloudinary
+            await delete_image({ public_id: user.avatar.public_id });
+            
+            // Remover referencia de la base de datos
+            delete user.avatar;
+            await user.save();
+
+            return user;
+        } catch (err) {
+            if (err instanceof ResponseError) throw err;
+            throw new ResponseError(500, "Error al eliminar la imagen de perfil");
+        }
+    }
+
+    // DELETE
+
+    public async delete_user({ user_id }: { user_id: string }) {
+        try {
+            const user = await this.get_user_by_id({ id: user_id });
+
+            // Eliminar imagen de perfil si existe
+            if (user.avatar?.public_id) {
+                await delete_image({ public_id: user.avatar.public_id });
+            }
+
+            // Eliminar usuario de la base de datos
+            await user.deleteOne();
+        } catch (err) {
+            if (err instanceof ResponseError) throw err;
+            throw new ResponseError(500, "Error al eliminar el usuario");
+        }
+    }
+
+    // private methods
+
+    private async verify_exist_email({ email }: { email: string }) {
+        try {
+            const user = await UserModel.findOne({ email });
+
+            if (user) {
+                throw new ResponseError(400, "El correo ya pertenece a un usuario");
+            }
+        } catch (err) {
+            if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al verificar el correo");
         }
     }
 
-    private async verify_exist_phone({phone}: {phone: string}) {
+    private async verify_exist_phone({ phone }: { phone: string }) {
         try {
-            const user = await UserModel.findOne({phone});
-            if(user) {
+            const user = await UserModel.findOne({ phone });
+            if (user) {
                 throw new ResponseError(400, "El telefono ya pertenece a un usuario");
             }
         } catch (err) {
-            if(err instanceof ResponseError) throw err;
+            if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al verificar el telefono");
         }
     }
 
-    private async verify_exist_identity({identity}: {identity: UserIdentity}) {
+    private async verify_exist_identity({ identity }: { identity: UserIdentity }) {
         try {
-            const user = await UserModel.findOne({identity});
-            if(user) {
+            const user = await UserModel.findOne({ identity });
+            if (user) {
                 throw new ResponseError(400, "La identidad ya pertenece a un usuario");
             }
         } catch (err) {
-            if(err instanceof ResponseError) throw err;
+            if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al verificar la identidad");
         }
     }
 
-    private async verify_exist_pin({pin}: {pin: number}) {
+    private async verify_exist_pin({ pin }: { pin: number }) {
         try {
-            const user = await UserModel.findOne({pin});
-            if(user) {
+            const user = await UserModel.findOne({ pin });
+            if (user) {
                 return {
                     exist: true,
-                }
+                };
             } else {
                 return {
                     exist: false,
-                }
+                };
             }
-        }
-        catch (err) {
-            if(err instanceof ResponseError) throw err;
+        } catch (err) {
+            if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al verificar el pin");
+        }
+    }
+
+    private async verify_hashed_password({ password, hashed_password }: { password: string; hashed_password: string }) {
+        try {
+            const is_valid = await bcrypt.compare(password, hashed_password);
+            return is_valid;
+        } catch (err) {
+            if (err instanceof ResponseError) throw err;
+            throw new ResponseError(500, "Error al verificar la contraseña");
+        }
+    }
+
+    private async generate_access_token({ payload }: { payload: UserTokenPayload }) {
+        try {
+            const token = jwt.sign(payload, GLOBAL_ENV.JWT_SECTRET, { expiresIn: "7d" });
+            return token;
+        } catch (err) {
+            if (err instanceof ResponseError) throw err;
+            throw new ResponseError(500, "Error al generar el token de acceso");
         }
     }
 }
