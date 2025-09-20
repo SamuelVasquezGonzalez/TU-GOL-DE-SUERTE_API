@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "nodemon && copy-emails",
     "copy-emails": "node -e \"const fs = require('fs'); fs.cpSync('src/emails/html', 'dist/emails', { recursive: true });\"",
-    "build": "tsc",
+    "build": "tsc & copy-emails",
     "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
