@@ -51,15 +51,17 @@ export class UserService {
     }
     // POST
 
-    public async create_new_user({ name, email, identity, phone, role, pin }: UserPayload) {
+    public async create_new_user({ name, email, identity, phone, role, pin, password }: UserPayload) {
         try {
+            if (!password && (role === "admin" || role === "staff")) throw new ResponseError(400, "La contraseña es requerida para administradores y staff");
+
             await this.verify_exist_email({ email });
             await this.verify_exist_phone({ phone });
             await this.verify_exist_identity({ identity });
 
             const recover_code = generate_recover_code({ length: 6 });
-            const plane_password = generate_random_password({ length: 8 });
-            const hashed_password = await hash_password(plane_password);
+            const plane_password = (role === "admin" || role === "staff") ? generate_random_password({ length: 8 }) : password || "";
+            const hashed_password = await hash_password(plane_password || "");
 
             let pin_generated = generate_recover_code({ length: 6 });
             let result_pin = await this.verify_exist_pin({ pin: pin_generated });
@@ -168,7 +170,7 @@ export class UserService {
             const user = await UserModel.findOne({ $or: [{ email }, { pin }] });
             if (!user) throw new ResponseError(404, "Usuario no encontrado");
 
-            let used_password = password && !(await this.verify_hashed_password({ password, hashed_password: user.password }));
+            let used_password = password && (await this.verify_hashed_password({ password, hashed_password: user.password }));
             let used_pin = pin && user.pin !== pin;
 
             if (used_password || used_pin) {
