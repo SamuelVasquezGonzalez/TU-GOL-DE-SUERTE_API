@@ -77,7 +77,7 @@ export class UserService {
                 email,
                 identity,
                 phone,
-                role,
+                role: !role ? "customer" : role,
                 recover_code,
                 password: hashed_password,
                 pin: pin ? pin_generated : null,

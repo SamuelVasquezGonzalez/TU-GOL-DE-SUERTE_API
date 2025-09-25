@@ -5,13 +5,13 @@ import { GLOBAL_ENV } from "@/shared/contants";
 import { RequestUser } from "@/contracts/types/global.type";
 import { UserTokenPayload } from "@/contracts/types/user.type";
 
-export const admin_auth = (req: Request, res: Response, next: NextFunction) => {
+export const staff_auth = (req: Request, res: Response, next: NextFunction) => {
     try {
         const token = req.headers["authorization"];
         if(!token) throw new ResponseError(401, "No se proporcionó un token");
         const decoded = jwt.verify(token, GLOBAL_ENV.JWT_SECTRET) as UserTokenPayload;
 
-        if(decoded.role !== "admin" && decoded.role !== "staff" && decoded.role !== "customer") throw new ResponseError(401, "El usuario no es un administrador");
+        if(decoded.role !== "staff") throw new ResponseError(401, "El usuario no es un staff");
         (req as RequestUser).user = decoded;
         next();
     } catch (error) {

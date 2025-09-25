@@ -3,6 +3,7 @@ import { UserController } from "@/controllers/user.controller";
 import { admin_auth } from "@/auth/admin.auth";
 import { customer_auth } from "@/auth/customer.auth";
 import { upload_files } from "@/middlewares/upload_files";
+import { staff_auth } from "@/auth/staff.auth";
 
 const router = Router();
 const user_controller = new UserController();
@@ -16,6 +17,7 @@ router.get("/:id", user_controller.get_user_by_id); // Admin solo
 
 // Rutas autenticadas
 router.get("/profile/me", customer_auth, user_controller.get_user_profile);
+router.get("/staff/profile/me", staff_auth, user_controller.get_user_profile);
 
 // ==================== POST ROUTES ====================
 

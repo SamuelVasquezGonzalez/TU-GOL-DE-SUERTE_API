@@ -7,7 +7,7 @@ import { UserTokenPayload } from "@/contracts/types/user.type";
 
 export const customer_auth = (req: Request, res: Response, next: NextFunction) => {
     try {
-        const token = req.headers.authorization?.split(" ")[1];
+        const token = req.headers["authorization"];
         if(!token) throw new ResponseError(401, "No se proporcionó un token");
         const decoded = jwt.verify(token, GLOBAL_ENV.JWT_SECTRET) as UserTokenPayload;
 
