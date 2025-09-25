@@ -104,6 +104,7 @@ export class UserService {
                 });
             }
         } catch (err) {
+            console.log(err);
             if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al crear el administrador");
         }

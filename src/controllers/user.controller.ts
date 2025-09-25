@@ -104,6 +104,7 @@ export class UserController {
                 data: new_user
             });
         } catch (err) {
+            console.log(err);
             const error = err instanceof ResponseError ? err : new ResponseError(500, "Error al crear usuario");
             res.status(error.statusCode).json({
                 success: false,
