@@ -12,9 +12,12 @@ export const upload_image = async ({image}: {image: Express.Multer.File}): Promi
     try {
         if(!image) throw new ResponseError(400, "No se proporcionó una imagen");
 
-        const buffer = Buffer.from(image.buffer);   
-        const base64 = buffer.toString('base64');
-        const result = await cloudinary.uploader.upload(base64, {
+        const {buffer, mimetype} = image;
+
+        const base64_image = buffer.toString("base64");
+        const base64_image_url = `data:${mimetype};base64,${base64_image}`;
+
+        const result = await cloudinary.uploader.upload(base64_image_url, {
             transformation: [
                 {width: 150, height: 150, crop: "fit"},
                 {quality: 80},

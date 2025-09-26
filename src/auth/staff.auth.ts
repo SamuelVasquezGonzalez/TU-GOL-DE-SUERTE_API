@@ -11,7 +11,7 @@ export const staff_auth = (req: Request, res: Response, next: NextFunction) => {
         if(!token) throw new ResponseError(401, "No se proporcionó un token");
         const decoded = jwt.verify(token, GLOBAL_ENV.JWT_SECTRET) as UserTokenPayload;
 
-        if(decoded.role !== "staff") throw new ResponseError(401, "El usuario no es un staff");
+        if(decoded.role !== "admin" && decoded.role !== "staff") throw new ResponseError(401, "El usuario no es un staff");
         (req as RequestUser).user = decoded;
         next();
     } catch (error) {

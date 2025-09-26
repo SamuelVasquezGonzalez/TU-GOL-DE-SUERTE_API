@@ -5,6 +5,7 @@ import { UserService } from "./user.service";
 import { CurvaEntity } from "@/contracts/types/soccer_games.type";
 import { TicketStatus } from "@/contracts/types/ticket.type";
 import { send_ticket_purchase_email, send_ticket_status_update_email } from "@/emails/email-main";
+import dayjs from "dayjs";
 
 export class TicketService {
     // methods
@@ -39,8 +40,10 @@ export class TicketService {
 
     public async get_tickets_by_game_id({game_id}: {game_id: string}) {
         try {
-            const tickets = await TicketModel.find({soccer_game_id: game_id}).lean();
-            if(!tickets) throw new ResponseError(404, "No se encontraron boletas");
+            console.log(game_id);
+            const tickets = await TicketModel.find().where({soccer_game_id: game_id}).lean();
+            console.log(tickets);
+            if(tickets.length === 0) throw new ResponseError(404, "No se encontraron boletas");
             return tickets;
         } catch (err) {
             if(err instanceof ResponseError) throw err;
@@ -160,9 +163,9 @@ export class TicketService {
                 user_email: customer_info.email,
                 ticket_number: ticket_number,
                 game_info: {
-                    team1: "Equipo Local", // Este valor debería venir de la información real del juego
-                    team2: "Equipo Visitante", // Este valor debería venir de la información real del juego
-                    date: game_info.start_date.toLocaleDateString('es-ES'),
+                    team1: game_info.soccer_teams[0],
+                    team2: game_info.soccer_teams[1],
+                    date: dayjs(game_info.start_date).format("DD/MM/YYYY hh:mm A"),
                     tournament: game_info.tournament
                 },
                 results_purchased: selected_results,
@@ -180,9 +183,11 @@ export class TicketService {
         try {
             const ticket = await TicketModel.findById(ticket_id);
             if(!ticket) throw new ResponseError(404, "No se encontró la boleta");
+            if(ticket.close) throw new ResponseError(404, "La boleta ya está cerrada");
             
             const old_status = ticket.status;
             ticket.status = status;
+            ticket.close = true;
             await ticket.save();
 
             // Obtener información del usuario y del juego para el email
@@ -200,9 +205,9 @@ export class TicketService {
                 old_status: old_status,
                 new_status: status,
                 game_info: {
-                    team1: "Equipo Local", // Este valor debería venir de la información real del juego
-                    team2: "Equipo Visitante", // Este valor debería venir de la información real del juego
-                    date: game_info.start_date.toLocaleDateString('es-ES')
+                    team1: game_info.soccer_teams[0],
+                    team2: game_info.soccer_teams[1],
+                    date: dayjs(game_info.start_date).format("DD/MM/YYYY hh:mm A")
                 }
             });
         } catch (err) {

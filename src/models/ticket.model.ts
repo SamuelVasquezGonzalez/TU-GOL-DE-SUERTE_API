@@ -10,6 +10,7 @@ const TicketSchema = new Schema<ITicket>({
     status: { type: String, required: true, enum: ["pending", "won", "lost"] },
     curva_id: { type: String, required: true },
     created_date: { type: Date, required: true },
+    close: { type: Boolean, required: true, default: false }
 });
 
 export const TicketModel = model<ITicket>("Ticket", TicketSchema);

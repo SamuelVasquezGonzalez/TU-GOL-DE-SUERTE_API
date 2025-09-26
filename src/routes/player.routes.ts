@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { PlayerController } from "@/controllers/player.controller";
-import { admin_auth } from "@/auth/admin.auth";
+import { staff_auth } from "@/auth/staff.auth";
 
 const router = Router();
 const player_controller = new PlayerController();
@@ -16,17 +16,17 @@ router.get("/:id", player_controller.get_player_by_id);
 // ==================== POST ROUTES ====================
 
 // Rutas admin
-router.post("/", admin_auth, player_controller.create_player);
+router.post("/", staff_auth, player_controller.create_player);
 
 // ==================== PUT ROUTES ====================
 
 // Rutas admin
-router.put("/:id", admin_auth, player_controller.update_player);
+router.put("/:id", staff_auth, player_controller.update_player);
 
 // ==================== DELETE ROUTES ====================
 
 // Rutas admin
-router.delete("/:id", admin_auth, player_controller.delete_player);
-router.delete("/team/:team_id", admin_auth, player_controller.delete_players_by_team);
+router.delete("/:id", staff_auth, player_controller.delete_player);
+router.delete("/team/:team_id", staff_auth, player_controller.delete_players_by_team);
 
 export { router as playerRoutes };

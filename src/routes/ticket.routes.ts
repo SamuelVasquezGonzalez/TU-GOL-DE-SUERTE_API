@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { TicketController } from "@/controllers/ticket.controller";
-import { admin_auth } from "@/auth/admin.auth";
 import { customer_auth } from "@/auth/customer.auth";
+import { staff_auth } from "@/auth/staff.auth";
 
 const router = Router();
 const ticket_controller = new TicketController();
@@ -14,10 +14,10 @@ router.get("/my-tickets", customer_auth, ticket_controller.get_my_tickets);
 router.get("/:id", customer_auth, ticket_controller.get_ticket_by_id);
 
 // Rutas admin
-router.get("/", admin_auth, ticket_controller.get_all_tickets);
-router.get("/user/:user_id", admin_auth, ticket_controller.get_tickets_by_user);
-router.get("/game/:game_id", admin_auth, ticket_controller.get_tickets_by_game);
-router.get("/curva/:curva_id", admin_auth, ticket_controller.get_tickets_by_curva);
+router.get("/", staff_auth, ticket_controller.get_all_tickets);
+router.get("/user/:user_id", staff_auth, ticket_controller.get_tickets_by_user);
+router.get("/game/:game_id", staff_auth, ticket_controller.get_tickets_by_game);
+router.get("/curva/:curva_id", staff_auth, ticket_controller.get_tickets_by_curva);
 
 // ==================== POST ROUTES ====================
 
@@ -25,12 +25,12 @@ router.get("/curva/:curva_id", admin_auth, ticket_controller.get_tickets_by_curv
 router.post("/", customer_auth, ticket_controller.create_ticket);
 
 // Rutas admin
-router.post("/admin", admin_auth, ticket_controller.create_ticket_admin);
+router.post("/admin", staff_auth, ticket_controller.create_ticket_admin);
 
 // ==================== PUT ROUTES ====================
 
 // Rutas admin
-router.put("/:id/status", admin_auth, ticket_controller.change_ticket_status);
+router.put("/:id/status", staff_auth, ticket_controller.change_ticket_status);
 
 // ==================== DELETE ROUTES ====================
 

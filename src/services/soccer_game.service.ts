@@ -17,6 +17,20 @@ export class SoccerGameService {
         try {
             const soccer_games = await SoccerGameModel.find().sort({created_date: -1}).lean();
             if(!soccer_games) throw new ResponseError(404, "No se encontraron partidos de futbol");
+
+            const soccer_teams_service = new SoccerTeamsService();
+            const soccer_teams = await soccer_teams_service.get_all_soccer_teams();
+
+            for(const soccer_game of soccer_games) {
+                const soccer_team = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[0]);
+                if(soccer_team) {
+                    soccer_game.soccer_teams[0] = soccer_team.name;
+                }
+                const soccer_team_two = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[1]);
+                if(soccer_team_two) {
+                    soccer_game.soccer_teams[1] = soccer_team_two.name;
+                }
+            }
             return soccer_games;
         } catch (err) {
             if(err instanceof ResponseError) throw err;
@@ -26,8 +40,20 @@ export class SoccerGameService {
 
     public async get_soccer_game_by_id({id}: {id: string}) {
         try {
-            const soccer_game = await SoccerGameModel.findById(id).lean();
+            const soccer_game = await SoccerGameModel.findById(id);
             if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
+
+            const soccer_teams_service = new SoccerTeamsService();
+            const soccer_teams = await soccer_teams_service.get_all_soccer_teams();
+
+            const soccer_team = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[0]);
+            if(soccer_team) {
+                soccer_game.soccer_teams[0] = soccer_team.name;
+            }
+            const soccer_team_two = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[1]);
+            if(soccer_team_two) {
+                soccer_game.soccer_teams[1] = soccer_team_two.name;
+            }
             return soccer_game;
         }
         catch (err) {
@@ -40,6 +66,18 @@ export class SoccerGameService {
         try {
             const soccer_game = await SoccerGameModel.findOne({tournament}).lean();
             if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
+
+            const soccer_teams_service = new SoccerTeamsService();
+            const soccer_teams = await soccer_teams_service.get_all_soccer_teams();
+
+            const soccer_team = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[0]);
+            if(soccer_team) {
+                soccer_game.soccer_teams[0] = soccer_team.name;
+            }
+            const soccer_team_two = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[1]);
+            if(soccer_team_two) {
+                soccer_game.soccer_teams[1] = soccer_team_two.name;
+            }
             return soccer_game;
         } catch (err) {
             if(err instanceof ResponseError) throw err;
@@ -107,6 +145,7 @@ export class SoccerGameService {
             const curva = await this.generate_curva()
 
             await SoccerGameModel.create({
+                created_date: new Date(),
                 soccer_teams,
                 start_date,
                 end_time,
@@ -161,7 +200,7 @@ export class SoccerGameService {
     public async update_curva_results({game_id, curva_id, curva_updated}: {game_id: string, curva_id: string, curva_updated: CurvaEntity}) {
         try {
             // Obtener el documento del juego sin .lean() para poder guardarlo
-            const game = await SoccerGameModel.findById(game_id);
+            const game = await this.get_soccer_game_by_id({id: game_id});
             if(!game) throw new ResponseError(404, "No se encontró el partido de futbol");
 
             // Buscar la curva en el juego
@@ -178,6 +217,7 @@ export class SoccerGameService {
 
         }
         catch (err) {
+            console.log(err);
             if(err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al actualizar los resultados de la curva");
         }
@@ -198,6 +238,7 @@ export class SoccerGameService {
             await soccer_game.save();
         }
         catch (err) {
+            console.log(err);
             if(err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al finalizar el partido de futbol");
         }
@@ -211,6 +252,7 @@ export class SoccerGameService {
             await soccer_game.save();
         }
         catch (err) {
+            console.log(err);
             if(err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al actualizar el partido de futbol");
         }
@@ -282,11 +324,13 @@ export class SoccerGameService {
         try {
             if(!game) throw new ResponseError(404, "No se proporcionó el partido de futbol");
 
+            if(game.status === "finished") throw new ResponseError(404, "El partido ya ha finalizado");
+
             const score = game.score
             const parsed_score = `${score[0]}.${score[1]}`
 
             const tickets_service = new TicketService();
-            const tickets = await tickets_service.get_tickets_by_game_id({game_id: game.id});
+            const tickets = await tickets_service.get_tickets_by_game_id({game_id: (game as any)?._id.toString()});
 
             let winners: ITicket[] = [];
             let losers: ITicket[] = [];
@@ -297,12 +341,16 @@ export class SoccerGameService {
                 if(result) {
                     ticket.status = "won";
                     winners.push(ticket);
-                    await tickets_service.change_ticket_status({ticket_id: ticket.id, status: "won"});
+                    await tickets_service.change_ticket_status({ticket_id: ticket._id.toString(), status: "won"});
                 } else {
                     ticket.status = "lost";
                     losers.push(ticket);
-                    await tickets_service.change_ticket_status({ticket_id: ticket.id, status: "lost"});
+                    await tickets_service.change_ticket_status({ticket_id: ticket._id.toString(), status: "lost"});
                 }
+            }
+
+            if(winners.length === 0 && losers.length === 0) {
+                console.log("GANA LA CASA")
             }
 
 

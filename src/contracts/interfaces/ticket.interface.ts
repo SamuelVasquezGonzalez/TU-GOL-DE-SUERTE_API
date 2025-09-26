@@ -11,4 +11,5 @@ export interface ITicket extends Document {
     curva_id: string // id de la curva donde se compraron los resultado
 
     created_date: Date // fecha y hora de creacion de la boleta
+    close: boolean
 }

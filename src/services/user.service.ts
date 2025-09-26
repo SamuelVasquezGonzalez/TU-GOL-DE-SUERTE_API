@@ -63,14 +63,6 @@ export class UserService {
             const plane_password = (role === "admin" || role === "staff") ? generate_random_password({ length: 8 }) : password || "";
             const hashed_password = await hash_password(plane_password || "");
 
-            let pin_generated = generate_recover_code({ length: 6 });
-            let result_pin = await this.verify_exist_pin({ pin: pin_generated });
-
-            // Seguir generando PINs hasta encontrar uno que no esté en uso
-            while (result_pin.exist) {
-                pin_generated = generate_recover_code({ length: 6 });
-                result_pin = await this.verify_exist_pin({ pin: pin_generated });
-            }
 
             await UserModel.create({
                 name,
@@ -80,7 +72,7 @@ export class UserService {
                 role: !role ? "customer" : role,
                 recover_code,
                 password: hashed_password,
-                pin: pin ? pin_generated : null,
+                pin: null,
             });
 
             // Enviar correo de bienvenida según el rol
@@ -104,7 +96,6 @@ export class UserService {
                 });
             }
         } catch (err) {
-            console.log(err);
             if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al crear el administrador");
         }
@@ -362,23 +353,23 @@ export class UserService {
         }
     }
 
-    private async verify_exist_pin({ pin }: { pin: number }) {
-        try {
-            const user = await UserModel.findOne({ pin });
-            if (user) {
-                return {
-                    exist: true,
-                };
-            } else {
-                return {
-                    exist: false,
-                };
-            }
-        } catch (err) {
-            if (err instanceof ResponseError) throw err;
-            throw new ResponseError(500, "Error al verificar el pin");
-        }
-    }
+    // private async verify_exist_pin({ pin }: { pin: number }) {
+    //     try {
+    //         const user = await UserModel.findOne({ pin });
+    //         if (user) {
+    //             return {
+    //                 exist: true,
+    //             };
+    //         } else {
+    //             return {
+    //                 exist: false,
+    //             };
+    //         }
+    //     } catch (err) {
+    //         if (err instanceof ResponseError) throw err;
+    //         throw new ResponseError(500, "Error al verificar el pin");
+    //     }
+    // }
 
     private async verify_hashed_password({ password, hashed_password }: { password: string; hashed_password: string }) {
         try {
