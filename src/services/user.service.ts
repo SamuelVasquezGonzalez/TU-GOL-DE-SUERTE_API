@@ -51,7 +51,7 @@ export class UserService {
     }
     // POST
 
-    public async create_new_user({ name, email, identity, phone, role, pin, password }: UserPayload) {
+    public async create_new_user({ name, email, identity, phone, role, password }: UserPayload) {
         try {
             if (!password && (role === "admin" || role === "staff")) throw new ResponseError(400, "La contraseña es requerida para administradores y staff");
 
@@ -72,7 +72,6 @@ export class UserService {
                 role: !role ? "customer" : role,
                 recover_code,
                 password: hashed_password,
-                pin: null,
             });
 
             // Enviar correo de bienvenida según el rol
@@ -96,6 +95,7 @@ export class UserService {
                 });
             }
         } catch (err) {
+            console.log(err);
             if (err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al crear el administrador");
         }
@@ -155,17 +155,16 @@ export class UserService {
         }
     }
 
-    public async login_user({ email, password, pin }: { email?: string; password?: string; pin?: number }) {
+    public async login_user({ email, password }: { email: string; password: string }) {
         try {
-            if (!email && !password && !pin) throw new ResponseError(400, "Se debe proporcionar un correo o una contraseña o un pin");
+            if (!email || !password) throw new ResponseError(400, "Se debe proporcionar un correo y una contraseña");
 
-            const user = await UserModel.findOne({ $or: [{ email }, { pin }] });
+            const user = await UserModel.findOne({ email });
             if (!user) throw new ResponseError(404, "Usuario no encontrado");
 
-            let used_password = password && (await this.verify_hashed_password({ password, hashed_password: user.password }));
-            let used_pin = pin && user.pin !== pin;
+            const is_valid_password = await this.verify_hashed_password({ password, hashed_password: user.password });
 
-            if (used_password || used_pin) {
+            if (is_valid_password) {
                 const access_token = await this.generate_access_token(
                     { payload: 
                         { 
@@ -179,7 +178,7 @@ export class UserService {
                     access_token,
                 };
             } else {
-                throw new ResponseError(400, "Correo o pin incorrecto");
+                throw new ResponseError(400, "Correo o contraseña incorrecto");
             }
         } catch (err) {
             if (err instanceof ResponseError) throw err;
@@ -353,23 +352,6 @@ export class UserService {
         }
     }
 
-    // private async verify_exist_pin({ pin }: { pin: number }) {
-    //     try {
-    //         const user = await UserModel.findOne({ pin });
-    //         if (user) {
-    //             return {
-    //                 exist: true,
-    //             };
-    //         } else {
-    //             return {
-    //                 exist: false,
-    //             };
-    //         }
-    //     } catch (err) {
-    //         if (err instanceof ResponseError) throw err;
-    //         throw new ResponseError(500, "Error al verificar el pin");
-    //     }
-    // }
 
     private async verify_hashed_password({ password, hashed_password }: { password: string; hashed_password: string }) {
         try {

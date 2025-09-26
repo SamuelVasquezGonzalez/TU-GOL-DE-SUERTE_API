@@ -10,7 +10,6 @@ const UserSchema = new Schema<IUser>({
     recover_code: {type: Number, required: true},
     created_at: {type: Date, default: new Date()},
     role: {type: String, required: true, enum: ["admin", "customer", "staff"]},
-    pin: {type: Number, required: false, default: null, unique: true},
     avatar: {type: mongoose.Schema.Types.Mixed, required: false, default: null},
 })
 

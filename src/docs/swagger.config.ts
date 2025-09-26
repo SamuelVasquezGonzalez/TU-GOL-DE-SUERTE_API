@@ -78,10 +78,6 @@ const swaggerDefinition = {
             enum: ['admin', 'customer'],
             description: 'Rol del usuario',
           },
-          pin: {
-            type: 'number',
-            description: 'PIN único del usuario (opcional)',
-          },
           recover_code: {
             type: 'number',
             description: 'Código de recuperación',

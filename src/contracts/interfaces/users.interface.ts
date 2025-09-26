@@ -12,7 +12,6 @@ export interface IUser extends Document {
     recover_code: number;
     
     role: UserRole
-    pin?: number;
     
     created_at: Date;
 
@@ -27,6 +26,5 @@ export interface UserPayload {
     phone: string;
     role: UserRole;
     password?: string;
-    pin?: boolean;
     avatar?: Express.Multer.File;
 }
