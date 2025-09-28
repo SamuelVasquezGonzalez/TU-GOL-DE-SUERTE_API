@@ -201,7 +201,7 @@ export class TicketController {
         try {
             const { game_id, customer_id, curva_id, quantity, ticket_price, user } = req.body;
 
-            if (!game_id || !customer_id || !curva_id || !quantity || !ticket_price) {
+            if (!game_id || (!customer_id && !user) || !curva_id || !quantity || !ticket_price) {
                 throw new ResponseError(400, "Todos los campos son requeridos");
             }
 
