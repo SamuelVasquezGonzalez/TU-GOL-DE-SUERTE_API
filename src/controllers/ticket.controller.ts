@@ -199,7 +199,7 @@ export class TicketController {
 
     public create_ticket_admin = async (req: Request, res: Response) => {
         try {
-            const { game_id, customer_id, curva_id, quantity, ticket_price } = req.body;
+            const { game_id, customer_id, curva_id, quantity, ticket_price, user } = req.body;
 
             if (!game_id || !customer_id || !curva_id || !quantity || !ticket_price) {
                 throw new ResponseError(400, "Todos los campos son requeridos");
@@ -211,6 +211,7 @@ export class TicketController {
                 curva_id,
                 quantity,
                 ticket_price,
+                user,
             });
 
             res.status(201).json({

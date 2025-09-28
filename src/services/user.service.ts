@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { UserPayload } from "@/contracts/interfaces/users.interface";
+import { IUser, UserPayload } from "@/contracts/interfaces/users.interface";
 import { UserIdentity, UserRole, UserTokenPayload } from "@/contracts/types/user.type";
 import { UserModel } from "@/models/user.model";
 import { delete_image, upload_image } from "@/utils/cloudinary.util";
@@ -7,7 +7,7 @@ import { ResponseError } from "@/utils/errors.util";
 import { generate_random_password, generate_recover_code, hash_password } from "@/utils/generate.util";
 import { GLOBAL_ENV } from "@/shared/contants";
 import jwt from "jsonwebtoken";
-import { send_welcome_email, send_welcome_admin_email, send_welcome_staff_email, send_recovery_email } from "@/emails/email-main";
+import { send_welcome_admin_email, send_welcome_staff_email, send_recovery_email } from "@/emails/email-main";
 
 export class UserService {
     // methods
@@ -55,20 +55,25 @@ export class UserService {
         try {
             if (!password && (role === "admin" || role === "staff")) throw new ResponseError(400, "La contraseña es requerida para administradores y staff");
 
+            if(role !== "customer") {
+                await this.verify_exist_phone({ phone });
+                await this.verify_exist_identity({ identity });
+            }
             await this.verify_exist_email({ email });
-            await this.verify_exist_phone({ phone });
-            await this.verify_exist_identity({ identity });
 
             const recover_code = generate_recover_code({ length: 6 });
             const plane_password = (role === "admin" || role === "staff") ? generate_random_password({ length: 8 }) : password || "";
             const hashed_password = await hash_password(plane_password || "");
 
 
-            await UserModel.create({
+            const user = await UserModel.create({
                 name,
                 email,
-                identity,
-                phone,
+                identity: {
+                    type_document: "CC",
+                    number_document: `${generate_random_password({ length: 10 })}`,
+                },
+                phone : role === "customer" ? generate_recover_code({ length: 10 }) : phone,
                 role: !role ? "customer" : role,
                 recover_code,
                 password: hashed_password,
@@ -87,13 +92,9 @@ export class UserService {
                     staff_email: email,
                     temp_staff_pssw: plane_password
                 });
-            } else {
-                await send_welcome_email({
-                    name: name,
-                    email: email,
-                    temp_pssw: plane_password
-                });
             }
+
+            return user.toObject() as IUser;
         } catch (err) {
             console.log(err);
             if (err instanceof ResponseError) throw err;

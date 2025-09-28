@@ -91,20 +91,50 @@ export class TicketService {
         customer_id,
         curva_id,
         quantity,
-        ticket_price
+        ticket_price,
+        user
     }: {
         game_id: string,
-        customer_id: string,
+        customer_id?: string,
         curva_id?: string,
         quantity: number,
-        ticket_price: number
+        ticket_price: number,
+        user?: {
+            name: string,
+            email: string,
+        }
     }) {
         try {
             const game_service = new SoccerGameService();
             const game_info = await game_service.get_soccer_game_by_id({id: game_id});
 
+            if(!user && !customer_id) throw new ResponseError(400, "El usuario es requerido");
+
             const user_service = new UserService();
-            const customer_info = await user_service.get_user_by_id({id: customer_id});
+            let customer_info;
+
+            if(customer_id) {
+                customer_info = await user_service.get_user_by_id({id: customer_id});
+            } else {
+                let try_find = await user_service.get_users_by_param({param: user?.email || ""});
+                if(try_find.length > 0) {
+                    customer_info = try_find[0];
+                } else {
+                    customer_info = await user_service.create_new_user({
+                        name: user?.name || "", 
+                        identity: {
+                            type_document: "CC",
+                            number_document: "W"
+                        },
+                        phone: "1",
+                        role: "customer",
+                        email: user?.email || "",
+                        password: "1",
+
+                    });
+                }
+                
+            }
 
             let curva_info: CurvaEntity | null = null;
 

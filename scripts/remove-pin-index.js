@@ -80,3 +80,5 @@ async function removePinIndex() {
 
 // Ejecutar el script
 removePinIndex().catch(console.error);
+
+

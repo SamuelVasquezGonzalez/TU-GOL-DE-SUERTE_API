@@ -90,20 +90,25 @@ const update_game_score_event = (socket: Socket) => {
 const create_ticket_event = (socket: Socket) => {
     socket.on(GAME_EVENTS.CREATE_TICKET, async (data: {
         game_id: string,
-        customer_id: string,
+        customer_id?: string,
         curva_id: string,
         quantity: number,
-        ticket_price: number
+        ticket_price: number,
+        user?: {
+            name: string,
+            email: string,
+        }
     }) => {
         try {
-            const { game_id, customer_id, curva_id, quantity, ticket_price } = data;
+            const { game_id, customer_id, curva_id, quantity, ticket_price, user } = data;
             const ticket_service = new TicketService();
             const new_ticket = await ticket_service.create_new_ticket({
                 game_id, 
                 customer_id, 
                 curva_id, 
                 quantity, 
-                ticket_price
+                ticket_price,
+                user
             });
             
             // Respuesta al cliente específico
