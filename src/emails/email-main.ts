@@ -94,7 +94,7 @@ const send_welcome_email = async ({ name, email, temp_pssw }: SendEmailProps) =>
             .replace(/{{temp_user_pssw}}/g, temp_pssw || "")
 
             const response = await resend.emails.send({
-                from: "Bienvenido <onboarding@resend.dev>",
+                from: "Bienvenido <partidos@tugoldesuerte.com>",
                 to: email,
                 subject: "Bienvenido a TU-GOL-DE-SUERTE",
                 html: replaced_content,
@@ -119,7 +119,7 @@ const send_welcome_admin_email = async ({ admin_name, admin_email, temp_admin_ps
             .replace(/{{temp_admin_pssw}}/g, temp_admin_pssw)
 
             const response = await resend.emails.send({
-                from: "Administración <onboarding@resend.dev>",
+                from: "Administración <partidos@tugoldesuerte.com>",
                 to: admin_email,
                 subject: "Bienvenido Administrador - TU-GOL-DE-SUERTE",
                 html: replaced_content,
@@ -144,7 +144,7 @@ const send_welcome_staff_email = async ({ staff_name, staff_email, temp_staff_ps
             .replace(/{{temp_staff_pssw}}/g, temp_staff_pssw)
 
             const response = await resend.emails.send({
-                from: "Staff <onboarding@resend.dev>",
+                from: "Staff <partidos@tugoldesuerte.com>",
                 to: staff_email,
                 subject: "Bienvenido al Staff - TU-GOL-DE-SUERTE",
                 html: replaced_content,
@@ -169,7 +169,7 @@ const send_recovery_email = async ({ user_name, user_email, recover_code }: Send
             .replace(/{{recover_code}}/g, recover_code.toString())
 
             const response = await resend.emails.send({
-                from: "Soporte <onboarding@resend.dev>",
+                from: "Soporte <partidos@tugoldesuerte.com>",
                 to: user_email,
                 subject: "Recuperación de Contraseña - TU-GOL-DE-SUERTE",
                 html: replaced_content,
@@ -207,7 +207,7 @@ const send_ticket_purchase_email = async ({
             .replace(/{{total_amount}}/g, total_amount.toString())
 
             const response = await resend.emails.send({
-                from: "Compras <onboarding@resend.dev>",
+                from: "Compras <partidos@tugoldesuerte.com>",
                 to: user_email,
                 subject: "Confirmación de Compra de Boleta - TU-GOL-DE-SUERTE",
                 html: replaced_content,
@@ -240,7 +240,7 @@ const send_event_confirmation_email = async ({
             .replace(/{{tournament}}/g, event_info.tournament)
 
             const response = await resend.emails.send({
-                from: "Eventos <onboarding@resend.dev>",
+                from: "Eventos <partidos@tugoldesuerte.com>",
                 to: admin_email,
                 subject: "Confirmación de Evento - TU-GOL-DE-SUERTE",
                 html: replaced_content,
@@ -279,7 +279,7 @@ const send_result_notification_email = async ({
             .replace(/{{prize_amount}}/g, prize_amount ? prize_amount.toString() : "0")
 
             const response = await resend.emails.send({
-                from: "Resultados <onboarding@resend.dev>",
+                from: "Resultados <partidos@tugoldesuerte.com>",
                 to: user_email,
                 subject: is_winner ? "¡FELICIDADES! Has ganado - TU-GOL-DE-SUERTE" : "Resultado de tu Apuesta - TU-GOL-DE-SUERTE",
                 html: replaced_content,
@@ -316,7 +316,7 @@ const send_ticket_status_update_email = async ({
             .replace(/{{game_date}}/g, game_info.date)
 
             const response = await resend.emails.send({
-                from: "Estado Boletas <onboarding@resend.dev>",
+                from: "Estado Boletas <partidos@tugoldesuerte.com>",
                 to: user_email,
                 subject: "Estado de Boleta Actualizado - TU-GOL-DE-SUERTE",
                 html: replaced_content,
