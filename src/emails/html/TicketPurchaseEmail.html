@@ -323,7 +323,7 @@
                             color: #a78bfa;
                             text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
                           "
-                          >Peche</strong
+                          >{{user_name}}</strong
                         >! Tu ticket ha sido comprado exitosamente
                       </p>
                     </td>
@@ -433,7 +433,7 @@
                                           font-weight: 700;
                                         "
                                       >
-                                        #TGS-2024-001234
+                                        {{ticket_number}}
                                       </td>
                                     </tr>
                                   </table>
@@ -471,7 +471,7 @@
                                           font-weight: 700;
                                         "
                                       >
-                                        15 de Diciembre, 2024
+                                        {{game_date}}
                                       </td>
                                     </tr>
                                   </table>
@@ -603,7 +603,7 @@
                                       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
                                     "
                                   >
-                                    Real Madrid vs Barcelona
+                                    {{team1}} vs {{team2}}
                                   </h4>
                                   <p
                                     style="
@@ -613,7 +613,7 @@
                                       font-weight: 500;
                                     "
                                   >
-                                    Liga Española - Jornada 15
+                                    {{tournament}}
                                   </p>
                                 </td>
                               </tr>
@@ -640,7 +640,7 @@
                                               rgba(0, 0, 0, 0.3);
                                           "
                                         >
-                                          Real Madrid
+                                          {{team1}}
                                         </p>
                                         <p
                                           style="
@@ -706,7 +706,7 @@
                                               rgba(0, 0, 0, 0.3);
                                           "
                                         >
-                                          Barcelona
+                                          {{team2}}
                                         </p>
                                         <p
                                           style="
@@ -809,139 +809,19 @@
                               width="100%"
                             >
                               <tr>
-                                <td
-                                  style="
-                                    padding: 20px 0;
-                                    border-bottom: 1px solid #475569;
-                                  "
-                                >
-                                  <table
-                                    role="presentation"
-                                    cellspacing="0"
-                                    cellpadding="0"
-                                    border="0"
-                                    width="100%"
+                                <td style="padding: 20px 0; text-align: center;">
+                                  <p
+                                    style="
+                                      color: #f8fafc;
+                                      font-size: 18px;
+                                      font-weight: 700;
+                                      margin: 0;
+                                      line-height: 1.6;
+                                      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+                                    "
                                   >
-                                    <tr>
-                                      <td
-                                        style="
-                                          color: #cbd5e1;
-                                          font-size: 16px;
-                                          width: 60%;
-                                        "
-                                      >
-                                        <strong
-                                          style="
-                                            color: #f8fafc;
-                                            text-shadow: 0 1px 2px
-                                              rgba(0, 0, 0, 0.3);
-                                          "
-                                          >Ganador del Partido:</strong
-                                        >
-                                        Real Madrid
-                                      </td>
-                                      <td
-                                        style="
-                                          color: #f8fafc;
-                                          font-size: 16px;
-                                          font-weight: 700;
-                                          text-align: right;
-                                          width: 40%;
-                                        "
-                                      >
-                                        Cuota: 2.10
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td
-                                  style="
-                                    padding: 20px 0;
-                                    border-bottom: 1px solid #475569;
-                                  "
-                                >
-                                  <table
-                                    role="presentation"
-                                    cellspacing="0"
-                                    cellpadding="0"
-                                    border="0"
-                                    width="100%"
-                                  >
-                                    <tr>
-                                      <td
-                                        style="
-                                          color: #cbd5e1;
-                                          font-size: 16px;
-                                          width: 60%;
-                                        "
-                                      >
-                                        <strong
-                                          style="
-                                            color: #f8fafc;
-                                            text-shadow: 0 1px 2px
-                                              rgba(0, 0, 0, 0.3);
-                                          "
-                                          >Total de Goles:</strong
-                                        >
-                                        Más de 2.5
-                                      </td>
-                                      <td
-                                        style="
-                                          color: #f8fafc;
-                                          font-size: 16px;
-                                          font-weight: 700;
-                                          text-align: right;
-                                          width: 40%;
-                                        "
-                                      >
-                                        Cuota: 1.85
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td style="padding: 20px 0">
-                                  <table
-                                    role="presentation"
-                                    cellspacing="0"
-                                    cellpadding="0"
-                                    border="0"
-                                    width="100%"
-                                  >
-                                    <tr>
-                                      <td
-                                        style="
-                                          color: #cbd5e1;
-                                          font-size: 16px;
-                                          width: 60%;
-                                        "
-                                      >
-                                        <strong
-                                          style="
-                                            color: #f8fafc;
-                                            text-shadow: 0 1px 2px
-                                              rgba(0, 0, 0, 0.3);
-                                          "
-                                          >Ambos Equipos Marcan:</strong
-                                        >
-                                        Sí
-                                      </td>
-                                      <td
-                                        style="
-                                          color: #f8fafc;
-                                          font-size: 16px;
-                                          font-weight: 700;
-                                          text-align: right;
-                                          width: 40%;
-                                        "
-                                      >
-                                        Cuota: 1.65
-                                      </td>
-                                    </tr>
-                                  </table>
+                                    {{results_purchased}}
+                                  </p>
                                 </td>
                               </tr>
                             </table>
@@ -1052,7 +932,7 @@
                                           width: 40%;
                                         "
                                       >
-                                        $50.00
+                                        ${{total_amount}}
                                       </td>
                                     </tr>
                                   </table>
@@ -1327,7 +1207,7 @@
                           font-weight: 500;
                         "
                       >
-                        Este email fue enviado a peche@ejemplo.com.
+                        Este email fue enviado a {{user_email}}.
                       </p>
                       <p
                         style="
