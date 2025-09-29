@@ -40,7 +40,6 @@ export class TicketService {
 
     public async get_tickets_by_game_id({game_id}: {game_id: string}) {
         try {
-            console.log(game_id);
             const tickets = await TicketModel.find().where({soccer_game_id: game_id}).lean();
             if(tickets.length === 0) throw new ResponseError(404, "No se encontraron boletas");
             return tickets;
@@ -139,8 +138,11 @@ export class TicketService {
 
             if(curva_id) {
                 const curva_exist = game_info.curvas_open.find((curva) => curva.id === curva_id);
+
                 if(!curva_exist) throw new ResponseError(404, "No se encontró la curva");
+
                 if(curva_exist.status === "sold_out") throw new ResponseError(404, "La curva ya no tiene resultados disponibles");
+                
                 if(curva_exist.status === "closed") throw new ResponseError(404, "La curva ya está cerrada");
                 curva_info = curva_exist;
             } else {

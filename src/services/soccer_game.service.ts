@@ -22,7 +22,8 @@ export class SoccerGameService {
             const soccer_teams_service = new SoccerTeamsService();
             const soccer_teams = await soccer_teams_service.get_all_soccer_teams();
 
-            for(const soccer_game of soccer_games) {
+            for(const soccer_game of soccer_games) {;
+
                 const soccer_team = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[0]);
                 if(soccer_team) {
                     soccer_game.soccer_teams[0] = soccer_team.name;
@@ -37,12 +38,13 @@ export class SoccerGameService {
             }
             return soccer_games;
         } catch (err) {
+            console.log(err);
             if(err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al obtener los partidos de futbol");
         }
     }
 
-    public async get_soccer_game_by_id({id}: {id: string}) {
+    public async get_soccer_game_by_id({id, parse_ids = true}: {id: string, parse_ids?: boolean}) {
         try {
             const soccer_game = await SoccerGameModel.findById(id);
             if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
@@ -51,17 +53,29 @@ export class SoccerGameService {
             const soccer_teams = await soccer_teams_service.get_all_soccer_teams();
 
             const soccer_team = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[0]);
+            
             if(soccer_team) {
-                soccer_game.soccer_teams[0] = soccer_team.name;
+                soccer_game.soccer_teams[0] = soccer_team.id;
+                
+                if(parse_ids) {
+                    soccer_game.soccer_teams[0] = soccer_team.name;
+                }
             }
             const soccer_team_two = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[1]);
             if(soccer_team_two) {
-                soccer_game.soccer_teams[1] = soccer_team_two.name;
+                soccer_game.soccer_teams[1] = soccer_team_two.id;
+                
+                if(parse_ids) {
+                    soccer_game.soccer_teams[1] = soccer_team_two.name;
+                }
             }
 
             const find_tournament = await TournamentModel.findById(soccer_game.tournament).lean();
             if(!find_tournament) throw new ResponseError(404, "No se encontró el torneo");
-            soccer_game.tournament = find_tournament.name;
+            
+            if(parse_ids) {
+                soccer_game.tournament = find_tournament.name;
+            }
 
             return soccer_game;
         }
@@ -228,7 +242,7 @@ export class SoccerGameService {
     public async update_curva_results({game_id, curva_id, curva_updated}: {game_id: string, curva_id: string, curva_updated: CurvaEntity}) {
         try {
             // Obtener el documento del juego sin .lean() para poder guardarlo
-            const game = await this.get_soccer_game_by_id({id: game_id});
+            const game = await this.get_soccer_game_by_id({id: game_id, parse_ids: false});
             if(!game) throw new ResponseError(404, "No se encontró el partido de futbol");
 
             // Buscar la curva en el juego

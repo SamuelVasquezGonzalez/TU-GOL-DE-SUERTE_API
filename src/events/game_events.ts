@@ -63,7 +63,6 @@ const update_game_score_event = (socket: Socket) => {
     }) => {
         try {
             const { game_id, score } = data;
-            console.log("Actualizando marcador del partido", game_id, score);
             const game_service = new SoccerGameService();
             await game_service.update_soccer_game_score({game_id, score});
             
