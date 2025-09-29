@@ -18,6 +18,7 @@ export class GamesController {
                 data: games,
             });
         } catch (err) {
+            console.log(err);
             if (err instanceof ResponseError) {
                 res.status(err.statusCode).json({
                     success: false,

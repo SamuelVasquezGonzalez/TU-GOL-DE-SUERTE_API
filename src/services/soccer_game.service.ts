@@ -162,7 +162,7 @@ export class SoccerGameService {
 
             const curva = await this.generate_curva()
             
-            let find_tournament = await TournamentModel.findOne({$i: tournament}).lean(); // buscar por conicidencia exacta¿
+            let find_tournament = await TournamentModel.findOne({name: tournament}).lean();
             if(!find_tournament) {
                 const created_tournament = await TournamentModel.create({
                     name: tournament,
@@ -418,7 +418,6 @@ export class SoccerGameService {
             const randomDecimal = Math.floor(Math.random() * 78) / 10 // Genera 0.0 a 7.7
             const user_number_result = randomDecimal.toFixed(1) // Mantener como string para preservar formato
             if(avaliable_results.includes(user_number_result)) { // Si el número ya existe, intenta nuevamente
-                console.log(user_number_result, "ya existe")
                 i--
             } else {
                 avaliable_results.push(user_number_result)
