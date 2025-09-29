@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "nodemon && pnpm copy-emails",
-    "copy-emails": "node -e \"const fs = require('fs'); fs.cpSync('src/emails/html', 'dist/emails', { recursive: true });\"",
+    "copy-emails": "node -e \"const fs = require('fs'); fs.cpSync('src/emails/html', 'dist/emails/html', { recursive: true });\"",
     "build": "tsc && tsc-alias && pnpm copy-emails",
     "start": "node dist/index.js"
   },
