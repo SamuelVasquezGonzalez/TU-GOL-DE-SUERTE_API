@@ -42,7 +42,6 @@ export class TicketService {
         try {
             console.log(game_id);
             const tickets = await TicketModel.find().where({soccer_game_id: game_id}).lean();
-            console.log(tickets);
             if(tickets.length === 0) throw new ResponseError(404, "No se encontraron boletas");
             return tickets;
         } catch (err) {
@@ -168,6 +167,7 @@ export class TicketService {
 
             if(curva_info.avaliable_results.length === 0) {
                 curva_info.status = "sold_out";
+                await game_service.open_new_curva({game_id});
             }
 
             await game_service.update_curva_results({game_id, curva_id: curva_info.id, curva_updated: curva_info});

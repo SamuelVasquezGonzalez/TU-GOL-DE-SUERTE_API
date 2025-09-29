@@ -18,25 +18,31 @@ import { playerRoutes } from "./routes/player.routes";
 const corsOptions: CorsOptions = {
     origin: ALLOWED_ORIGINS,
     methods: ALLOWED_METHODS,
+    allowedHeaders: ["*"],
+    credentials: true,
     optionsSuccessStatus: 204,
 };
 
 const ioCorsOptions = {
     origin: ALLOWED_ORIGINS,
     methods: ALLOWED_METHODS,
+    allowedHeaders: ["*"],
+    credentials: true,
     optionsSuccessStatus: 204,
 };
 
 export const app: Application = express();
-const http_server = createServer(app);
+export const http_server = createServer(app);
 const API_VERSION = "/v1/api";
 
 export const io_server = new Server(http_server, {
     cors: ioCorsOptions,
-    transports: ["websocket","polling"]
+    transports: ["websocket", "polling"],
+    allowEIO3: true
 });
 
 io_server.on("connection", (socket) => {
+    console.log("Cliente conectado", socket.id);
     register_all_game_events(socket);
 });
 

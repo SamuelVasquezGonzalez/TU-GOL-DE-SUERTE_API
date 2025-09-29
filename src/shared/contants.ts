@@ -1,7 +1,16 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-export const ALLOWED_ORIGINS = ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "https://tu-gol-de-suerte-react-app-j2bq.vercel.app"];
+export const ALLOWED_ORIGINS = [
+    "http://localhost:3000", 
+    "http://localhost:3001", 
+    "http://localhost:5173", 
+    "http://localhost:5174", 
+    "http://localhost:5175",
+    "http://localhost:4000",
+    "http://localhost:8080",
+    "https://tu-gol-de-suerte-react-app-j2bq.vercel.app"
+];
 export const ALLOWED_METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"];
 
 export const GLOBAL_ENV = {

@@ -2,7 +2,7 @@ import { io_server } from "@/server_config";
 import { SoccerGameService } from "@/services/soccer_game.service";
 import { TicketService } from "@/services/ticket.service";
 import { ResponseError } from "@/utils/errors.util";
-import { CurvaEntity } from "@/contracts/types/soccer_games.type";
+import { CurvaEntity, SoccerGameStatus } from "@/contracts/types/soccer_games.type";
 import { Socket } from "socket.io";
 
 export const GAME_EVENTS = {
@@ -19,6 +19,9 @@ export const GAME_EVENTS = {
     CURVA_UPDATED: "games:curva_updated_success",
     GAME_ENDED: "games:ended_success",
     CURVA_CLOSED: "games:curva_closed_success",
+
+    GAME_STATUS_UPDATED: "games:status_updated_success",
+    GAME_STATUS_TIME_BROADCAST: "games:status_changed_teams",
     
     SCORE_BROADCAST: "games:score_changed",
     TICKET_BROADCAST: "games:ticket_sold",
@@ -60,6 +63,7 @@ const update_game_score_event = (socket: Socket) => {
     }) => {
         try {
             const { game_id, score } = data;
+            console.log("Actualizando marcador del partido", game_id, score);
             const game_service = new SoccerGameService();
             await game_service.update_soccer_game_score({game_id, score});
             
@@ -82,6 +86,39 @@ const update_game_score_event = (socket: Socket) => {
                 success: false,
                 error: error_message,
                 event: GAME_EVENTS.UPDATE_SCORE
+            });
+        }
+    });
+}
+
+const update_game_status_event = (socket: Socket) => {
+    socket.on(GAME_EVENTS.GAME_STATUS_UPDATED, async (data: {
+        game_id: string,
+        status: SoccerGameStatus
+    }) => {
+        try {
+            const { game_id, status } = data;
+            const game_service = new SoccerGameService();
+            await game_service.update_game_status({game_id, status});
+
+            socket.emit(GAME_EVENTS.GAME_STATUS_TIME_BROADCAST, {
+                success: true,
+                data: { game_id, status },
+                message: "Estado del partido actualizado exitosamente"
+            });
+
+            io_server.emit(GAME_EVENTS.GAME_STATUS_TIME_BROADCAST, {
+                game_id,
+                status,
+                timestamp: new Date()
+            });
+        }
+        catch (err) {
+            const error_message = err instanceof ResponseError ? err.message : "Error al actualizar el estado del partido";
+            socket.emit(GAME_EVENTS.ERROR, {
+                success: false,
+                error: error_message,
+                event: GAME_EVENTS.GAME_STATUS_UPDATED
             });
         }
     });
@@ -231,7 +268,7 @@ const end_game_event = (socket: Socket) => {
             });
             
             // También notificar cambio de estado general
-            io_server.emit(GAME_EVENTS.GAME_STATUS_BROADCAST, {
+            io_server.emit(GAME_EVENTS.GAME_STATUS_TIME_BROADCAST, {
                 game_id,
                 status: "finished",
                 message: "El partido ha finalizado y se han determinado los ganadores",
@@ -260,5 +297,6 @@ export const register_all_game_events = (socket: Socket) => {
     update_curva_event(socket);
     close_curva_event(socket);
     end_game_event(socket);
+    update_game_status_event(socket);
 }
 

@@ -7,6 +7,7 @@ import { randomUUID } from "crypto";
 import { SoccerGame } from "@/contracts/interfaces/soccer_games.interface";
 import { TicketService } from "./ticket.service";
 import { ITicket } from "@/contracts/interfaces/ticket.interface";
+import { TournamentModel } from "@/models/tournament.model";
 
 export class SoccerGameService {
     // methods
@@ -30,6 +31,9 @@ export class SoccerGameService {
                 if(soccer_team_two) {
                     soccer_game.soccer_teams[1] = soccer_team_two.name;
                 }
+                const find_tournament = await TournamentModel.findById(soccer_game.tournament).lean();
+                if(!find_tournament) throw new ResponseError(404, "No se encontró el torneo");
+                soccer_game.tournament = find_tournament.name;
             }
             return soccer_games;
         } catch (err) {
@@ -54,6 +58,11 @@ export class SoccerGameService {
             if(soccer_team_two) {
                 soccer_game.soccer_teams[1] = soccer_team_two.name;
             }
+
+            const find_tournament = await TournamentModel.findById(soccer_game.tournament).lean();
+            if(!find_tournament) throw new ResponseError(404, "No se encontró el torneo");
+            soccer_game.tournament = find_tournament.name;
+
             return soccer_game;
         }
         catch (err) {
@@ -64,7 +73,7 @@ export class SoccerGameService {
 
     public async get_soccer_game_by_tournament({tournament}: {tournament: string}) {
         try {
-            const soccer_game = await SoccerGameModel.findOne({tournament}).lean();
+            let soccer_game = await SoccerGameModel.findOne({tournament}).lean();
             if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
 
             const soccer_teams_service = new SoccerTeamsService();
@@ -89,6 +98,10 @@ export class SoccerGameService {
         try {
             const soccer_game = await SoccerGameModel.findOne({date}).lean();
             if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
+
+            const find_tournament = await TournamentModel.findById(soccer_game.tournament).lean();
+            if(!find_tournament) throw new ResponseError(404, "No se encontró el torneo");
+            soccer_game.tournament = find_tournament.name;
             return soccer_game;
         } catch (err) {
             if(err instanceof ResponseError) throw err;
@@ -100,11 +113,16 @@ export class SoccerGameService {
 
     public async get_curva_by_id({id, game_id, include_game = false}: {id: string, game_id: string, include_game?: boolean}) {
         try {
-            const curva = await SoccerGameModel.findById(game_id).lean();
+            let curva = await SoccerGameModel.findById(game_id).lean();
             if(!curva) throw new ResponseError(404, "No se encontró la curva");
 
             const curva_found = curva.curvas_open.find((curva) => curva.id === id);
             if(!curva_found) throw new ResponseError(404, "No se encontró la curva");
+
+            const find_tournament = await TournamentModel.findById(curva.tournament).lean();
+            if(!find_tournament) throw new ResponseError(404, "No se encontró el torneo");
+            curva.tournament = find_tournament.name;
+            
 
             return {
                 game_id,
@@ -143,6 +161,16 @@ export class SoccerGameService {
             if(!response_exist_soccer_game.status) throw new ResponseError(400, "Ya hay un partido registrado");
 
             const curva = await this.generate_curva()
+            
+            let find_tournament = await TournamentModel.findOne({$i: tournament}).lean(); // buscar por conicidencia exacta¿
+            if(!find_tournament) {
+                const created_tournament = await TournamentModel.create({
+                    name: tournament,
+                    created_date: new Date()
+                });
+
+                find_tournament = created_tournament;
+            }
 
             await SoccerGameModel.create({
                 created_date: new Date(),
@@ -151,7 +179,7 @@ export class SoccerGameService {
                 end_time,
                 status,
                 score: [0, 0],
-                tournament,
+                tournament: find_tournament._id.toString(),
                 curvas_open: [curva]
             })
 
@@ -222,6 +250,19 @@ export class SoccerGameService {
             throw new ResponseError(500, "Error al actualizar los resultados de la curva");
         }
     }
+
+    public async update_game_status({game_id, status}: {game_id: string, status: SoccerGameStatus}) {
+        try {
+            const soccer_game = await this.get_soccer_game_by_id({id: game_id});
+            if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
+            soccer_game.status = status;
+            await soccer_game.save();
+        }
+        catch (err) {
+            if(err instanceof ResponseError) throw err;
+            throw new ResponseError(500, "Error al actualizar el estado del partido de futbol");
+        }
+    }   
 
     public async end_soccer_game({game_id}: {game_id: string}) {
         try {
