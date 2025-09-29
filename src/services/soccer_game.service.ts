@@ -206,7 +206,7 @@ export class SoccerGameService {
 
     public async open_new_curva({game_id}: {game_id: string}) {
         try {
-            const soccer_game = await this.get_soccer_game_by_id({id: game_id});
+            const soccer_game = await this.get_soccer_game_by_id({id: game_id, parse_ids: false});
             if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
             const curva = await this.generate_curva();
             soccer_game.curvas_open.push(curva);
@@ -225,7 +225,7 @@ export class SoccerGameService {
 
     public async close_curva({game_id, curva_id}: {game_id: string, curva_id: string}) {
         try {
-            const soccer_game = await this.get_soccer_game_by_id({id: game_id});
+            const soccer_game = await this.get_soccer_game_by_id({id: game_id, parse_ids: false});
             if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
             const curva = soccer_game.curvas_open.find((curva) => curva.id === curva_id);
             if(!curva) throw new ResponseError(404, "No se encontró la curva");
@@ -267,7 +267,7 @@ export class SoccerGameService {
 
     public async update_game_status({game_id, status}: {game_id: string, status: SoccerGameStatus}) {
         try {
-            const soccer_game = await this.get_soccer_game_by_id({id: game_id});
+            const soccer_game = await this.get_soccer_game_by_id({id: game_id, parse_ids: false});
             if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
             soccer_game.status = status;
             await soccer_game.save();
@@ -281,7 +281,7 @@ export class SoccerGameService {
     public async end_soccer_game({game_id}: {game_id: string}) {
         try {
 
-            const soccer_game = await this.get_soccer_game_by_id({id: game_id});
+            const soccer_game = await this.get_soccer_game_by_id({id: game_id, parse_ids: false});
             if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
 
             const closed_curvas = this.close_all_curvas({curvas_open: soccer_game.curvas_open});
@@ -301,7 +301,7 @@ export class SoccerGameService {
 
     public async update_soccer_game_score({game_id, score}: {game_id: string, score: [number, number]}) {
         try {
-            const soccer_game = await this.get_soccer_game_by_id({id: game_id});
+            const soccer_game = await this.get_soccer_game_by_id({id: game_id, parse_ids: false});
             if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
             soccer_game.score = score;
             await soccer_game.save();

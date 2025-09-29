@@ -6,6 +6,7 @@ import { CurvaEntity } from "@/contracts/types/soccer_games.type";
 import { TicketStatus } from "@/contracts/types/ticket.type";
 import { send_ticket_purchase_email, send_ticket_status_update_email } from "@/emails/email-main";
 import dayjs from "dayjs";
+import { SoccerTeamModel } from "@/models/soccer_team.model";
 
 export class TicketService {
     // methods
@@ -104,7 +105,7 @@ export class TicketService {
     }) {
         try {
             const game_service = new SoccerGameService();
-            const game_info = await game_service.get_soccer_game_by_id({id: game_id});
+            const game_info = await game_service.get_soccer_game_by_id({id: game_id, parse_ids: false});
 
             if(!user && !customer_id) throw new ResponseError(400, "El usuario es requerido");
 
@@ -189,14 +190,20 @@ export class TicketService {
                 created_date: new Date()
             });
 
+            const teamOne = await SoccerTeamModel.findById(game_info.soccer_teams[0]);
+            if(!teamOne) throw new ResponseError(404, "No se encontró el equipo");
+
             
+            const teamTwo = await SoccerTeamModel.findById(game_info.soccer_teams[1]);
+            if(!teamTwo) throw new ResponseError(404, "No se encontró el equipo");
+
             await send_ticket_purchase_email({
                 user_name: customer_info.name,
                 user_email: customer_info.email,
                 ticket_number: ticket_number,
                 game_info: {
-                    team1: game_info.soccer_teams[0],
-                    team2: game_info.soccer_teams[1],
+                    team1: teamOne.name,
+                    team2: teamTwo.name,
                     date: dayjs(game_info.start_date).format("DD/MM/YYYY hh:mm A"),
                     tournament: game_info.tournament
                 },
