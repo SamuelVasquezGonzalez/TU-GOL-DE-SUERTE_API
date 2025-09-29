@@ -9,7 +9,8 @@ export const ALLOWED_ORIGINS = [
     "http://localhost:5175",
     "http://localhost:4000",
     "http://localhost:8080",
-    "https://tu-gol-de-suerte-react-app-j2bq.vercel.app"
+    "https://tu-gol-de-suerte-react-app-j2bq.vercel.app",
+    "https://tu-gol-de-suerte-react-app.vercel.app"
 ];
 export const ALLOWED_METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"];
 
