@@ -129,21 +129,19 @@ const create_ticket_event = (socket: Socket) => {
         customer_id?: string,
         curva_id: string,
         quantity: number,
-        ticket_price: number,
         user?: {
             name: string,
             email: string,
         }
     }) => {
         try {
-            const { game_id, customer_id, curva_id, quantity, ticket_price, user } = data;
+            const { game_id, customer_id, curva_id, quantity, user } = data;
             const ticket_service = new TicketService();
             const new_ticket = await ticket_service.create_new_ticket({
                 game_id, 
                 customer_id, 
                 curva_id, 
                 quantity, 
-                ticket_price,
                 user
             });
             

@@ -161,9 +161,12 @@ export class UserService {
             if (!email || !password) throw new ResponseError(400, "Se debe proporcionar un correo y una contraseña");
 
             const user = await UserModel.findOne({ email });
+            console.log(user);
             if (!user) throw new ResponseError(404, "Usuario no encontrado");
 
             const is_valid_password = await this.verify_hashed_password({ password, hashed_password: user.password });
+
+            console.log(is_valid_password);
 
             if (is_valid_password) {
                 const access_token = await this.generate_access_token(

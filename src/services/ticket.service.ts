@@ -39,11 +39,14 @@ export class TicketService {
         }
     }
 
-    public async get_tickets_by_game_id({game_id}: {game_id: string}) {
+    public async get_tickets_by_game_id({game_id, no_error}: {game_id: string, no_error?: boolean}) {
         try {
             const tickets = await TicketModel.find().where({soccer_game_id: game_id}).lean();
-            if(tickets.length === 0) throw new ResponseError(404, "No se encontraron boletas");
-            return tickets;
+            if(tickets.length === 0) {
+                if(no_error) return [];
+                throw new ResponseError(404, "No se encontraron boletas");
+            }
+            return tickets || [];
         } catch (err) {
             if(err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al obtener las boletas");
@@ -90,19 +93,19 @@ export class TicketService {
         customer_id,
         curva_id,
         quantity,
-        ticket_price,
         user
     }: {
         game_id: string,
         customer_id?: string,
         curva_id?: string,
         quantity: number,
-        ticket_price: number,
         user?: {
             name: string,
             email: string,
         }
     }) {
+
+        console.log(curva_id)
         try {
             const game_service = new SoccerGameService();
             const game_info = await game_service.get_soccer_game_by_id({id: game_id, parse_ids: false});
@@ -142,10 +145,23 @@ export class TicketService {
 
                 if(!curva_exist) throw new ResponseError(404, "No se encontró la curva");
 
-                if(curva_exist.status === "sold_out") throw new ResponseError(404, "La curva ya no tiene resultados disponibles");
-                
-                if(curva_exist.status === "closed") throw new ResponseError(404, "La curva ya está cerrada");
-                curva_info = curva_exist;
+                // Si la curva específica no está disponible, buscar una alternativa
+                if(curva_exist.status === "sold_out" || curva_exist.status === "closed" || curva_exist.avaliable_results.length < quantity) {
+                    // Buscar curvas alternativas con resultados suficientes
+                    const avaliable_curvas = game_info.curvas_open.filter((curva) => {
+                        return curva.status === "open" && curva.avaliable_results.length >= quantity;
+                    });
+
+                    if(avaliable_curvas.length === 0) {
+                        throw new ResponseError(404, "La curva especificada no está disponible y no hay curvas alternativas con resultados suficientes");
+                    }
+                    
+                    // Usar la primera curva disponible como alternativa
+                    curva_info = avaliable_curvas[0];
+                } else {
+                    // La curva específica está disponible
+                    curva_info = curva_exist;
+                }
             } else {
                 if(game_info.curvas_open.length === 0) throw new ResponseError(404, "No hay curvas abiertas"); // preguntar si el partido tiene curvas abiertas
 
@@ -175,7 +191,7 @@ export class TicketService {
 
             await game_service.update_curva_results({game_id, curva_id: curva_info.id, curva_updated: curva_info});
 
-            const payed_amount = ticket_price * quantity;
+            const payed_amount = game_info.soccer_price * quantity;
 
             const ticket_number = await this.generate_ticket_number();
 

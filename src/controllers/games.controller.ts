@@ -147,9 +147,9 @@ export class GamesController {
 
     public create_game = async (req: Request, res: Response) => {
         try {
-            const { soccer_teams, start_date, end_time, status, tournament } = req.body;
+            const { soccer_teams, start_date, end_time, status, tournament, soccer_price } = req.body;
 
-            if (!soccer_teams || !start_date || !end_time || !status || !tournament) {
+            if (!soccer_teams || !start_date || !end_time || !status || !tournament || !soccer_price) {
                 throw new ResponseError(400, "Todos los campos son requeridos");
             }
 
@@ -163,6 +163,7 @@ export class GamesController {
                 end_time: new Date(end_time),
                 status: status as SoccerGameStatus,
                 tournament,
+                soccer_price,
             });
 
             res.status(201).json({

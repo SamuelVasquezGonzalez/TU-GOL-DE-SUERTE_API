@@ -3,7 +3,7 @@ import type { CurvaEntity, SoccerGameStatus } from "../types/soccer_games.type";
 
 export interface SoccerGame extends Document {
     created_date: Date // fecha y hora de creacion del partido
-
+    soccer_price: number // precio del partido
     soccer_teams: [string, string] // tupla de equipos de futbol => team1 vs team2
     start_date: Date // fecha y hora de inicio del partido
     end_time: Date // hora de finalizacion del partido

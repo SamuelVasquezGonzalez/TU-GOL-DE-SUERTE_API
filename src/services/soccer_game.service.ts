@@ -158,14 +158,16 @@ export class SoccerGameService {
             start_date, 
             end_time, 
             status, 
-            tournament
+            tournament,
+            soccer_price
         }: 
         {
             soccer_teams: [string, string], 
             start_date: Date, 
             end_time: Date, 
             status: SoccerGameStatus,
-            tournament: string
+            tournament: string,
+            soccer_price: number
 
         }) {
         try {
@@ -194,7 +196,8 @@ export class SoccerGameService {
                 status,
                 score: [0, 0],
                 tournament: find_tournament._id.toString(),
-                curvas_open: [curva]
+                curvas_open: [curva],
+                soccer_price
             })
 
 
@@ -385,7 +388,7 @@ export class SoccerGameService {
             const parsed_score = `${score[0]}.${score[1]}`
 
             const tickets_service = new TicketService();
-            const tickets = await tickets_service.get_tickets_by_game_id({game_id: (game as any)?._id.toString()});
+            const tickets = await tickets_service.get_tickets_by_game_id({game_id: (game as any)?._id.toString(), no_error: true});
 
             let winners: ITicket[] = [];
             let losers: ITicket[] = [];
@@ -423,14 +426,15 @@ export class SoccerGameService {
         let curva: CurvaEntity = {
             id: randomUUID(),
             avaliable_results: [],
-            sold_results: [],
+            sold_results: [], 
             status: "open"
         }
         
         for (let i = 0; i < curva_tope; i++) {
-            // Genera un número aleatorio entre 0.0 y 7.7 con formato decimal de un dígito
-            const randomDecimal = Math.floor(Math.random() * 78) / 10 // Genera 0.0 a 7.7
-            const user_number_result = randomDecimal.toFixed(1) // Mantener como string para preservar formato
+            // Genera un número donde ambos lados del punto decimal estén entre 0-7
+            const parteEntera = Math.floor(Math.random() * 8) // 0-7
+            const parteDecimal = Math.floor(Math.random() * 8) // 0-7
+            const user_number_result = `${parteEntera}.${parteDecimal}` // Formato: X.Y donde X y Y están entre 0-7
             if(avaliable_results.includes(user_number_result)) { // Si el número ya existe, intenta nuevamente
                 i--
             } else {

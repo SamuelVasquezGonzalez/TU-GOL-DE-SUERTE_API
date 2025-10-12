@@ -162,10 +162,10 @@ export class TicketController {
 
     public create_ticket = async (req: Request, res: Response) => {
         try {
-            const { game_id, curva_id, quantity, ticket_price } = req.body;
+            const { game_id, curva_id, quantity } = req.body;
             const customer_id = (req as RequestUser).user._id;
 
-            if (!game_id || !curva_id || !quantity || !ticket_price) {
+            if (!game_id || !curva_id || !quantity) {
                 throw new ResponseError(400, "Todos los campos son requeridos");
             }
 
@@ -174,7 +174,6 @@ export class TicketController {
                 customer_id,
                 curva_id,
                 quantity,
-                ticket_price,
             });
 
             res.status(201).json({
@@ -199,9 +198,9 @@ export class TicketController {
 
     public create_ticket_admin = async (req: Request, res: Response) => {
         try {
-            const { game_id, customer_id, curva_id, quantity, ticket_price, user } = req.body;
+            const { game_id, customer_id, curva_id, quantity, user } = req.body;
 
-            if (!game_id || (!customer_id && !user) || !curva_id || !quantity || !ticket_price) {
+            if (!game_id || (!customer_id && !user) || !curva_id || !quantity) {
                 throw new ResponseError(400, "Todos los campos son requeridos");
             }
 
@@ -210,7 +209,6 @@ export class TicketController {
                 customer_id,
                 curva_id,
                 quantity,
-                ticket_price,
                 user,
             });
 

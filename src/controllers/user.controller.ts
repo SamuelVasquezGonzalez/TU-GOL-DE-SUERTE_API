@@ -157,6 +157,7 @@ export class UserController {
             });
         } catch (err) {
             if (err instanceof ResponseError) {
+                console.log(err);
                 res.status(err.statusCode).json({
                     success: false,
                     message: err.message,

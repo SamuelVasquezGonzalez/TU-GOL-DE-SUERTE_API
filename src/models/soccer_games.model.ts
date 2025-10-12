@@ -13,6 +13,7 @@ const SoccerGameSchema = new Schema<SoccerGame>({
     soccer_teams: { type: [String], required: true },
     start_date: { type: Date, required: true },
     end_time: { type: Date, required: true },
+    soccer_price: { type: Number, required: true },
     status: { type: String, required: true },
     score: { type: [Number], required: true },
     tournament: { type: String, required: true },
