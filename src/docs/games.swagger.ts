@@ -45,6 +45,7 @@
  *               - end_time
  *               - status
  *               - tournament
+ *               - soccer_price
  *             properties:
  *               soccer_teams:
  *                 type: array
@@ -73,6 +74,11 @@
  *                 type: string
  *                 description: Nombre del torneo
  *                 example: "Liga Profesional"
+ *               soccer_price:
+ *                 type: number
+ *                 minimum: 0
+ *                 description: Precio del partido
+ *                 example: 50000
  *     responses:
  *       201:
  *         description: Partido creado exitosamente
@@ -386,7 +392,6 @@
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 
-
 /**
  * @openapi
  * /v1/api/games/{game_id}/end:
@@ -425,4 +430,3 @@
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-

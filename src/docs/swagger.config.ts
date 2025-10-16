@@ -1,5 +1,5 @@
-import swaggerJSDoc from 'swagger-jsdoc';
-import { GLOBAL_ENV } from '../shared/contants';
+import swaggerJSDoc from 'swagger-jsdoc'
+import { GLOBAL_ENV } from '../shared/contants'
 
 const swaggerDefinition = {
   openapi: '3.0.0',
@@ -104,7 +104,14 @@ const swaggerDefinition = {
       },
       SoccerGame: {
         type: 'object',
-        required: ['soccer_teams', 'start_date', 'end_time', 'status', 'tournament'],
+        required: [
+          'soccer_teams',
+          'start_date',
+          'end_time',
+          'status',
+          'tournament',
+          'soccer_price',
+        ],
         properties: {
           _id: {
             type: 'string',
@@ -147,6 +154,11 @@ const swaggerDefinition = {
           tournament: {
             type: 'string',
             description: 'Nombre del torneo',
+          },
+          soccer_price: {
+            type: 'number',
+            minimum: 0,
+            description: 'Precio del partido',
           },
           curvas_open: {
             type: 'array',
@@ -383,7 +395,8 @@ const swaggerDefinition = {
             description: 'Archivo a subir (máximo 5MB)',
           },
         },
-        description: 'Esquema para subida de archivos usando multipart/form-data. Límite de 5MB por archivo.',
+        description:
+          'Esquema para subida de archivos usando multipart/form-data. Límite de 5MB por archivo.',
       },
     },
   },
@@ -413,7 +426,7 @@ const swaggerDefinition = {
       description: 'Gestión de jugadores de fútbol',
     },
   ],
-};
+}
 
 const options = {
   definition: swaggerDefinition,
@@ -426,6 +439,6 @@ const options = {
     './src/docs/tickets.swagger.ts',
     './src/docs/players.swagger.ts',
   ],
-};
+}
 
-export const swaggerSpec = swaggerJSDoc(options);
+export const swaggerSpec = swaggerJSDoc(options)

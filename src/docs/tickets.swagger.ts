@@ -138,8 +138,6 @@
  *               - game_id
  *               - curva_id
  *               - quantity
- *               - ticket_price
- *               - results_purchased
  *             properties:
  *               game_id:
  *                 type: string
@@ -154,17 +152,6 @@
  *                 minimum: 1
  *                 description: Cantidad de boletas
  *                 example: 1
- *               ticket_price:
- *                 type: number
- *                 minimum: 0
- *                 description: Precio total de la apuesta
- *                 example: 5000
- *               results_purchased:
- *                 type: array
- *                 items:
- *                   type: string
- *                 description: Resultados apostados (formato 0.0 a 7.7)
- *                 example: ["1.2", "3.0", "4.1"]
  *     responses:
  *       201:
  *         description: Ticket creado exitosamente
@@ -356,8 +343,6 @@
  *               - customer_id
  *               - curva_id
  *               - quantity
- *               - ticket_price
- *               - results_purchased
  *             properties:
  *               game_id:
  *                 type: string
@@ -376,17 +361,6 @@
  *                 minimum: 1
  *                 description: Cantidad de boletas
  *                 example: 1
- *               ticket_price:
- *                 type: number
- *                 minimum: 0
- *                 description: Precio total de la apuesta
- *                 example: 5000
- *               results_purchased:
- *                 type: array
- *                 items:
- *                   type: string
- *                 description: Resultados apostados (formato 0.0 a 7.7)
- *                 example: ["2.1", "4.0", "5.2"]
  *     responses:
  *       201:
  *         description: Ticket creado exitosamente por administrador
@@ -483,4 +457,3 @@
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-
