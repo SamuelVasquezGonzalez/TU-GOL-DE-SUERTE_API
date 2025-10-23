@@ -53,7 +53,6 @@ export class UserService {
 
     public async create_new_user({ name, email, identity, phone, role, password }: UserPayload) {
         try {
-            if (!password && (role === "admin" || role === "staff")) throw new ResponseError(400, "La contraseña es requerida para administradores y staff");
 
             if(role !== "customer") {
                 await this.verify_exist_phone({ phone });
@@ -62,7 +61,7 @@ export class UserService {
             await this.verify_exist_email({ email });
 
             const recover_code = generate_recover_code({ length: 6 });
-            const plane_password = (role === "admin" || role === "staff") ? generate_random_password({ length: 8 }) : password || "";
+            const plane_password = password ?? "";
             const hashed_password = await hash_password(plane_password || "");
 
 

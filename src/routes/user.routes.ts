@@ -33,10 +33,10 @@ router.post("/verify-code", user_controller.verify_recovery_code);
 // ==================== PUT ROUTES ====================
 
 // Rutas autenticadas
-router.put("/profile", customer_auth, upload_files.single("image"), user_controller.update_user_profile);
-router.put("/change-password", customer_auth, user_controller.change_password);
-router.put("/reset-password", admin_auth, user_controller.reset_password);
-router.put("/profile/image", customer_auth, upload_files.single("image"), user_controller.upload_profile_image);
+router.put("/profile", customer_auth, staff_auth, upload_files.single("image"), user_controller.update_user_profile);
+router.put("/change-password", customer_auth, staff_auth, user_controller.change_password);
+router.put("/reset-password", admin_auth, staff_auth, user_controller.reset_password);
+router.put("/profile/image", customer_auth, staff_auth, upload_files.single("image"), user_controller.upload_profile_image);
 
 // ==================== DELETE ROUTES ====================
 

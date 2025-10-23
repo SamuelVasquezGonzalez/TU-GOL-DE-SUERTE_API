@@ -387,6 +387,8 @@ export class SoccerGameService {
             const score = game.score
             const parsed_score = `${score[0]}.${score[1]}`
 
+            if(score[0] > 7 || score[1] > 7) throw new ResponseError(404, "GANA LA CASA");
+
             const tickets_service = new TicketService();
             const tickets = await tickets_service.get_tickets_by_game_id({game_id: (game as any)?._id.toString(), no_error: true});
 
