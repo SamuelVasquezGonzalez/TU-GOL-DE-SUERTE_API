@@ -438,6 +438,7 @@ const options = {
     './src/docs/teams.swagger.ts',
     './src/docs/tickets.swagger.ts',
     './src/docs/players.swagger.ts',
+    './src/docs/webhooks.swagger.ts',
   ],
 }
 
