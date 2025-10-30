@@ -25,3 +25,4 @@ export interface ITransactionHistory extends Document {
   successful_purchase: boolean // true si fue comprado sin problemas (APPROVED)
 }
 
+
