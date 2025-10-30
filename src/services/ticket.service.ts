@@ -102,6 +102,7 @@ export class TicketService {
     curva_id,
     quantity,
     user,
+    sell_by,
   }: {
     game_id: string
     customer_id?: string
@@ -111,6 +112,7 @@ export class TicketService {
       name: string
       email: string
     }
+    sell_by?: string
   }) {
     try {
       const game_service = new SoccerGameService()
@@ -226,6 +228,8 @@ export class TicketService {
         status: 'pending',
         curva_id: curva_info.id,
         created_date: new Date(),
+        sell_by: sell_by,
+        reward_amount: game_info.soccer_reward,
       })
 
       const teamOne = await SoccerTeamModel.findById(game_info.soccer_teams[0])

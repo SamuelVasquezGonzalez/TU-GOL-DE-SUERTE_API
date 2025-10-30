@@ -12,6 +12,8 @@ import { ticketRoutes } from './routes/ticket.routes'
 import { teamsRoutes } from './routes/teams.routes'
 import { gamesRoutes } from './routes/games.routes'
 import { playerRoutes } from './routes/player.routes'
+import { transactionHistoryRoutes } from './routes/transaction-history.routes'
+import { statsRoutes } from './routes/stats.routes'
 import webhookRoutes from './routes/webhook.routes'
 
 const corsOptions: CorsOptions = {
@@ -46,6 +48,10 @@ io_server.on('connection', (socket) => {
 })
 
 app.use(cors(corsOptions))
+
+// Middleware específico para webhooks de Wompi (DEBE ir ANTES de express.json())
+app.use(`${API_VERSION}/webhooks/wompi`, express.raw({ type: 'application/json' }))
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true, limit: '50mb' }))
 app.use(morgan('dev'))
@@ -94,9 +100,11 @@ app.use(`${API_VERSION}/tickets`, ticketRoutes)
 app.use(`${API_VERSION}/teams`, teamsRoutes)
 app.use(`${API_VERSION}/games`, gamesRoutes)
 app.use(`${API_VERSION}/players`, playerRoutes)
+app.use(`${API_VERSION}/transaction-history`, transactionHistoryRoutes)
+app.use(`${API_VERSION}/stats`, statsRoutes)
 
 // Rutas de webhook (sin prefijo de versión para compatibilidad con Wompi)
-app.use('/api/webhooks', webhookRoutes)
+app.use(`${API_VERSION}/webhooks`, webhookRoutes)
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({

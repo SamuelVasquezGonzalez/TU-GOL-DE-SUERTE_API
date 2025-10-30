@@ -1,168 +1,169 @@
 import { Request, Response } from 'express'
-import { WompiWebhookService } from '@/services/wompi-webhook.service'
-import { WompiService } from '@/services/wompi.service'
-import { ResponseError } from '@/utils/errors.util'
-import { WompiWebhookPayload } from '@/contracts/types/wompi.type'
+import { WompiWebhookService } from '../services/wompi-webhook.service'
+import * as crypto from 'crypto'
 
 export class WompiWebhookController {
   private webhookService = new WompiWebhookService()
-  private wompiService = new WompiService()
 
   /**
    * Endpoint para recibir webhooks de Wompi
    */
   public handleWebhook = async (req: Request, res: Response) => {
     try {
-      // 1. Validar firma del webhook
-      const signature = req.headers['x-wompi-signature'] as string
-      const payload = JSON.stringify(req.body)
+      // ✅ CORRECCIÓN 1: Leer del header correcto
+      const signature = req.headers['x-event-checksum'] as string
+      
+      // ✅ CORRECCIÓN 2: Usar el Buffer RAW directamente
+      const rawBodyBuffer = req.body as Buffer
+      const payloadString = rawBodyBuffer ? rawBodyBuffer.toString('utf8') : ''
 
-      if (!signature) {
-        throw new ResponseError(401, 'Firma de webhook requerida')
+      // 1. Validar la firma del webhook usando el Buffer RAW
+      if (!validateWompiSignature(rawBodyBuffer, signature)) {
+        console.error('Webhook signature validation failed', { 
+          signature: signature || 'ausente', 
+          payloadLength: payloadString.length,
+          rawBodyBufferLength: rawBodyBuffer ? rawBodyBuffer.length : 0
+        })
+        return res.status(400).json({ error: 'Invalid signature' })
       }
 
-      const isValidSignature = this.wompiService.validateWebhookSignature(payload, signature)
-      if (!isValidSignature) {
-        throw new ResponseError(401, 'Firma de webhook inválida')
-      }
+      // 2. Parsear el JSON para procesar
+      const event = JSON.parse(payloadString)
 
-      // 2. Procesar el webhook
-      const webhookData: WompiWebhookPayload = req.body
-      await this.webhookService.processWebhook(webhookData)
-
-      // 3. Responder a Wompi
-      res.status(200).json({
-        received: true,
-        message: 'Webhook procesado exitosamente',
+      // Log del evento recibido para debugging
+      console.log(`📥 Webhook recibido: ${event.event}`, {
+        transaction_id: event.data?.transaction?.id,
+        reference: event.data?.transaction?.reference,
+        status: event.data?.transaction?.status,
+        timestamp: new Date().toISOString()
       })
-    } catch (error) {
-      console.error('Error procesando webhook de Wompi:', error)
 
-      if (error instanceof ResponseError) {
-        res.status(error.statusCode).json({
-          success: false,
-          message: error.message,
-        })
-      } else {
-        res.status(500).json({
-          success: false,
-          message: 'Error interno del servidor',
-        })
+      // 3. Manejar según el tipo de evento
+      // Nota: Respondemos 200 inmediatamente para evitar reintentos de Wompi
+      // El procesamiento se hace en segundo plano
+      res.status(200).json({ success: true })
+
+      // Procesar el evento de forma asíncrona (sin esperar)
+      switch (event.event) {
+        case 'transaction.updated':
+          this.handleTransactionUpdated(event.data).catch(err => {
+            console.error('Error procesando transaction.updated:', err)
+          })
+          break
+        case 'transaction.created':
+          this.handleTransactionCreated(event.data).catch(err => {
+            console.error('Error procesando transaction.created:', err)
+          })
+          break
+        case 'transaction.approved':
+          this.handleTransactionApproved(event.data).catch(err => {
+            console.error('Error procesando transaction.approved:', err)
+          })
+          break
+        case 'transaction.declined':
+          this.handleTransactionDeclined(event.data).catch(err => {
+            console.error('Error procesando transaction.declined:', err)
+          })
+          break
+        default:
+          console.log(`⚠️ Tipo de evento desconocido: ${event.event}`)
       }
+    } catch (error) {
+      console.error('Error procesando webhook:', error)
+      res.status(500).json({ error: 'Internal server error' })
     }
   }
 
   /**
-   * Endpoint para crear un pago (usado por el frontend)
+   * Manejar transacción actualizada
    */
-  public createPayment = async (req: Request, res: Response) => {
-    try {
-      const { amount, customerData, gameId, curvaId, quantity, selectedResults } = req.body
+  private async handleTransactionUpdated(transactionData: any) {
+    await this.webhookService.processTransactionUpdate(transactionData)
+  }
 
-      if (!amount || !customerData || !gameId || !curvaId || !quantity) {
-        throw new ResponseError(400, 'Datos de pago incompletos')
-      }
+  /**
+   * Manejar transacción creada
+   */
+  private async handleTransactionCreated(transactionData: any) {
+    await this.webhookService.processTransactionCreated(transactionData)
+  }
 
-      // Generar referencia única
-      const reference = this.wompiService.generatePaymentReference()
+  /**
+   * Manejar transacción aprobada
+   */
+  private async handleTransactionApproved(transactionData: any) {
+    await this.webhookService.processTransactionApproved(transactionData)
+  }
 
-      // Preparar datos de pago
-      const paymentRequest = this.wompiService.preparePaymentRequest({
-        amount,
-        customerData,
-        reference,
-        paymentMethod: 'CARD', // Por defecto, el usuario puede cambiar en el checkout
-      })
+  /**
+   * Manejar transacción rechazada
+   */
+  private async handleTransactionDeclined(transactionData: any) {
+    await this.webhookService.processTransactionDeclined(transactionData)
+  }
+}
 
-      // Crear transacción en Wompi
-      const paymentResponse = await this.wompiService.createPayment(paymentRequest)
+// ✅ FÓRMULA CORRECTA SEGÚN DOCUMENTACIÓN DE WOMPI
+function validateWompiSignature(rawBodyBuffer: Buffer, signature: string): boolean {
+  const secret = process.env.WOMPI_EVENTS_SECRET
+  if (!secret) {
+    console.error('WOMPI_EVENTS_SECRET no configurado')
+    return false
+  }
 
-      // Crear ticket temporal con estado pendiente
-      const ticket = await this.createPendingTicket({
-        gameId,
-        curvaId,
-        quantity,
-        selectedResults,
-        customerData,
-        reference,
-        paymentResponse,
-      })
+  if (!signature) {
+    console.error('Firma de webhook no proporcionada')
+    return false
+  }
 
-      res.status(201).json({
-        success: true,
-        message: 'Pago creado exitosamente',
-        data: {
-          transaction_id: paymentResponse.data.id,
-          reference: reference,
-          ticket_id: ticket._id,
-          checkout_url: paymentResponse.data.redirect_url,
-        },
-      })
-    } catch (error) {
-      console.error('Error creando pago:', error)
+  if (!rawBodyBuffer) {
+    console.error('Buffer del body no disponible')
+    return false
+  }
 
-      if (error instanceof ResponseError) {
-        res.status(error.statusCode).json({
-          success: false,
-          message: error.message,
-        })
-      } else {
-        res.status(500).json({
-          success: false,
-          message: 'Error interno del servidor',
-        })
+  try {
+    // Parsear el JSON del evento
+    const event = JSON.parse(rawBodyBuffer.toString('utf8'))
+    
+    // Verificar que tenga la estructura correcta
+    if (!event.signature || !event.signature.properties || !event.timestamp) {
+      console.error('Estructura del evento inválida - faltan campos signature')
+      return false
+    }
+
+    // Paso 1: Concatenar los valores de los campos especificados en properties
+    let propertiesValues = ''
+    for (const property of event.signature.properties) {
+      const value = getNestedValue(event.data, property)
+      if (value !== undefined && value !== null) {
+        propertiesValues += value.toString()
       }
     }
+
+    // Paso 2: Concatenar el timestamp
+    const timestamp = event.timestamp.toString()
+
+    // Paso 3: Concatenar el secreto
+    const stringToHash = propertiesValues + timestamp + secret
+
+    // Paso 4: Calcular SHA256
+    const expectedSignature = crypto
+      .createHash('sha256')
+      .update(stringToHash)
+      .digest('hex')
+
+    // Comparar sin importar mayúsculas/minúsculas
+    return expectedSignature.toLowerCase() === signature.toLowerCase()
+
+  } catch (error) {
+    console.error('Error parsing event JSON:', error)
+    return false
   }
+}
 
-  /**
-   * Crear ticket temporal con estado pendiente
-   */
-  private async createPendingTicket(data: {
-    gameId: string
-    curvaId: string
-    quantity: number
-    selectedResults: string[]
-    customerData: any
-    reference: string
-    paymentResponse: any
-  }) {
-    const { TicketModel } = await import('@/models/ticket.model')
-
-    const ticket = new TicketModel({
-      ticket_number: await this.generateTicketNumber(),
-      soccer_game_id: data.gameId,
-      user_id: 'temp', // Se actualizará cuando se confirme el pago
-      results_purchased: data.selectedResults,
-      payed_amount: data.paymentResponse.data.amount_in_cents / 100,
-      status: 'pending',
-      curva_id: data.curvaId,
-      created_date: new Date(),
-      close: false,
-
-      // Datos de pago
-      payment_reference: data.reference,
-      payment_status: 'PENDING',
-      wompi_transaction_id: data.paymentResponse.data.id,
-      customer_email: data.customerData.email,
-      customer_name: data.customerData.name,
-      customer_phone: data.customerData.phone,
-      payment_method: data.paymentResponse.data.payment_method_type,
-      payment_amount_cents: data.paymentResponse.data.amount_in_cents,
-      payment_currency: data.paymentResponse.data.currency,
-      payment_created_at: new Date(data.paymentResponse.data.created_at),
-    })
-
-    return await ticket.save()
-  }
-
-  /**
-   * Generar número de ticket único
-   */
-  private async generateTicketNumber(): Promise<number> {
-    const { TicketModel } = await import('@/models/ticket.model')
-
-    const lastTicket = await TicketModel.findOne({}, {}, { sort: { ticket_number: -1 } })
-    return lastTicket ? lastTicket.ticket_number + 1 : 1
-  }
+// Función auxiliar para obtener valores anidados del objeto data
+function getNestedValue(obj: any, path: string): any {
+  return path.split('.').reduce((current, key) => {
+    return current && current[key] !== undefined ? current[key] : undefined
+  }, obj)
 }

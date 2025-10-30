@@ -18,6 +18,7 @@ const SoccerGameSchema = new Schema<SoccerGame>({
     score: { type: [Number], required: true },
     tournament: { type: String, required: true },
     curvas_open: { type: [CurvaSchema], required: true },
+    soccer_reward: { type: Number, required: true },
 });
 
 export const SoccerGameModel = model<SoccerGame>("SoccerGame", SoccerGameSchema);

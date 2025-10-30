@@ -1,109 +1,239 @@
-import { WompiService } from './wompi.service'
 import { TicketService } from './ticket.service'
-import { PaymentLogModel } from '@/models/payment_log.model'
 import { TicketModel } from '@/models/ticket.model'
-import { WompiWebhookPayload } from '@/contracts/types/wompi.type'
+import { TransactionHistoryModel } from '@/models/transaction-history.model'
 import { send_ticket_purchase_email } from '@/emails/email-main'
+import { io_server } from '@/server_config'
+import { GAME_EVENTS } from '@/events/game_events'
 
 export class WompiWebhookService {
   private ticketService = new TicketService()
 
   /**
-   * Procesar webhook de Wompi
+   * Procesar actualización de transacción
    */
-  async processWebhook(payload: WompiWebhookPayload): Promise<void> {
-    const { event, data } = payload
-    const transaction = data.transaction
+  async processTransactionUpdate(transactionData: any): Promise<void> {
+    // Los datos están dentro de transactionData.transaction
+    const transaction = transactionData.transaction
+    const { id, status, reference, customer_email } = transaction
 
     try {
-      // Log del evento recibido
-      await this.logWebhookEvent(transaction.id, event, transaction.status, transaction)
+      // ⚠️ PREVENIR PROCESAMIENTO DUPLICADO
+      // Verificar si ya existe un ticket con esta referencia de pago
+      const existingTicket = await TicketModel.findOne({ 
+        payment_reference: reference,
+        payment_status: status
+      })
 
-      // Procesar según el tipo de evento
-      switch (event) {
-        case 'transaction.updated':
-          await this.processTransactionUpdate(transaction)
-          break
-        case 'transaction.created':
-          await this.processTransactionCreated(transaction)
-          break
-        default:
-          console.log(`Evento no manejado: ${event}`)
+      if (existingTicket) {
+        console.log(`⏭️ Webhook duplicado ignorado - Ticket ya procesado: ${reference} con status ${status}`)
+        return // Ya fue procesado, no hacer nada
       }
+
+      // Si el pago es aprobado, crear el ticket
+      if (status === 'APPROVED') {
+        // Parsear el reference para extraer userId, gameId y quantity
+        // Formato: TGS_{userId}_{gameId}_Q{quantity}_{timestamp}_{random}
+        // Ejemplo: TGS_64f8a1b2c3d4e5f6a7b8c9d0_68fc4ecf1cda29838ddcd4b3_Q03_1761685874654_abc123def
+        let userId: string | undefined
+        let gameId: string | undefined
+        let quantity: number = 1
+        
+        try {
+          if (reference && reference.startsWith('TGS_')) {
+            const parts = reference.split('_')
+            
+            // TGS_{userId}_{gameId}_Q{quantity}_{timestamp}_{random}
+            // parts[0] = "TGS"
+            // parts[1] = userId
+            // parts[2] = gameId
+            // parts[3] = "Q{quantity}"
+            
+            if (parts.length >= 4) {
+              userId = parts[1]
+              gameId = parts[2]
+              
+              // Extraer quantity de parts[3] (formato: "Q03" -> 3)
+              if (parts[3] && parts[3].startsWith('Q')) {
+                const quantityStr = parts[3].substring(1) // Remover el "Q"
+                quantity = parseInt(quantityStr, 10) || 1
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error parseando reference:', error)
+        }
+        
+        // Verificar que tenemos los datos necesarios
+        if (!gameId || !userId) {
+          console.error('❌ No se pudo extraer gameId o userId del reference:', reference)
+          return
+        }
+
+        try {
+          // Crear el ticket usando el servicio con los datos parseados del reference
+          const ticketData = await this.ticketService.create_new_ticket({
+            game_id: gameId,
+            customer_id: userId,
+            quantity: quantity,
+            user: customer_email ? {
+              name: transaction.customer_data?.full_name || 'Cliente',
+              email: customer_email
+            } : undefined
+          })
+
+          // Obtener el ticket actualizado
+          const updatedTicket = await TicketModel.findOneAndUpdate(
+            { ticket_number: ticketData.ticket_number },
+            {
+              payment_reference: reference,
+              wompi_transaction_id: id,
+              payment_status: status,
+              payment_finalized_at: transaction.finalized_at 
+                ? new Date(transaction.finalized_at) 
+                : new Date(),
+              customer_email: customer_email
+            },
+            { new: true }
+          )
+
+          // Guardar en el historial de transacciones
+          if (updatedTicket) {
+            await this.saveTransactionHistory({
+              ticket: updatedTicket,
+              transaction: transaction,
+              customer_email: customer_email,
+              customer_name: transaction.customer_data?.full_name
+            })
+          }
+
+          // Emitir broadcast de socket para notificar la venta del ticket
+          io_server.emit(GAME_EVENTS.TICKET_BROADCAST, {
+            game_id: gameId,
+            curva_id: ticketData.curva_id,
+            quantity: quantity,
+            timestamp: new Date(),
+          })
+        } catch (error) {
+          console.error('Error creando ticket:', error)
+        }
+      } else if (status === 'DECLINED') {
+        // Aquí podrías implementar lógica para notificar al usuario sobre el rechazo
+      }
+
     } catch (error) {
-      console.error('Error procesando webhook:', error)
-      await this.logWebhookError(transaction.id, event, error)
+      console.error('Error procesando actualización de transacción:', error)
       throw error
     }
   }
 
   /**
-   * Procesar actualización de transacción
+   * Procesar nueva transacción
    */
-  private async processTransactionUpdate(transaction: any): Promise<void> {
-    const { id, status, reference, customer_email } = transaction
+  async processTransactionCreated(transactionData: any): Promise<void> {
+    const { id, status, reference } = transactionData
 
-    // Buscar ticket por referencia
-    const ticket = await TicketModel.findOne({
-      payment_reference: reference,
-    })
+    try {
+      // Buscar ticket por referencia
+      const ticket = await TicketModel.findOne({
+        payment_reference: reference,
+      })
 
-    if (!ticket) {
-      console.error(`Ticket no encontrado para referencia: ${reference}`)
-      return
+      if (!ticket) {
+        console.error(`Ticket no encontrado para referencia: ${reference}`)
+        return
+      }
+
+      // Actualizar con datos iniciales
+      ticket.payment_status = status
+      ticket.wompi_transaction_id = id
+      ticket.payment_created_at = new Date(transactionData.created_at)
+
+      await ticket.save()
+    } catch (error) {
+      console.error('Error procesando transacción creada:', error)
+      throw error
     }
-
-    // Actualizar estado del ticket
-    ticket.payment_status = status
-    ticket.wompi_transaction_id = id
-    ticket.payment_finalized_at = transaction.finalized_at
-      ? new Date(transaction.finalized_at)
-      : undefined
-
-    // Si el pago es aprobado, activar el ticket
-    if (status === 'APPROVED') {
-      ticket.status = 'pending' // Cambiar a 'pending' para que esté activo
-      ticket.customer_email = customer_email
-
-      // Enviar notificación al cliente
-      await this.sendPaymentConfirmationEmail(ticket)
-    }
-
-    // Si el pago es rechazado, cancelar el ticket
-    if (status === 'DECLINED') {
-      ticket.status = 'lost' // Marcar como perdido
-      await this.sendPaymentErrorEmail(ticket)
-    }
-
-    await ticket.save()
-
-    console.log(`Ticket ${ticket.ticket_number} actualizado con estado: ${status}`)
   }
 
   /**
-   * Procesar nueva transacción
+   * Manejar transacciones aprobadas
    */
-  private async processTransactionCreated(transaction: any): Promise<void> {
-    const { id, status, reference } = transaction
+  async processTransactionApproved(transactionData: any): Promise<void> {
+    try {
+      const { reference, customer_email, metadata } = transactionData
 
-    // Buscar ticket por referencia
-    const ticket = await TicketModel.findOne({
-      payment_reference: reference,
-    })
+      // 1. Buscar la transacción en la base de datos
+      const ticket = await TicketModel.findOne({ payment_reference: reference })
+      if (!ticket) {
+        console.error('Ticket no encontrado:', reference)
+        return
+      }
 
-    if (!ticket) {
-      console.error(`Ticket no encontrado para referencia: ${reference}`)
-      return
+      // 2. Actualizar estado a aprobada
+      ticket.payment_status = 'APPROVED'
+      ticket.wompi_transaction_id = transactionData.id
+      ticket.customer_email = customer_email
+      ticket.status = 'pending' // Activar el ticket
+
+      await ticket.save()
+
+      // Guardar en el historial de transacciones
+      await this.saveTransactionHistory({
+        ticket: ticket,
+        transaction: transactionData,
+        customer_email: customer_email,
+        customer_name: transactionData.customer_data?.full_name
+      })
+
+      // 3. Crear los tickets para el usuario usando los servicios
+      if (metadata && metadata.userId && metadata.gameId) {
+        await this.createTicketsForUser(metadata.userId, metadata.gameId, ticket.results_purchased.length)
+      }
+
+      // 4. Enviar notificación al usuario
+      await this.sendPaymentConfirmationEmail(ticket)
+    } catch (error) {
+      console.error('Error procesando transacción aprobada:', error)
+      throw error
     }
+  }
 
-    // Actualizar con datos iniciales
-    ticket.payment_status = status
-    ticket.wompi_transaction_id = id
-    ticket.payment_created_at = new Date(transaction.created_at)
+  /**
+   * Manejar transacciones rechazadas
+   */
+  async processTransactionDeclined(transactionData: any): Promise<void> {
+    try {
+      const { reference, metadata } = transactionData
 
-    await ticket.save()
+      // 1. Buscar la transacción
+      const ticket = await TicketModel.findOne({ payment_reference: reference })
+      if (!ticket) {
+        console.error('Ticket no encontrado:', reference)
+        return
+      }
 
-    console.log(`Ticket ${ticket.ticket_number} creado con transacción: ${id}`)
+      // 2. Actualizar estado a rechazada
+      ticket.payment_status = 'DECLINED'
+      ticket.status = 'lost' // Marcar como perdido
+
+      await ticket.save()
+
+      // Guardar en el historial de transacciones (también las rechazadas)
+      await this.saveTransactionHistory({
+        ticket: ticket,
+        transaction: transactionData,
+        customer_email: transactionData.customer_email,
+        customer_name: transactionData.customer_data?.full_name
+      })
+
+      // 3. Liberar los tickets reservados
+      if (metadata && metadata.gameId) {
+        await this.releaseReservedTickets(metadata.gameId, ticket.results_purchased.length)
+      }
+    } catch (error) {
+      console.error('Error procesando transacción rechazada:', error)
+      throw error
+    }
   }
 
   /**
@@ -134,59 +264,95 @@ export class WompiWebhookService {
     }
   }
 
+
   /**
-   * Enviar email de error de pago
+   * Crear tickets para el usuario
    */
-  private async sendPaymentErrorEmail(ticket: any): Promise<void> {
+  private async createTicketsForUser(userId: string, gameId: string, quantity: number): Promise<void> {
     try {
-      // Aquí podrías implementar un email específico para errores de pago
-      console.log(`Email de error enviado para ticket ${ticket.ticket_number}`)
+      // Usar el servicio de tickets para crear los tickets
+      await this.ticketService.create_new_ticket({
+        game_id: gameId,
+        customer_id: userId,
+        quantity: quantity,
+      })
     } catch (error) {
-      console.error('Error enviando email de error:', error)
+      console.error('Error creando tickets para usuario:', error)
+      throw error
     }
   }
 
   /**
-   * Log de evento de webhook
+   * Liberar tickets reservados
    */
-  private async logWebhookEvent(
-    transactionId: string,
-    eventType: string,
-    paymentStatus: string,
-    rawPayload: any
-  ): Promise<void> {
+  private async releaseReservedTickets(gameId: string, quantity: number): Promise<void> {
     try {
-      await PaymentLogModel.create({
-        transaction_id: transactionId,
-        event_type: eventType,
-        payment_status: paymentStatus,
-        raw_payload: rawPayload,
-        processed_at: new Date(),
-      })
+      // Aquí podrías implementar la lógica para liberar tickets reservados
+      // Por ejemplo, actualizar el estado de las curvas para liberar los resultados
     } catch (error) {
-      console.error('Error logging webhook event:', error)
+      console.error('Error liberando tickets reservados:', error)
+      throw error
     }
   }
 
   /**
-   * Log de error de webhook
+   * Guardar transacción en el historial
    */
-  private async logWebhookError(
-    transactionId: string,
-    eventType: string,
-    error: any
-  ): Promise<void> {
+  private async saveTransactionHistory({
+    ticket,
+    transaction,
+    customer_email,
+    customer_name,
+  }: {
+    ticket: any
+    transaction: any
+    customer_email?: string
+    customer_name?: string
+  }): Promise<void> {
     try {
-      await PaymentLogModel.create({
-        transaction_id: transactionId,
-        event_type: eventType,
-        error_message: error.message || 'Error desconocido',
-        raw_payload: null,
-        processed_at: new Date(),
-        retry_count: 1,
+      // Verificar si ya existe un registro con la misma referencia de transacción
+      const existingHistory = await TransactionHistoryModel.findOne({
+        wompi_transaction_id: ticket.wompi_transaction_id || transaction.id,
       })
-    } catch (logError) {
-      console.error('Error logging webhook error:', logError)
+
+      if (existingHistory) {
+        // Actualizar el registro existente
+        existingHistory.payment_status = ticket.payment_status || transaction.status
+        existingHistory.successful_purchase = ticket.payment_status === 'APPROVED'
+        existingHistory.finalized_at = ticket.payment_finalized_at 
+          ? new Date(ticket.payment_finalized_at) 
+          : (transaction.finalized_at ? new Date(transaction.finalized_at) : new Date())
+        
+        if (customer_email) existingHistory.customer_email = customer_email
+        if (customer_name) existingHistory.customer_name = customer_name
+
+        await existingHistory.save()
+      } else {
+        // Crear nuevo registro en el historial
+        await TransactionHistoryModel.create({
+          payment_reference: ticket.payment_reference || transaction.reference,
+          wompi_transaction_id: ticket.wompi_transaction_id || transaction.id,
+          payed_amount: ticket.payed_amount || (transaction.amount_in_cents ? transaction.amount_in_cents / 100 : 0),
+          payment_status: ticket.payment_status || transaction.status || 'PENDING',
+          user_id: ticket.user_id,
+          customer_email: customer_email || ticket.customer_email,
+          customer_name: customer_name || ticket.customer_name,
+          created_at: ticket.payment_created_at 
+            ? new Date(ticket.payment_created_at) 
+            : (transaction.created_at ? new Date(transaction.created_at) : new Date()),
+          finalized_at: ticket.payment_finalized_at 
+            ? new Date(ticket.payment_finalized_at) 
+            : (transaction.finalized_at ? new Date(transaction.finalized_at) : undefined),
+          soccer_game_id: ticket.soccer_game_id,
+          curva_id: ticket.curva_id,
+          results_purchased: ticket.results_purchased || [],
+          successful_purchase: ticket.payment_status === 'APPROVED' || transaction.status === 'APPROVED',
+        })
+      }
+    } catch (error) {
+      console.error('Error guardando historial de transacción:', error)
+      // No lanzar error para no interrumpir el flujo principal
     }
   }
+
 }

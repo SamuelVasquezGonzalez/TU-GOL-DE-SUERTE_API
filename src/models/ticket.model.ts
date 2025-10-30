@@ -11,6 +11,8 @@ const TicketSchema = new Schema<ITicket>({
   curva_id: { type: String, required: true },
   created_date: { type: Date, required: true },
   close: { type: Boolean, required: true, default: false },
+  sell_by: { type: String, required: false },
+  reward_amount: { type: Number, required: false },
 
   // Columnas de pago Wompi
   payment_reference: { type: String, required: false },

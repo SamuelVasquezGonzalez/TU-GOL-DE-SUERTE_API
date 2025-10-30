@@ -9,6 +9,8 @@ export interface ITicket extends Document {
   payed_amount: number // cantidad de apuesta
   status: TicketStatus // estado de la boleta => pending, won, lost
   curva_id: string // id de la curva donde se compraron los resultado
+  sell_by?: string // id del usuario que vendio la boleta
+  reward_amount?: number // cantidad de ganancia
 
   created_date: Date // fecha y hora de creacion de la boleta
   close: boolean

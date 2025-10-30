@@ -8,6 +8,7 @@ import { SoccerGame } from "@/contracts/interfaces/soccer_games.interface";
 import { TicketService } from "./ticket.service";
 import { ITicket } from "@/contracts/interfaces/ticket.interface";
 import { TournamentModel } from "@/models/tournament.model";
+import { HouseWinsHistoryModel } from "@/models/house-wins-history.model";
 
 export class SoccerGameService {
     // methods
@@ -159,7 +160,8 @@ export class SoccerGameService {
             end_time, 
             status, 
             tournament,
-            soccer_price
+            soccer_price,
+            soccer_reward
         }: 
         {
             soccer_teams: [string, string], 
@@ -167,7 +169,8 @@ export class SoccerGameService {
             end_time: Date, 
             status: SoccerGameStatus,
             tournament: string,
-            soccer_price: number
+            soccer_price: number,
+            soccer_reward: number
 
         }) {
         try {
@@ -197,7 +200,8 @@ export class SoccerGameService {
                 score: [0, 0],
                 tournament: find_tournament._id.toString(),
                 curvas_open: [curva],
-                soccer_price
+                soccer_price,
+                soccer_reward
             })
 
 
@@ -386,11 +390,21 @@ export class SoccerGameService {
 
             const score = game.score
             const parsed_score = `${score[0]}.${score[1]}`
-
-            if(score[0] > 7 || score[1] > 7) throw new ResponseError(404, "GANA LA CASA");
+            const game_id = (game as any)?._id.toString()
 
             const tickets_service = new TicketService();
-            const tickets = await tickets_service.get_tickets_by_game_id({game_id: (game as any)?._id.toString(), no_error: true});
+            const tickets = await tickets_service.get_tickets_by_game_id({game_id, no_error: true});
+
+            // Caso 1: Score > 7 (GANA LA CASA)
+            if(score[0] > 7 || score[1] > 7) {
+                await this.saveHouseWinHistory({
+                    game_id,
+                    reason: 'high_score',
+                    score: score,
+                    tickets: tickets,
+                    game: game,
+                });
+            }
 
             let winners: ITicket[] = [];
             let losers: ITicket[] = [];
@@ -400,6 +414,7 @@ export class SoccerGameService {
                 const result = results_purchased.find((result) => result == parsed_score)
                 if(result) {
                     ticket.status = "won";
+                    ticket.reward_amount = game.soccer_reward;
                     winners.push(ticket);
                     await tickets_service.change_ticket_status({ticket_id: ticket._id.toString(), status: "won"});
                 } else {
@@ -409,14 +424,76 @@ export class SoccerGameService {
                 }
             }
 
+            // Caso 2: No hay ganadores ni perdedores (GANA LA CASA)
             if(winners.length === 0 && losers.length === 0) {
-                console.log("GANA LA CASA")
+                await this.saveHouseWinHistory({
+                    game_id,
+                    reason: 'no_winners',
+                    tickets: tickets,
+                    game: game,
+                });
             }
 
 
         } catch (err) {
             if(err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al marcar los perdedores y ganadores de los usuarios");
+        }
+    }
+
+    /**
+     * Guardar histórico cuando gana la casa
+     */
+    private async saveHouseWinHistory({
+        game_id,
+        reason,
+        score,
+        tickets,
+        game,
+    }: {
+        game_id: string
+        reason: 'high_score' | 'no_winners'
+        score?: [number, number]
+        tickets: ITicket[]
+        game: SoccerGame
+    }) {
+        try {
+            // Calcular totales
+            const total_tickets = tickets.length
+            // Calcular cuánto ganó la casa: suma de todos los tickets vendidos en ese partido
+            const house_winnings = tickets.reduce((sum, t) => sum + (t.payed_amount || 0), 0)
+
+            // Obtener información del torneo
+            const tournament = await TournamentModel.findById(game.tournament).lean()
+            const tournament_name = tournament?.name || ''
+
+            // Obtener nombres de los equipos
+            const teams_service = new SoccerTeamsService()
+            const all_teams = await teams_service.get_all_soccer_teams()
+            
+            const team1_id = game.soccer_teams[0]
+            const team2_id = game.soccer_teams[1]
+            
+            const team1 = all_teams.find((t: any) => (t._id?.toString() || t.id) === team1_id)
+            const team2 = all_teams.find((t: any) => (t._id?.toString() || t.id) === team2_id)
+
+            const team1_name = team1?.name || team1_id
+            const team2_name = team2?.name || team2_id
+
+            // Guardar en el histórico
+            await HouseWinsHistoryModel.create({
+                soccer_game_id: game_id,
+                reason: reason,
+                score: score,
+                total_tickets: total_tickets,
+                house_winnings: house_winnings,
+                created_at: new Date(),
+                tournament: tournament_name,
+                teams: [team1_name, team2_name],
+            })
+        } catch (error) {
+            console.error('Error guardando histórico de ganancia de la casa:', error)
+            // No lanzamos error para no interrumpir el flujo principal
         }
     }
 

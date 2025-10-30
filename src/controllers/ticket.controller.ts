@@ -198,6 +198,7 @@ export class TicketController {
 
     public create_ticket_admin = async (req: Request, res: Response) => {
         try {
+            const staff_id = (req as RequestUser).user._id;
             const { game_id, customer_id, curva_id, quantity, user } = req.body;
 
             if (!game_id || (!customer_id && !user) || !curva_id || !quantity) {
@@ -210,6 +211,7 @@ export class TicketController {
                 curva_id,
                 quantity,
                 user,
+                sell_by: staff_id || undefined,
             });
 
             res.status(201).json({

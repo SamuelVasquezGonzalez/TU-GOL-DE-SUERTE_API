@@ -398,6 +398,154 @@ const swaggerDefinition = {
         description:
           'Esquema para subida de archivos usando multipart/form-data. Límite de 5MB por archivo.',
       },
+      UserStats: {
+        type: 'object',
+        properties: {
+          user_id: {
+            type: 'string',
+            description: 'ID del usuario',
+          },
+          total_tickets: {
+            type: 'number',
+            description: 'Total de tickets comprados',
+          },
+          total_games: {
+            type: 'number',
+            description: 'Total de partidos en los que ha participado',
+          },
+          total_won: {
+            type: 'number',
+            description: 'Total de tickets ganados',
+          },
+          total_lost: {
+            type: 'number',
+            description: 'Total de tickets perdidos',
+          },
+          total_pending: {
+            type: 'number',
+            description: 'Total de tickets pendientes',
+          },
+          total_amount_spent: {
+            type: 'number',
+            description: 'Total de dinero gastado',
+          },
+          total_amount_won: {
+            type: 'number',
+            description: 'Total de dinero ganado',
+          },
+        },
+      },
+      StaffStats: {
+        type: 'object',
+        properties: {
+          staff_id: {
+            type: 'string',
+            description: 'ID del staff',
+          },
+          staff_name: {
+            type: 'string',
+            description: 'Nombre del staff',
+          },
+          staff_email: {
+            type: 'string',
+            description: 'Email del staff',
+          },
+          total_sales: {
+            type: 'number',
+            description: 'Total de ventas realizadas',
+          },
+          total_amount_sold: {
+            type: 'number',
+            description: 'Total de dinero vendido',
+          },
+          total_tickets_sold: {
+            type: 'number',
+            description: 'Total de tickets vendidos',
+          },
+        },
+      },
+      GeneralStats: {
+        type: 'object',
+        properties: {
+          total_revenue: {
+            type: 'number',
+            description: 'Ingresos totales del sistema',
+          },
+          total_tickets: {
+            type: 'number',
+            description: 'Total de tickets vendidos',
+          },
+          total_games: {
+            type: 'number',
+            description: 'Total de partidos',
+          },
+          total_users: {
+            type: 'number',
+            description: 'Total de usuarios',
+          },
+          total_staff: {
+            type: 'number',
+            description: 'Total de staff',
+          },
+          revenue_by_day: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                date: { type: 'string' },
+                revenue: { type: 'number' },
+                tickets: { type: 'number' },
+              },
+            },
+          },
+          revenue_by_game: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                game_id: { type: 'string' },
+                game_name: { type: 'string' },
+                revenue: { type: 'number' },
+                tickets: { type: 'number' },
+              },
+            },
+          },
+          revenue_by_tournament: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                tournament_id: { type: 'string' },
+                tournament_name: { type: 'string' },
+                revenue: { type: 'number' },
+                tickets: { type: 'number' },
+              },
+            },
+          },
+          revenue_by_date: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                date: { type: 'string' },
+                revenue: { type: 'number' },
+                tickets: { type: 'number' },
+              },
+            },
+          },
+          revenue_by_hour: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                hour: { type: 'number' },
+                revenue: { type: 'number' },
+                tickets: { type: 'number' },
+              },
+            },
+          },
+        },
+      },
     },
   },
   tags: [
@@ -425,6 +573,10 @@ const swaggerDefinition = {
       name: 'Players',
       description: 'Gestión de jugadores de fútbol',
     },
+    {
+      name: 'Stats',
+      description: 'Estadísticas del sistema',
+    },
   ],
 }
 
@@ -439,6 +591,7 @@ const options = {
     './src/docs/tickets.swagger.ts',
     './src/docs/players.swagger.ts',
     './src/docs/webhooks.swagger.ts',
+    './src/routes/stats.routes.ts',
   ],
 }
 

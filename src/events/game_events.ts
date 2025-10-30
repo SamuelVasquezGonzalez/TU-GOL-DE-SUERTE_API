@@ -135,10 +135,11 @@ const create_ticket_event = (socket: Socket) => {
       user?: {
         name: string
         email: string
-      }
+      },
+      sell_by?: string
     }) => {
       try {
-        const { game_id, customer_id, curva_id, quantity, user } = data
+        const { game_id, customer_id, curva_id, quantity, user, sell_by } = data
         const ticket_service = new TicketService()
         const new_ticket = await ticket_service.create_new_ticket({
           game_id,
@@ -146,6 +147,7 @@ const create_ticket_event = (socket: Socket) => {
           curva_id,
           quantity,
           user,
+          sell_by,
         })
 
         // Respuesta al cliente específico
