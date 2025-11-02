@@ -7,6 +7,109 @@ export interface UserStats {
   total_pending: number
   total_amount_spent: number
   total_amount_won: number
+  // Estadísticas para gráficos
+  spending_by_day: DailySpending[]
+  spending_by_week: WeeklySpending[]
+  earnings_by_day: DailyEarnings[]
+  earnings_by_week: WeeklyEarnings[]
+  tickets_by_day: DailyTicketStats[]
+  tickets_by_week: WeeklyTicketStats[]
+  tickets_by_game: GameTicketStats[]
+  tickets_by_tournament: TournamentTicketStats[]
+  tickets_by_status: StatusDistribution[]
+  tickets_by_hour: HourTicketStats[]
+  win_rate_by_period: WinRatePeriod[]
+}
+
+export interface DailySpending {
+  date: string
+  amount_spent: number
+  tickets: number
+}
+
+export interface WeeklySpending {
+  week: string
+  week_start: string
+  week_end: string
+  amount_spent: number
+  tickets: number
+}
+
+export interface DailyEarnings {
+  date: string
+  amount_won: number
+  tickets_won: number
+}
+
+export interface WeeklyEarnings {
+  week: string
+  week_start: string
+  week_end: string
+  amount_won: number
+  tickets_won: number
+}
+
+export interface DailyTicketStats {
+  date: string
+  total: number
+  won: number
+  lost: number
+  pending: number
+}
+
+export interface WeeklyTicketStats {
+  week: string
+  week_start: string
+  week_end: string
+  total: number
+  won: number
+  lost: number
+  pending: number
+}
+
+export interface GameTicketStats {
+  game_id: string
+  game_name: string
+  total_tickets: number
+  won: number
+  lost: number
+  pending: number
+  amount_spent: number
+  amount_won: number
+}
+
+export interface TournamentTicketStats {
+  tournament_id: string
+  tournament_name: string
+  total_tickets: number
+  won: number
+  lost: number
+  pending: number
+  amount_spent: number
+  amount_won: number
+}
+
+export interface StatusDistribution {
+  status: 'won' | 'lost' | 'pending'
+  count: number
+  percentage: number
+}
+
+export interface HourTicketStats {
+  hour: number
+  tickets: number
+  amount_spent: number
+}
+
+export interface WinRatePeriod {
+  period: string // 'day' o 'week'
+  date?: string // Para días
+  week_start?: string // Para semanas
+  week_end?: string // Para semanas
+  win_rate: number // Porcentaje de victorias (0-100)
+  total_tickets: number
+  won: number
+  lost: number
 }
 
 export interface StaffStats {

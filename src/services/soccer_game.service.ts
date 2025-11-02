@@ -213,16 +213,37 @@ export class SoccerGameService {
 
     public async open_new_curva({game_id}: {game_id: string}) {
         try {
-            const soccer_game = await this.get_soccer_game_by_id({id: game_id, parse_ids: false});
-            if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
+            // Verificar que el juego existe sin modificar el documento
+            const game = await SoccerGameModel.findById(game_id).lean();
+            if(!game) throw new ResponseError(404, "No se encontró el partido de futbol");
+            
+            // Generar la nueva curva
             const curva = await this.generate_curva();
-            soccer_game.curvas_open.push(curva);
-            await soccer_game.save();
+            
+            // Agregar la nueva curva usando findByIdAndUpdate para evitar problemas de validación
+            const update_result = await SoccerGameModel.findByIdAndUpdate(
+                game_id,
+                {
+                    $push: {
+                        curvas_open: curva
+                    }
+                },
+                { 
+                    new: true, 
+                    runValidators: true 
+                }
+            );
+
+            if(!update_result) {
+                throw new ResponseError(404, "No se pudo agregar la nueva curva");
+            }
+
             return {
                 status: true,
                 curva
             }
         } catch (err) {
+            console.error('Error en open_new_curva:', err);
             if(err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al abrir la curva");
         }
@@ -232,12 +253,30 @@ export class SoccerGameService {
 
     public async close_curva({game_id, curva_id}: {game_id: string, curva_id: string}) {
         try {
-            const soccer_game = await this.get_soccer_game_by_id({id: game_id, parse_ids: false});
-            if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
-            const curva = soccer_game.curvas_open.find((curva) => curva.id === curva_id);
-            if(!curva) throw new ResponseError(404, "No se encontró la curva");
-            curva.status = "closed";
-            await soccer_game.save();
+            // Verificar que el juego existe y encontrar la curva
+            const game = await SoccerGameModel.findById(game_id).lean();
+            if(!game) throw new ResponseError(404, "No se encontró el partido de futbol");
+            
+            const curvaIndex = game.curvas_open.findIndex((curva) => curva.id === curva_id);
+            if(curvaIndex === -1) throw new ResponseError(404, "No se encontró la curva");
+            
+            // Actualizar solo el status de la curva usando findByIdAndUpdate
+            const update_result = await SoccerGameModel.findByIdAndUpdate(
+                game_id,
+                {
+                    $set: {
+                        [`curvas_open.${curvaIndex}.status`]: "closed"
+                    }
+                },
+                { 
+                    new: true, 
+                    runValidators: true 
+                }
+            );
+
+            if(!update_result) {
+                throw new ResponseError(404, "No se pudo cerrar la curva");
+            }
             
         }   
         catch (err) {
@@ -287,12 +326,30 @@ export class SoccerGameService {
 
     public async update_game_status({game_id, status}: {game_id: string, status: SoccerGameStatus}) {
         try {
-            const soccer_game = await this.get_soccer_game_by_id({id: game_id, parse_ids: false});
-            if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
-            soccer_game.status = status;
-            await soccer_game.save();
+            // Verificar que el juego existe sin modificar el documento
+            const game = await SoccerGameModel.findById(game_id).lean();
+            if(!game) throw new ResponseError(404, "No se encontró el partido de futbol");
+            
+            // Actualizar solo el status usando findByIdAndUpdate para evitar problemas de validación
+            const update_result = await SoccerGameModel.findByIdAndUpdate(
+                game_id,
+                {
+                    $set: {
+                        status: status
+                    }
+                },
+                { 
+                    new: true, 
+                    runValidators: true 
+                }
+            );
+
+            if(!update_result) {
+                throw new ResponseError(404, "No se pudo actualizar el estado del partido");
+            }
         }
         catch (err) {
+            console.log(err);   
             if(err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al actualizar el estado del partido de futbol");
         }
@@ -321,10 +378,27 @@ export class SoccerGameService {
 
     public async update_soccer_game_score({game_id, score}: {game_id: string, score: [number, number]}) {
         try {
-            const soccer_game = await this.get_soccer_game_by_id({id: game_id, parse_ids: false});
-            if(!soccer_game) throw new ResponseError(404, "No se encontró el partido de futbol");
-            soccer_game.score = score;
-            await soccer_game.save();
+            // Verificar que el juego existe sin modificar el documento
+            const game = await SoccerGameModel.findById(game_id).lean();
+            if(!game) throw new ResponseError(404, "No se encontró el partido de futbol");
+            
+            // Actualizar solo el score usando findByIdAndUpdate para evitar problemas de validación
+            const update_result = await SoccerGameModel.findByIdAndUpdate(
+                game_id,
+                {
+                    $set: {
+                        score: score
+                    }
+                },
+                { 
+                    new: true, 
+                    runValidators: true 
+                }
+            );
+
+            if(!update_result) {
+                throw new ResponseError(404, "No se pudo actualizar el marcador del partido");
+            }
         }
         catch (err) {
             console.log(err);
@@ -406,7 +480,10 @@ export class SoccerGameService {
             const game_id = (game as any)?._id.toString()
 
             const tickets_service = new TicketService();
-            const tickets = await tickets_service.get_tickets_by_game_id({game_id, no_error: true});
+            const all_tickets = await tickets_service.get_tickets_by_game_id({game_id, no_error: true});
+            
+            // Filtrar solo tickets que no están cerrados aún
+            const tickets = all_tickets.filter(ticket => !ticket.close);
 
             // Caso 1: Score > 7 (GANA LA CASA)
             if(score[0] > 7 || score[1] > 7) {
@@ -414,7 +491,7 @@ export class SoccerGameService {
                     game_id,
                     reason: 'high_score',
                     score: score,
-                    tickets: tickets,
+                    tickets: all_tickets, // Usar todos los tickets para el histórico
                     game: game,
                 });
             }

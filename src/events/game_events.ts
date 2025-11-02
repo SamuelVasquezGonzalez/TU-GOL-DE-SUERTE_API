@@ -62,6 +62,10 @@ const update_game_score_event = (socket: Socket) => {
     async (data: { game_id: string; score: [number, number] }) => {
       try {
         const { game_id, score } = data
+        console.log(`🎮 Evento UPDATE_SCORE recibido - game_id: ${game_id}, score: ${score}`)
+        console.log(`🎮 Score: ${score}`)
+        console.log(`🎮 Game ID: ${game_id}`)
+        console.log(`🎮 Score: ${score}`)
         const game_service = new SoccerGameService()
         await game_service.update_soccer_game_score({ game_id, score })
 
@@ -97,6 +101,7 @@ const update_game_status_event = (socket: Socket) => {
     async (data: { game_id: string; status: SoccerGameStatus }) => {
       try {
         const { game_id, status } = data
+        console.log(`🎮 Evento GAME_STATUS_UPDATED recibido - game_id: ${game_id}, status: ${status}`)
         const game_service = new SoccerGameService()
         await game_service.update_game_status({ game_id, status })
 
@@ -112,6 +117,7 @@ const update_game_status_event = (socket: Socket) => {
           timestamp: new Date(),
         })
       } catch (err) {
+        console.error(`❌ Error al actualizar el estado del partido`, err)
         const error_message =
           err instanceof ResponseError ? err.message : 'Error al actualizar el estado del partido'
         socket.emit(GAME_EVENTS.ERROR, {
@@ -135,6 +141,7 @@ const create_ticket_event = (socket: Socket) => {
       user?: {
         name: string
         email: string
+        phone?: string
       },
       sell_by?: string
     }) => {
