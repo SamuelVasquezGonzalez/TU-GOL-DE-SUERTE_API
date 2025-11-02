@@ -228,13 +228,16 @@ export class TicketController {
                 throw new ResponseError(400, "Todos los campos son requeridos");
             }
 
+            // Convertir staff_id a string para asegurar consistencia
+            const sell_by_str = staff_id ? String(staff_id) : undefined;
+
             const new_ticket = await this.ticket_service.create_new_ticket({
                 game_id,
                 customer_id,
                 curva_id,
                 quantity,
                 user,
-                sell_by: staff_id || undefined,
+                sell_by: sell_by_str,
             });
 
             res.status(201).json({

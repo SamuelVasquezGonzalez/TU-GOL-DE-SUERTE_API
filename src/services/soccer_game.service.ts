@@ -248,21 +248,34 @@ export class SoccerGameService {
 
     public async update_curva_results({game_id, curva_id, curva_updated}: {game_id: string, curva_id: string, curva_updated: CurvaEntity}) {
         try {
-            // Obtener el documento del juego sin .lean() para poder guardarlo
-            const game = await this.get_soccer_game_by_id({id: game_id, parse_ids: false});
+            // Obtener el juego solo para verificar que existe y encontrar el índice de la curva
+            const game = await SoccerGameModel.findById(game_id).lean();
             if(!game) throw new ResponseError(404, "No se encontró el partido de futbol");
 
             // Buscar la curva en el juego
             const curvaIndex = game.curvas_open.findIndex((curva) => curva.id === curva_id);
             if(curvaIndex === -1) throw new ResponseError(404, "No se encontró la curva");
 
-            // Actualizar la curva directamente en el arreglo
-            game.curvas_open[curvaIndex].avaliable_results = curva_updated.avaliable_results;
-            game.curvas_open[curvaIndex].sold_results = curva_updated.sold_results;
-            game.curvas_open[curvaIndex].status = curva_updated.status;
+            // Actualizar solo la curva específica usando findByIdAndUpdate para evitar problemas de validación
+            // Esto actualiza solo el array de curvas sin tocar otros campos
+            const update_result = await SoccerGameModel.findByIdAndUpdate(
+                game_id,
+                {
+                    $set: {
+                        [`curvas_open.${curvaIndex}.avaliable_results`]: curva_updated.avaliable_results,
+                        [`curvas_open.${curvaIndex}.sold_results`]: curva_updated.sold_results,
+                        [`curvas_open.${curvaIndex}.status`]: curva_updated.status,
+                    }
+                },
+                { 
+                    new: true, 
+                    runValidators: true 
+                }
+            );
 
-            // Guardar el documento
-            await game.save();
+            if(!update_result) {
+                throw new ResponseError(404, "No se pudo actualizar la curva");
+            }
 
         }
         catch (err) {

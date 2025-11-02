@@ -30,13 +30,8 @@ export class WompiWebhookController {
       // 2. Parsear el JSON para procesar
       const event = JSON.parse(payloadString)
 
+
       // Log del evento recibido para debugging
-      console.log(`📥 Webhook recibido: ${event.event}`, {
-        transaction_id: event.data?.transaction?.id,
-        reference: event.data?.transaction?.reference,
-        status: event.data?.transaction?.status,
-        timestamp: new Date().toISOString()
-      })
 
       // 3. Manejar según el tipo de evento
       // Nota: Respondemos 200 inmediatamente para evitar reintentos de Wompi

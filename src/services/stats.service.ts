@@ -14,6 +14,7 @@ import {
   TournamentRevenue,
   DateRevenue,
   HourRevenue,
+  WeeklyRevenue,
 } from '@/contracts/interfaces/stats.interface'
 import dayjs from 'dayjs'
 
@@ -89,10 +90,17 @@ export class StatsService {
       }
 
       // Obtener todos los tickets vendidos por este staff
-      // Buscar con el staff_id convertido a string
+      // Cuando un staff vende directamente, el ticket puede no tener payment_status
+      // También buscar por ObjectId por si hay tickets antiguos con formato diferente
       const sold_tickets = await TicketModel.find({
-        sell_by: staff_id_str,
-        payment_status: 'APPROVED', // Solo contar tickets pagados exitosamente
+        $or: [
+          { sell_by: staff_id_str }, // Buscar como string
+          { sell_by: staff_id }, // Buscar como ObjectId (para tickets antiguos)
+        ],
+        // Excluir tickets rechazados explícitamente, pero incluir todos los demás
+        $nor: [
+          { payment_status: 'DECLINED' },
+        ],
       }).lean()
 
       // Calcular estadísticas de ventas
@@ -103,6 +111,14 @@ export class StatsService {
       )
       const total_sales = total_tickets_sold // Por ahora es igual al número de tickets
 
+      // Calcular estadísticas por día
+      const revenue_by_day = this.calculateDailyStats(sold_tickets)
+      const tickets_by_day = this.calculateDailyTicketStats(sold_tickets)
+
+      // Calcular estadísticas por semana
+      const revenue_by_week = this.calculateWeeklyStats(sold_tickets)
+      const tickets_by_week = this.calculateWeeklyTicketStats(sold_tickets)
+
       return {
         staff_id: staff_id_str,
         staff_name: staff.name,
@@ -110,6 +126,10 @@ export class StatsService {
         total_sales,
         total_amount_sold,
         total_tickets_sold,
+        revenue_by_day,
+        revenue_by_week,
+        tickets_by_day,
+        tickets_by_week,
       }
     } catch (err) {
       if (err instanceof ResponseError) throw err
@@ -445,6 +465,99 @@ export class StatsService {
     }
 
     return hours_array.sort((a, b) => a.hour - b.hour)
+  }
+
+  /**
+   * Calcular estadísticas diarias de revenue para staff
+   */
+  private calculateDailyStats(tickets: any[]): DailyRevenue[] {
+    const revenue_by_day_map = new Map<string, { revenue: number; tickets: number }>()
+
+    tickets.forEach((ticket) => {
+      const date = ticket.created_date 
+        ? dayjs(ticket.created_date).format('YYYY-MM-DD')
+        : dayjs().format('YYYY-MM-DD')
+      
+      const existing = revenue_by_day_map.get(date) || { revenue: 0, tickets: 0 }
+      const payed_amount = Number(ticket.payed_amount) || 0
+      
+      revenue_by_day_map.set(date, {
+        revenue: existing.revenue + payed_amount,
+        tickets: existing.tickets + 1,
+      })
+    })
+
+    return Array.from(revenue_by_day_map.entries())
+      .map(([date, data]) => ({
+        date,
+        revenue: data.revenue,
+        tickets: data.tickets,
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date))
+  }
+
+  /**
+   * Calcular estadísticas diarias de tickets para staff
+   */
+  private calculateDailyTicketStats(tickets: any[]): DailyRevenue[] {
+    // Es igual a calculateDailyStats, pero se mantiene separado por claridad
+    return this.calculateDailyStats(tickets)
+  }
+
+  /**
+   * Calcular estadísticas semanales de revenue para staff
+   */
+  private calculateWeeklyStats(tickets: any[]): WeeklyRevenue[] {
+    const revenue_by_week_map = new Map<string, { revenue: number; tickets: number; week_start: string; week_end: string }>()
+
+    tickets.forEach((ticket) => {
+      if (!ticket.created_date) return
+      
+      const ticket_date = dayjs(ticket.created_date)
+      // dayjs usa domingo (0) como inicio de semana, necesitamos lunes (1)
+      // Calcular días desde el lunes (0=lunes, 6=domingo)
+      const day_of_week = ticket_date.day() === 0 ? 6 : ticket_date.day() - 1
+      
+      // Obtener el lunes de la semana actual
+      const week_start = ticket_date.subtract(day_of_week, 'day').startOf('day')
+      const week_end = week_start.add(6, 'day').endOf('day')
+      
+      const week_key = `${week_start.format('YYYY-MM-DD')}_${week_end.format('YYYY-MM-DD')}`
+      
+      const existing = revenue_by_week_map.get(week_key) || { 
+        revenue: 0, 
+        tickets: 0, 
+        week_start: week_start.format('YYYY-MM-DD'),
+        week_end: week_end.format('YYYY-MM-DD')
+      }
+      
+      const payed_amount = Number(ticket.payed_amount) || 0
+      
+      revenue_by_week_map.set(week_key, {
+        revenue: existing.revenue + payed_amount,
+        tickets: existing.tickets + 1,
+        week_start: existing.week_start,
+        week_end: existing.week_end,
+      })
+    })
+
+    return Array.from(revenue_by_week_map.entries())
+      .map(([week_key, data]) => ({
+        week: `${data.week_start} - ${data.week_end}`,
+        week_start: data.week_start,
+        week_end: data.week_end,
+        revenue: data.revenue,
+        tickets: data.tickets,
+      }))
+      .sort((a, b) => a.week_start.localeCompare(b.week_start))
+  }
+
+  /**
+   * Calcular estadísticas semanales de tickets para staff
+   */
+  private calculateWeeklyTicketStats(tickets: any[]): WeeklyRevenue[] {
+    // Es igual a calculateWeeklyStats, pero se mantiene separado por claridad
+    return this.calculateWeeklyStats(tickets)
   }
 }
 

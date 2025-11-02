@@ -230,6 +230,9 @@ export class TicketService {
 
       const ticket_number = await this.generate_ticket_number()
 
+      // Convertir sell_by a string si existe para asegurar consistencia
+      const sell_by_str = sell_by ? String(sell_by) : undefined
+
       await TicketModel.create({
         ticket_number: ticket_number,
         soccer_game_id: game_id,
@@ -239,7 +242,7 @@ export class TicketService {
         status: 'pending',
         curva_id: curva_info.id,
         created_date: new Date(),
-        sell_by: sell_by,
+        sell_by: sell_by_str,
         reward_amount: game_info.soccer_reward,
       })
 

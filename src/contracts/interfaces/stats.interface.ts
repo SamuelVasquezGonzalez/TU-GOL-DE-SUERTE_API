@@ -16,6 +16,18 @@ export interface StaffStats {
   total_sales: number
   total_amount_sold: number
   total_tickets_sold: number
+  revenue_by_day: DailyRevenue[]
+  revenue_by_week: WeeklyRevenue[]
+  tickets_by_day: DailyRevenue[]
+  tickets_by_week: WeeklyRevenue[]
+}
+
+export interface WeeklyRevenue {
+  week: string // Formato: "YYYY-WW" o "YYYY-MM-DD (inicio semana)"
+  week_start: string // Fecha de inicio de la semana (YYYY-MM-DD)
+  week_end: string // Fecha de fin de la semana (YYYY-MM-DD)
+  revenue: number
+  tickets: number
 }
 
 export interface GeneralStats {
