@@ -158,6 +158,29 @@ export class TicketController {
         }
     };
 
+    public get_my_last_ticket_by_user_id = async (req: Request, res: Response) => {
+        try {
+            const user_id = (req as RequestUser).user._id;
+            const ticket = await this.ticket_service.get_my_last_ticket_by_user_id({ user_id });
+            res.status(200).json({
+                success: true,
+                message: "Última boleta del usuario obtenida exitosamente",
+                data: ticket,
+            });
+        } catch (err) {
+            if (err instanceof ResponseError) {
+                res.status(err.statusCode).json({
+                    success: false,
+                    message: err.message,
+                });
+            } else {
+                res.status(500).json({
+                    success: false,
+                    message: "Error al obtener la última boleta del usuario",
+                });
+            }
+        }
+    };
     // ==================== POST ENDPOINTS ====================
 
     public create_ticket = async (req: Request, res: Response) => {

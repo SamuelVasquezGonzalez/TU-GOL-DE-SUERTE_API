@@ -11,6 +11,8 @@ const ticket_controller = new TicketController();
 // Rutas autenticadas para usuarios
 router.get("/my-tickets", customer_auth, ticket_controller.get_my_tickets);
 
+router.get("/my-last-ticket", customer_auth, ticket_controller.get_my_last_ticket_by_user_id);
+
 router.get("/:id", customer_auth, ticket_controller.get_ticket_by_id);
 
 // Rutas admin

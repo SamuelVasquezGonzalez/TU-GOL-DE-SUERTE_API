@@ -41,6 +41,17 @@ export class TicketService {
     }
   }
 
+  public async get_my_last_ticket_by_user_id({ user_id }: { user_id: string }) {
+    try {
+      const ticket = await TicketModel.findOne({ user_id }).sort({ created_date: -1 }).lean()
+      if (!ticket) throw new ResponseError(404, 'No se encontró la última boleta del usuario')
+      return ticket
+    } catch (err) {
+      if (err instanceof ResponseError) throw err
+      throw new ResponseError(500, 'Error al obtener la última boleta del usuario')
+  }
+  }
+
   public async get_tickets_by_game_id({
     game_id,
     no_error,
