@@ -34,6 +34,7 @@ router.post("/admin", staff_auth, ticket_controller.create_ticket_admin);
 // Rutas admin
 router.put("/:id/status", staff_auth, ticket_controller.change_ticket_status);
 
+
 // ==================== DELETE ROUTES ====================
 
 // Rutas autenticadas para usuarios
