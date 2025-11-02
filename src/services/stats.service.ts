@@ -5,6 +5,7 @@ import { SoccerGameModel } from '@/models/soccer_games.model'
 import { TransactionHistoryModel } from '@/models/transaction-history.model'
 import { TournamentModel } from '@/models/tournament.model'
 import { SoccerTeamsService } from './soccer_teams.service'
+import { getCached, setCached } from '@/config/redis.config'
 import {
   UserStats,
   StaffStats,
@@ -38,6 +39,13 @@ export class StatsService {
       // Convertir user_id a string para asegurar consistencia
       const user_id_str = String(user_id)
       
+      // Intentar obtener del cache (TTL: 5 minutos)
+      const cacheKey = `user_stats:${user_id_str}`
+      const cachedStats = await getCached<UserStats>(cacheKey)
+      if (cachedStats) {
+        return cachedStats
+      }
+      
       const user = await UserModel.findById(user_id_str).lean()
       if (!user) throw new ResponseError(404, 'Usuario no encontrado')
 
@@ -69,11 +77,28 @@ export class StatsService {
         return sum + (Number(t.reward_amount) || Number(t.payed_amount) || 0)
       }, 0)
 
-      // Obtener información de juegos y torneos para las estadísticas
-      const games = await SoccerGameModel.find().lean()
-      const tournaments = await TournamentModel.find().lean()
+      // Obtener información de juegos y torneos para las estadísticas (con cache)
+      // Cachear juegos (TTL: 10 minutos)
+      let games = await getCached<any[]>('games:all')
+      if (!games) {
+        games = await SoccerGameModel.find().lean()
+        await setCached('games:all', games, 600) // 10 minutos
+      }
+      
+      // Cachear torneos (TTL: 30 minutos)
+      let tournaments = await getCached<any[]>('tournaments:all')
+      if (!tournaments) {
+        tournaments = await TournamentModel.find().lean()
+        await setCached('tournaments:all', tournaments, 1800) // 30 minutos
+      }
+      
+      // Cachear equipos (TTL: 1 hora)
       const soccer_teams_service = new SoccerTeamsService()
-      const all_teams = await soccer_teams_service.get_all_soccer_teams()
+      let all_teams = await getCached<any[]>('teams:all')
+      if (!all_teams) {
+        all_teams = await soccer_teams_service.get_all_soccer_teams()
+        await setCached('teams:all', all_teams, 3600) // 1 hora
+      }
       
       // Crear mapas para acceso rápido
       const games_map = new Map()
@@ -105,7 +130,7 @@ export class StatsService {
       const tickets_by_hour = this.calculateUserTicketsByHour(tickets)
       const win_rate_by_period = this.calculateWinRateByPeriod(tickets)
 
-      return {
+      const stats: UserStats = {
         user_id: user_id_str,
         total_tickets,
         total_games,
@@ -126,6 +151,11 @@ export class StatsService {
         tickets_by_hour,
         win_rate_by_period,
       }
+      
+      // Guardar en cache (TTL: 5 minutos)
+      await setCached(cacheKey, stats, 300)
+      
+      return stats
     } catch (err) {
       if (err instanceof ResponseError) throw err
       throw new ResponseError(500, 'Error al obtener estadísticas del usuario')
@@ -139,6 +169,13 @@ export class StatsService {
     try {
       // Convertir staff_id a string para asegurar consistencia
       const staff_id_str = String(staff_id)
+      
+      // Intentar obtener desde cache primero
+      const cacheKey = `staff_stats:${staff_id_str}`
+      const cachedStats = await getCached<StaffStats>(cacheKey)
+      if (cachedStats) {
+        return cachedStats
+      }
       
       const staff = await UserModel.findById(staff_id_str).lean()
       if (!staff) throw new ResponseError(404, 'Staff no encontrado')
@@ -177,7 +214,7 @@ export class StatsService {
       const revenue_by_week = this.calculateWeeklyStats(sold_tickets)
       const tickets_by_week = this.calculateWeeklyTicketStats(sold_tickets)
 
-      return {
+      const stats: StaffStats = {
         staff_id: staff_id_str,
         staff_name: staff.name,
         staff_email: staff.email,
@@ -189,6 +226,11 @@ export class StatsService {
         tickets_by_day,
         tickets_by_week,
       }
+      
+      // Guardar en cache (TTL: 3 minutos)
+      await setCached(cacheKey, stats, 180)
+      
+      return stats
     } catch (err) {
       if (err instanceof ResponseError) throw err
       throw new ResponseError(500, 'Error al obtener estadísticas del staff')

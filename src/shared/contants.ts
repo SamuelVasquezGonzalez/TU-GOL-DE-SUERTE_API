@@ -39,6 +39,10 @@ export const GLOBAL_ENV = {
   WOMPI_BASE_URL: process.env.WOMPI_BASE_URL as string,
   FRONTEND_URL: process.env.FRONTEND_URL as string,
   BACKEND_URL: process.env.BACKEND_URL as string,
+
+  REDIS_HOST: process.env.REDIS_HOST as string,
+  REDIS_PORT: process.env.REDIS_PORT as string,
+  REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
 }
 
 export const DEFAULT_PROFILE_AVATAR = {

@@ -2,7 +2,15 @@ import { Router } from 'express'
 import { WompiWebhookController } from '@/controllers/wompi-webhook.controller'
 
 const router = Router()
-const wompiController = new WompiWebhookController()
+
+// Lazy initialization para evitar problemas de carga de módulos
+let wompiControllerInstance: WompiWebhookController | null = null
+const getWompiController = (): WompiWebhookController => {
+  if (!wompiControllerInstance) {
+    wompiControllerInstance = new WompiWebhookController()
+  }
+  return wompiControllerInstance
+}
 
 /**
  * @swagger
@@ -78,7 +86,7 @@ const wompiController = new WompiWebhookController()
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/wompi', wompiController.handleWebhook)
+router.post('/wompi', (req, res) => getWompiController().handleWebhook(req, res))
 
 
 export default router

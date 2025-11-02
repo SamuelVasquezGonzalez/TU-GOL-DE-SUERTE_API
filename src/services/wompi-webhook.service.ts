@@ -6,7 +6,11 @@ import { io_server } from '@/server_config'
 import { GAME_EVENTS } from '@/events/game_events'
 
 export class WompiWebhookService {
-  private ticketService = new TicketService()
+  private ticketService: TicketService
+
+  constructor() {
+    this.ticketService = new TicketService()
+  }
 
   /**
    * Procesar actualización de transacción
@@ -42,9 +46,6 @@ export class WompiWebhookService {
           if (reference && reference.startsWith('TGS_')) {
             const parts = reference.split('_')
             
-            console.log(`📋 Parseando reference: ${reference}`)
-            console.log(`📋 Parts separados:`, parts)
-            
             // TGS_{userId}_{gameId}_Q{quantity}_{timestamp}_{random}
             // parts[0] = "TGS"
             // parts[1] = userId
@@ -63,36 +64,22 @@ export class WompiWebhookService {
                 // Validar que el parseo fue exitoso y es un número válido
                 if (!isNaN(parsedQuantity) && parsedQuantity > 0) {
                   quantity = parsedQuantity
-                } else {
-                  console.warn(`⚠️ Cantidad inválida parseada: "${quantityStr}", usando default: 1`)
                 }
-                
-                console.log(`📊 Cantidad parseada: ${quantity} (de "${parts[3]}")`)
-              } else {
-                console.warn(`⚠️ Parts[3] no inicia con 'Q': "${parts[3]}"`)
               }
-            } else {
-              console.warn(`⚠️ Reference no tiene suficientes parts. Esperado >= 4, obtenido: ${parts.length}`)
             }
-          } else {
-            console.warn(`⚠️ Reference no inicia con 'TGS_': ${reference}`)
           }
         } catch (error) {
-          console.error('❌ Error parseando reference:', error)
+          console.error('Error parseando reference:', error)
           console.error('Reference recibido:', reference)
         }
         
         // Verificar que tenemos los datos necesarios
         if (!gameId || !userId) {
-          console.error('❌ No se pudo extraer gameId o userId del reference:', reference)
+          console.error('No se pudo extraer gameId o userId del reference:', reference)
           return
         }
-        
-        console.log(`✅ Datos parseados - userId: ${userId}, gameId: ${gameId}, quantity: ${quantity}`)
 
         try {
-          console.log(`🎫 Creando ticket - game_id: ${gameId}, customer_id: ${userId}, quantity: ${quantity}`)
-          
           // Crear el ticket usando el servicio con los datos parseados del reference
           const ticketData = await this.ticketService.create_new_ticket({
             game_id: gameId,
@@ -103,8 +90,6 @@ export class WompiWebhookService {
               email: customer_email
             } : undefined
           })
-          
-          console.log(`✅ Ticket creado - ticket_number: ${ticketData.ticket_number}, resultados: ${ticketData.results_purchased?.length || 0}`)
 
           // Obtener el ticket actualizado
           const updatedTicket = await TicketModel.findOneAndUpdate(

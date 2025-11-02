@@ -26,11 +26,19 @@ export class InitiConnection {
                 GLOBAL_ENV.MONGODB_URI,
                 {
                     dbName: "tu_gol_de_suerte",
+                    // Connection Pooling Configuration
+                    maxPoolSize: 10, // Máximo de conexiones simultáneas
+                    minPoolSize: 2, // Mínimo de conexiones mantenidas
+                    serverSelectionTimeoutMS: 5000, // Timeout para seleccionar servidor
+                    socketTimeoutMS: 45000, // Timeout para operaciones
+                    connectTimeoutMS: 10000, // Timeout para conectar
+                    heartbeatFrequencyMS: 10000, // Frecuencia de heartbeat
                 }
             );
 
             if(db.connection.readyState === 1) {
                 console.log("Connected to MongoDB");
+                console.log(`MongoDB Pool: min=${2}, max=${10}`);
             }
 
         } catch (error) {

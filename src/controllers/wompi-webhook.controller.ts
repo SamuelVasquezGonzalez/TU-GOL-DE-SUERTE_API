@@ -1,9 +1,15 @@
 import { Request, Response } from 'express'
 import { WompiWebhookService } from '../services/wompi-webhook.service'
+import { wompiWebhookQueue } from '../config/queue.config'
+import { isRedisConnected } from '../config/redis.config'
 import * as crypto from 'crypto'
 
 export class WompiWebhookController {
-  private webhookService = new WompiWebhookService()
+  private webhookService: WompiWebhookService
+
+  constructor() {
+    this.webhookService = new WompiWebhookService()
+  }
 
   /**
    * Endpoint para recibir webhooks de Wompi
@@ -38,12 +44,26 @@ export class WompiWebhookController {
       // El procesamiento se hace en segundo plano
       res.status(200).json({ success: true })
 
-      // Procesar el evento de forma asíncrona (sin esperar)
+      // Procesar el evento de forma asíncrona (con queue si Redis está disponible)
       switch (event.event) {
         case 'transaction.updated':
-          this.handleTransactionUpdated(event.data).catch(err => {
-            console.error('Error procesando transaction.updated:', err)
-          })
+          // Usar queue si Redis está disponible, sino procesar directamente
+          if (isRedisConnected()) {
+            wompiWebhookQueue.add('process-transaction-update', event.data, {
+              priority: 1, // Alta prioridad para transacciones aprobadas
+            }).catch(err => {
+              console.error('Error agregando webhook a queue:', err)
+              // Fallback: procesar directamente si falla la queue
+              this.handleTransactionUpdated(event.data).catch(err => {
+                console.error('Error procesando transaction.updated:', err)
+              })
+            })
+          } else {
+            // Procesar directamente si no hay Redis
+            this.handleTransactionUpdated(event.data).catch(err => {
+              console.error('Error procesando transaction.updated:', err)
+            })
+          }
           break
         case 'transaction.created':
           this.handleTransactionCreated(event.data).catch(err => {

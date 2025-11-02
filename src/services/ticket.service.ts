@@ -4,6 +4,7 @@ import { SoccerGameService } from './soccer_game.service'
 import { UserService } from './user.service'
 import { TicketStatus } from '@/contracts/types/ticket.type'
 import { send_ticket_purchase_email, send_ticket_status_update_email } from '@/emails/email-main'
+import { invalidateUserStatsCache, invalidateStaffStatsCache } from '@/config/redis.config'
 import dayjs from 'dayjs'
 import { SoccerTeamModel } from '@/models/soccer_team.model'
 
@@ -126,8 +127,6 @@ export class TicketService {
     sell_by?: string
   }) {
     try {
-      console.log(`🎫 [TicketService] create_new_ticket llamado con quantity: ${quantity}`)
-      
       const game_service = new SoccerGameService()
       const game_info = await game_service.get_soccer_game_by_id({ id: game_id, parse_ids: false })
 
@@ -170,12 +169,9 @@ export class TicketService {
         }
         // No lanzar error si no tiene suficientes resultados, el bucle while lo manejará
       }
-      
-      console.log(`🔄 [TicketService] Iniciando compra de ${quantity} tickets. Restantes: ${remaining_quantity}`)
 
       // Bucle para comprar todos los tickets, abriendo nuevas curvas si es necesario
       while (remaining_quantity > 0) {
-        console.log(`🔄 [TicketService] Bucle - Tickets restantes: ${remaining_quantity}`)
         // Obtener el juego actualizado para tener las curvas más recientes
         const current_game_info = await game_service.get_soccer_game_by_id({ 
           id: game_id, 
@@ -189,7 +185,6 @@ export class TicketService {
 
         // Si no hay curva disponible, crear una nueva
         if (!current_curva) {
-          console.log(`🆕 [TicketService] No hay curva disponible, creando nueva curva...`)
           const new_curva_result = await game_service.open_new_curva({ game_id })
           if (!new_curva_result.status || !new_curva_result.curva) {
             throw new ResponseError(500, 'Error al abrir nueva curva')
@@ -208,8 +203,6 @@ export class TicketService {
           if (!current_curva) {
             throw new ResponseError(500, 'No se pudo encontrar la nueva curva creada')
           }
-          
-          console.log(`✅ [TicketService] Nueva curva creada: ${current_curva.id} con ${current_curva.avaliable_results.length} resultados`)
         }
         
         // Si es la primera iteración y se especificó una curva_id, usar esa curva primero si está disponible
@@ -219,7 +212,6 @@ export class TicketService {
           )
           if (specified_curva) {
             current_curva = specified_curva
-            console.log(`📍 [TicketService] Usando curva especificada: ${curva_id}`)
           }
         }
         
@@ -243,8 +235,6 @@ export class TicketService {
         // Calcular cuántos tickets podemos comprar de esta curva
         const available_in_curva = current_curva.avaliable_results.length
         const tickets_to_buy_from_curva = Math.min(remaining_quantity, available_in_curva)
-        
-        console.log(`📊 [TicketService] Curva ${current_curva.id} - Disponibles: ${available_in_curva}, Comprando: ${tickets_to_buy_from_curva}`)
 
         // Comprar los tickets de esta curva
         // Crear copias profundas de los arrays para evitar mutaciones
@@ -255,8 +245,6 @@ export class TicketService {
           avaliable_results: [...(current_curva.avaliable_results || [])],
           sold_results: [...(current_curva.sold_results || [])],
         }
-        
-        console.log(`🔍 [TicketService] updated_curva.id: ${updated_curva.id}, tipo: ${typeof updated_curva.id}`)
 
         for (let i = 0; i < tickets_to_buy_from_curva; i++) {
           // Validar que aún hay resultados disponibles
@@ -286,13 +274,11 @@ export class TicketService {
 
         // Actualizar la curva en la base de datos
         try {
-          console.log(`💾 [TicketService] Actualizando curva ${updated_curva.id}...`)
           await game_service.update_curva_results({
             game_id,
             curva_id: updated_curva.id,
             curva_updated: updated_curva as any, // Cast para compatibilidad con UUID type
           })
-          console.log(`✅ [TicketService] Curva ${updated_curva.id} actualizada exitosamente`)
         } catch (curvaError) {
           console.error(`❌ [TicketService] Error actualizando curva ${updated_curva.id}:`, curvaError)
           throw curvaError
@@ -300,12 +286,8 @@ export class TicketService {
 
         // Reducir la cantidad restante
         remaining_quantity -= tickets_to_buy_from_curva
-        console.log(`✅ [TicketService] Comprados ${tickets_to_buy_from_curva} tickets. Restantes: ${remaining_quantity}`)
       }
 
-      console.log(`💰 [TicketService] Total resultados comprados: ${selected_results.length}, Esperados: ${quantity}`)
-      console.log(`💰 [TicketService] Calculando precio: ${game_info.soccer_price} * ${quantity} = ${game_info.soccer_price * quantity}`)
-      
       const payed_amount = game_info.soccer_price * quantity
 
       const ticket_number = await this.generate_ticket_number()
@@ -331,6 +313,12 @@ export class TicketService {
         sell_by: sell_by_str,
         reward_amount: game_info.soccer_reward,
       })
+      
+      // Invalidar cache de stats del usuario y staff (si existe)
+      await invalidateUserStatsCache(String(customer_info._id))
+      if (sell_by_str) {
+        await invalidateStaffStatsCache(sell_by_str)
+      }
 
       const teamOne = await SoccerTeamModel.findById(game_info.soccer_teams[0])
       if (!teamOne) throw new ResponseError(404, 'No se encontró el equipo')
@@ -410,6 +398,12 @@ export class TicketService {
       ticket.status = status
       ticket.close = true
       await ticket.save()
+      
+      // Invalidar cache de stats del usuario y staff (si existe)
+      await invalidateUserStatsCache(String(ticket.user_id))
+      if (ticket.sell_by) {
+        await invalidateStaffStatsCache(String(ticket.sell_by))
+      }
 
       // Obtener información del usuario y del juego para el email
       const user_service = new UserService()
