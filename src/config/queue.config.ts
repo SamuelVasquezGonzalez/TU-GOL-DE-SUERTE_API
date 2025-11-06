@@ -30,7 +30,7 @@ wompiWebhookQueue.on('error', (error) => {
   console.error('❌ Wompi Webhook Queue Error:', error)
 })
 
-wompiWebhookQueue.on('failed', (job, error) => {
+wompiWebhookQueue.on('failed', (job: any, error: Error) => {
   console.error(`❌ Webhook job ${job?.id} failed:`, error)
 })
 

@@ -1,6 +1,6 @@
 import cors, { CorsOptions } from 'cors'
-import express, { Application, Request, Response } from 'express'
-import { Server } from 'socket.io'
+import express, { Application, Request, Response, NextFunction } from 'express'
+import { Server, Socket } from 'socket.io'
 import { createServer } from 'http'
 import morgan from 'morgan'
 import swaggerUi from 'swagger-ui-express'
@@ -68,7 +68,7 @@ export async function configureSocketIoRedisAdapter() {
   }
 }
 
-io_server.on('connection', (socket) => {
+io_server.on('connection', (socket: Socket) => {
   console.log('Cliente conectado', socket.id)
   register_all_game_events(socket)
 })
@@ -103,7 +103,7 @@ const webhookLimiter = rateLimit({
 })
 
 // Aplicar rate limiting general (excepto health y docs)
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   // Excluir endpoints de health y docs del rate limiting
   if (req.path === '/v1/api/health' || req.path.startsWith('/api-docs')) {
     return next()

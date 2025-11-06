@@ -2,11 +2,10 @@ import { GLOBAL_ENV } from "@/shared/contants";
 import { Resend } from "resend";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 import { ResponseError } from "@/utils/errors.util";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Obtener el directorio de emails (los HTML se copian a dist/emails/html durante el build)
+const __dirname = path.join(process.cwd(), 'dist', 'emails');
 
 const resend = new Resend(GLOBAL_ENV.RESEND_API_KEY);
 
