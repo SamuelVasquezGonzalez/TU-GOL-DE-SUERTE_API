@@ -17,7 +17,7 @@ export class QueueProcessorService {
    */
   public initializeProcessors(): void {
     // Procesar webhooks de Wompi
-    wompiWebhookQueue.process('process-transaction-update', async (job) => {
+    wompiWebhookQueue.process('process-transaction-update', async (job: any) => {
       const transactionData = job.data
       await this.webhookService.processTransactionUpdate(transactionData)
     })

@@ -51,7 +51,7 @@ export class WompiWebhookController {
           if (isRedisConnected()) {
             wompiWebhookQueue.add('process-transaction-update', event.data, {
               priority: 1, // Alta prioridad para transacciones aprobadas
-            }).catch(err => {
+            }).catch((err: Error) => {
               console.error('Error agregando webhook a queue:', err)
               // Fallback: procesar directamente si falla la queue
               this.handleTransactionUpdated(event.data).catch(err => {

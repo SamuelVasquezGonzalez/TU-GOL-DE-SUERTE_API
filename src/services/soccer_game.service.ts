@@ -9,6 +9,7 @@ import { TicketService } from "./ticket.service";
 import { ITicket } from "@/contracts/interfaces/ticket.interface";
 import { TournamentModel } from "@/models/tournament.model";
 import { HouseWinsHistoryModel } from "@/models/house-wins-history.model";
+import { ISoccerTeam } from "@/contracts/interfaces/soccer_teams.interface";
 
 export class SoccerGameService {
     // methods
@@ -25,11 +26,11 @@ export class SoccerGameService {
 
             for(const soccer_game of soccer_games) {;
 
-                const soccer_team = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[0]);
+                const soccer_team = soccer_teams.find((soccer_team: ISoccerTeam) => soccer_team.id === soccer_game.soccer_teams[0]);
                 if(soccer_team) {
                     soccer_game.soccer_teams[0] = soccer_team.name;
                 }
-                const soccer_team_two = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[1]);
+                const soccer_team_two = soccer_teams.find((soccer_team: ISoccerTeam) => soccer_team.id === soccer_game.soccer_teams[1]);
                 if(soccer_team_two) {
                     soccer_game.soccer_teams[1] = soccer_team_two.name;
                 }
@@ -53,7 +54,7 @@ export class SoccerGameService {
             const soccer_teams_service = new SoccerTeamsService();
             const soccer_teams = await soccer_teams_service.get_all_soccer_teams();
 
-            const soccer_team = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[0]);
+            const soccer_team = soccer_teams.find((soccer_team: ISoccerTeam) => soccer_team.id === soccer_game.soccer_teams[0]);
             
             if(soccer_team) {
                 soccer_game.soccer_teams[0] = soccer_team.id;
@@ -62,7 +63,7 @@ export class SoccerGameService {
                     soccer_game.soccer_teams[0] = soccer_team.name;
                 }
             }
-            const soccer_team_two = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[1]);
+            const soccer_team_two = soccer_teams.find((soccer_team: ISoccerTeam) => soccer_team.id === soccer_game.soccer_teams[1]);
             if(soccer_team_two) {
                 soccer_game.soccer_teams[1] = soccer_team_two.id;
                 
@@ -94,11 +95,11 @@ export class SoccerGameService {
             const soccer_teams_service = new SoccerTeamsService();
             const soccer_teams = await soccer_teams_service.get_all_soccer_teams();
 
-            const soccer_team = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[0]);
+            const soccer_team = soccer_teams.find((soccer_team: ISoccerTeam) => soccer_team.id === soccer_game.soccer_teams[0]);
             if(soccer_team) {
                 soccer_game.soccer_teams[0] = soccer_team.name;
             }
-            const soccer_team_two = soccer_teams.find((soccer_team) => soccer_team.id === soccer_game.soccer_teams[1]);
+            const soccer_team_two = soccer_teams.find((soccer_team: ISoccerTeam) => soccer_team.id === soccer_game.soccer_teams[1]);
             if(soccer_team_two) {
                 soccer_game.soccer_teams[1] = soccer_team_two.name;
             }
@@ -131,7 +132,7 @@ export class SoccerGameService {
             let curva = await SoccerGameModel.findById(game_id).lean();
             if(!curva) throw new ResponseError(404, "No se encontró la curva");
 
-            const curva_found = curva.curvas_open.find((curva) => curva.id === id);
+            const curva_found = curva.curvas_open.find((curva: CurvaEntity) => curva.id === id);
             if(!curva_found) throw new ResponseError(404, "No se encontró la curva");
 
             const find_tournament = await TournamentModel.findById(curva.tournament).lean();
@@ -257,7 +258,7 @@ export class SoccerGameService {
             const game = await SoccerGameModel.findById(game_id).lean();
             if(!game) throw new ResponseError(404, "No se encontró el partido de futbol");
             
-            const curvaIndex = game.curvas_open.findIndex((curva) => curva.id === curva_id);
+            const curvaIndex = game.curvas_open.findIndex((curva: CurvaEntity) => curva.id === curva_id);
             if(curvaIndex === -1) throw new ResponseError(404, "No se encontró la curva");
             
             // Actualizar solo el status de la curva usando findByIdAndUpdate
@@ -292,7 +293,7 @@ export class SoccerGameService {
             if(!game) throw new ResponseError(404, "No se encontró el partido de futbol");
 
             // Buscar la curva en el juego
-            const curvaIndex = game.curvas_open.findIndex((curva) => curva.id === curva_id);
+            const curvaIndex = game.curvas_open.findIndex((curva: CurvaEntity) => curva.id === curva_id);
             if(curvaIndex === -1) throw new ResponseError(404, "No se encontró la curva");
 
             // Actualizar solo la curva específica usando findByIdAndUpdate para evitar problemas de validación
@@ -435,7 +436,7 @@ export class SoccerGameService {
 
             const find_soccer_games = await SoccerGameModel.find({soccer_teams: [team_one, team_two]}).select("status").lean();
 
-            const find_exist_soccer_game = find_soccer_games.find((soccer_game) => (soccer_game.status === "pending" || soccer_game.status === "in_progress"));
+            const find_exist_soccer_game = find_soccer_games.find((soccer_game: SoccerGame) => (soccer_game.status === "pending" || soccer_game.status === "in_progress"));
 
             const status = find_exist_soccer_game ? false : true
 
@@ -483,7 +484,7 @@ export class SoccerGameService {
             const all_tickets = await tickets_service.get_tickets_by_game_id({game_id, no_error: true});
             
             // Filtrar solo tickets que no están cerrados aún
-            const tickets = all_tickets.filter(ticket => !ticket.close);
+            const tickets = all_tickets.filter((ticket: ITicket) => !ticket.close);
 
             // Caso 1: Score > 7 (GANA LA CASA)
             if(score[0] > 7 || score[1] > 7) {
@@ -501,7 +502,7 @@ export class SoccerGameService {
             
             for (const ticket of tickets) {
                 const results_purchased = ticket.results_purchased
-                const result = results_purchased.find((result) => result == parsed_score)
+                const result = results_purchased.find((result: string) => result == parsed_score)
                 if(result) {
                     ticket.status = "won";
                     ticket.reward_amount = game.soccer_reward;

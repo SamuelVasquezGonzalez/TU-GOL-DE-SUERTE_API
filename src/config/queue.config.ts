@@ -26,11 +26,11 @@ export const wompiWebhookQueue = new Queue('wompi-webhooks', {
 })
 
 // Manejo de errores de la queue
-wompiWebhookQueue.on('error', (error) => {
+wompiWebhookQueue.on('error', (error: Error) => {
   console.error('❌ Wompi Webhook Queue Error:', error)
 })
 
-wompiWebhookQueue.on('failed', (job, error) => {
+wompiWebhookQueue.on('failed', (job: any, error: Error) => {
   console.error(`❌ Webhook job ${job?.id} failed:`, error)
 })
 

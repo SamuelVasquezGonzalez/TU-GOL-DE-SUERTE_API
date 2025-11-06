@@ -79,7 +79,7 @@ export async function createMongoDBIndexes(): Promise<void> {
 export async function checkMongoDBIndexes(): Promise<void> {
   try {
     const ticketIndexes = await TicketModel.collection.indexes()
-    console.log('📊 Índices de TicketModel:', ticketIndexes.map(i => i.name))
+    console.log('📊 Índices de TicketModel:', ticketIndexes.map((i) => i.name || ''))
   } catch (error) {
     console.error('Error verificando índices:', error)
   }

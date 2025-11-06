@@ -57,22 +57,22 @@ export class StatsService {
       // Calcular estadísticas
       const total_tickets = tickets.length
       const unique_games = new Set(
-        tickets.map((t) => String(t.soccer_game_id || ''))
+        tickets.map((t: any) => String(t.soccer_game_id || ''))
       )
       const total_games = unique_games.size
 
-      const total_won = tickets.filter((t) => t.status === 'won').length
-      const total_lost = tickets.filter((t) => t.status === 'lost').length
-      const total_pending = tickets.filter((t) => t.status === 'pending').length
+      const total_won = tickets.filter((t: any) => t.status === 'won').length
+      const total_lost = tickets.filter((t: any) => t.status === 'lost').length
+      const total_pending = tickets.filter((t: any) => t.status === 'pending').length
 
       const total_amount_spent = tickets.reduce(
-        (sum, t) => sum + (Number(t.payed_amount) || 0),
+        (sum: number, t: any) => sum + (Number(t.payed_amount) || 0),
         0
       )
 
       // Calcular ganancias usando reward_amount de los tickets ganados
-      const won_tickets = tickets.filter((t) => t.status === 'won')
-      const total_amount_won = won_tickets.reduce((sum, t) => {
+      const won_tickets = tickets.filter((t: any) => t.status === 'won')
+      const total_amount_won = won_tickets.reduce((sum: number, t: any) => {
         // Usar reward_amount si existe, sino usar payed_amount como fallback
         return sum + (Number(t.reward_amount) || Number(t.payed_amount) || 0)
       }, 0)
@@ -102,20 +102,26 @@ export class StatsService {
       
       // Crear mapas para acceso rápido
       const games_map = new Map()
-      games.forEach((game) => {
-        games_map.set(String(game._id), game)
-      })
+      if (games) {
+        games.forEach((game: any) => {
+          games_map.set(String(game._id), game)
+        })
+      }
       
       const tournaments_map = new Map()
-      tournaments.forEach((t) => {
-        tournaments_map.set(String(t._id), t.name)
-      })
+      if (tournaments) {
+        tournaments.forEach((t: any) => {
+          tournaments_map.set(String(t._id), t.name)
+        })
+      }
       
       const teams_map = new Map()
-      all_teams.forEach((team) => {
-        const team_id = String((team as any)._id?.toString() || (team as any).id || '')
-        teams_map.set(team_id, team.name || 'Equipo desconocido')
-      })
+      if (all_teams) {
+        all_teams.forEach((team: any) => {
+          const team_id = String((team as any)._id?.toString() || (team as any).id || '')
+          teams_map.set(team_id, team.name || 'Equipo desconocido')
+        })
+      }
 
       // Calcular estadísticas para gráficos
       const spending_by_day = this.calculateUserSpendingByDay(tickets)
@@ -201,7 +207,7 @@ export class StatsService {
       // Calcular estadísticas de ventas
       const total_tickets_sold = sold_tickets.length
       const total_amount_sold = sold_tickets.reduce(
-        (sum, t) => sum + (Number(t.payed_amount) || 0),
+        (sum: number, t: any) => sum + (Number(t.payed_amount) || 0),
         0
       )
       const total_sales = total_tickets_sold // Por ahora es igual al número de tickets
@@ -256,13 +262,13 @@ export class StatsService {
       // Calcular el revenue desde ambos: tickets y transacciones para tener datos completos
       // Preferir transacciones del historial, pero también sumar desde tickets si faltan
       const revenue_from_transactions = successful_transactions.reduce(
-        (sum, t) => sum + (Number(t.payed_amount) || 0),
+        (sum: number, t: any) => sum + (Number(t.payed_amount) || 0),
         0
       )
       
       // También calcular desde tickets aprobados como respaldo
       const revenue_from_tickets = approved_tickets.reduce(
-        (sum, t) => sum + (Number(t.payed_amount) || 0),
+        (sum: number, t: any) => sum + (Number(t.payed_amount) || 0),
         0
       )
       
@@ -374,7 +380,7 @@ export class StatsService {
 
     // Crear mapa de equipos
     const teams_map = new Map<string, string>()
-    all_teams.forEach((team) => {
+    all_teams.forEach((team: any) => {
       const team_id = String((team as any)._id?.toString() || (team as any).id || '')
       teams_map.set(team_id, team.name || 'Equipo desconocido')
     })
@@ -452,7 +458,7 @@ export class StatsService {
     // Obtener todos los torneos
     const tournaments = await TournamentModel.find().lean()
     const tournament_map = new Map()
-    tournaments.forEach((t) => {
+    tournaments.forEach((t: any) => {
       tournament_map.set(t._id.toString(), t.name)
     })
 

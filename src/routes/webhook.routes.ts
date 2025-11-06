@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Request, Response } from 'express'
 import { WompiWebhookController } from '@/controllers/wompi-webhook.controller'
 
 const router = Router()
@@ -86,7 +86,7 @@ const getWompiController = (): WompiWebhookController => {
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/wompi', (req, res) => getWompiController().handleWebhook(req, res))
+router.post('/wompi', (req: Request, res: Response) => getWompiController().handleWebhook(req, res))
 
 
 export default router

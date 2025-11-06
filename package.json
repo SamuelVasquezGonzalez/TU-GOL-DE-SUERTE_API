@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
+  "type": "commonjs",
   "engines": {
     "node": ">=20.0.0"
   },
   "scripts": {
-    "dev": "nodemon && pnpm copy-emails",
+    "dev": "nodemon && npx -y pnpm copy-emails",
     "copy-emails": "node -e \"const fs = require('fs'); fs.cpSync('src/emails/html', 'dist/emails/html', { recursive: true });\"",
-    "build": "tsc && tsc-alias && pnpm copy-emails",
+    "build": "tsc && tsc-alias && npx -y pnpm copy-emails",
     "start": "node dist/index.js",
     "start:pm2": "pm2 start ecosystem.config.js",
     "start:pm2:single": "pm2 start ecosystem.config.js --instances 1",
