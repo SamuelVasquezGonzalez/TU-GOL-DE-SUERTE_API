@@ -4,8 +4,8 @@ import fs from "fs";
 import path from "path";
 import { ResponseError } from "@/utils/errors.util";
 
-// Obtener el directorio de emails (los HTML se copian a dist/emails/html durante el build)
-const __dirname = path.join(process.cwd(), 'dist', 'emails');
+// En CommonJS, __dirname está disponible globalmente
+declare const __dirname: string;
 
 const resend = new Resend(GLOBAL_ENV.RESEND_API_KEY);
 
