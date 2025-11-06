@@ -16,6 +16,7 @@ import { gamesRoutes } from './routes/games.routes'
 import { playerRoutes } from './routes/player.routes'
 import { transactionHistoryRoutes } from './routes/transaction-history.routes'
 import { statsRoutes } from './routes/stats.routes'
+import { staffCommissionHistoryRoutes } from './routes/staff-commission-history.routes'
 import webhookRoutes from './routes/webhook.routes'
 import { redisPubClient, redisSubClient, isRedisConnected } from './config/redis.config'
 
@@ -164,6 +165,7 @@ app.use(`${API_VERSION}/games`, gamesRoutes)
 app.use(`${API_VERSION}/players`, playerRoutes)
 app.use(`${API_VERSION}/transaction-history`, transactionHistoryRoutes)
 app.use(`${API_VERSION}/stats`, statsRoutes)
+app.use(`${API_VERSION}/commissions`, staffCommissionHistoryRoutes)
 
 // Rutas de webhook (sin prefijo de versión para compatibilidad con Wompi)
 app.use(`${API_VERSION}/webhooks`, webhookRoutes)

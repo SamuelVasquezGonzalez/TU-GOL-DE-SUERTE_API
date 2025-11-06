@@ -10,6 +10,7 @@ import { ITicket } from "@/contracts/interfaces/ticket.interface";
 import { TournamentModel } from "@/models/tournament.model";
 import { HouseWinsHistoryModel } from "@/models/house-wins-history.model";
 import { ISoccerTeam } from "@/contracts/interfaces/soccer_teams.interface";
+import { StaffCommissionHistoryService } from "./staff-commission-history.service";
 
 export class SoccerGameService {
     // methods
@@ -369,6 +370,20 @@ export class SoccerGameService {
             
             soccer_game.status = "finished";
             await soccer_game.save();
+
+            // Calcular y guardar comisiones de staff para este partido
+            try {
+                const commission_service = new StaffCommissionHistoryService();
+                const game_finished_at = new Date();
+                await commission_service.calculate_and_save_commissions_for_game({
+                    game_id: game_id,
+                    game_finished_at: game_finished_at,
+                });
+                console.log(`✅ Comisiones calculadas para el partido ${game_id}`);
+            } catch (commission_error) {
+                // No fallar el proceso de finalización si hay error en comisiones
+                console.error(`⚠️ Error calculando comisiones para el partido ${game_id}:`, commission_error);
+            }
         }
         catch (err) {
             console.log(err);
