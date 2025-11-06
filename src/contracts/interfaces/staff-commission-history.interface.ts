@@ -22,8 +22,10 @@ export interface IStaffCommissionHistory extends Document {
   net_commission: number // comisión neta del staff (commission_amount - total_transaction_costs)
   
   // Información de Wompi (solo informativa)
-  wompi_commission_percentage: number // porcentaje de comisión de Wompi (19%)
-  wompi_commission_amount: number // monto de comisión de Wompi (total_amount_sold × 19%)
+  wompi_commission_percentage: number // porcentaje variable de comisión de Wompi (2.65%)
+  wompi_fixed_cost: number // costo fijo de Wompi (700)
+  wompi_iva_percentage: number // porcentaje de IVA (19%)
+  wompi_commission_amount: number // monto total de comisión de Wompi (2.65% + 700 + IVA 19%)
   
   // Información temporal
   created_at: Date // fecha y hora de creación del registro

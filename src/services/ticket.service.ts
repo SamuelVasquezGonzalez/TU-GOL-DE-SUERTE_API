@@ -5,6 +5,7 @@ import { UserService } from './user.service'
 import { TicketStatus } from '@/contracts/types/ticket.type'
 import { send_ticket_purchase_email, send_ticket_status_update_email } from '@/emails/email-main'
 import { invalidateUserStatsCache, invalidateStaffStatsCache } from '@/config/redis.config'
+import { StaffCommissionHistoryService } from './staff-commission-history.service'
 import dayjs from 'dayjs'
 import { SoccerTeamModel } from '@/models/soccer_team.model'
 
@@ -329,6 +330,20 @@ export class TicketService {
       await invalidateUserStatsCache(String(customer_info._id))
       if (sell_by_str) {
         await invalidateStaffStatsCache(sell_by_str)
+      }
+
+      // Actualizar comisión del staff en tiempo real (solo para ventas físicas)
+      if (sell_by_str) {
+        try {
+          const commission_service = new StaffCommissionHistoryService()
+          await commission_service.update_commission_for_ticket({
+            game_id: game_id,
+            staff_id: sell_by_str,
+          })
+        } catch (commission_error) {
+          // No fallar la creación del ticket si hay error en comisiones
+          console.error(`⚠️ Error actualizando comisión para staff ${sell_by_str}:`, commission_error)
+        }
       }
 
       const teamOne = await SoccerTeamModel.findById(game_info.soccer_teams[0])

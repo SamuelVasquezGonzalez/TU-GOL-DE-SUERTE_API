@@ -5,12 +5,165 @@ import { ResponseError } from '@/utils/errors.util'
 
 export class StaffCommissionHistoryService {
   // Constantes de comisión
-  private readonly STAFF_COMMISSION_PERCENTAGE = 2.5
-  private readonly TRANSACTION_COST = 700
-  private readonly WOMPI_COMMISSION_PERCENTAGE = 19
+  private readonly STAFF_COMMISSION_PERCENTAGE = 21.5 // Porcentaje de comisión del staff
+  private readonly STAFF_FIXED_BONUS = 700 // Bono fijo del staff por boleta
+  private readonly WOMPI_COMMISSION_PERCENTAGE = 2.65 // Porcentaje variable de Wompi
+  private readonly WOMPI_FIXED_COST = 700 // Costo fijo de Wompi
+  private readonly IVA_PERCENTAGE = 19 // IVA sobre la comisión de Wompi
+
+  /**
+   * Actualizar comisión de un staff cuando se crea una nueva boleta física
+   * Este método recalcula la comisión basándose en todas las boletas físicas del staff en el partido
+   */
+  public async update_commission_for_ticket({
+    game_id,
+    staff_id,
+  }: {
+    game_id: string
+    staff_id: string
+  }) {
+    try {
+      // Solo procesar si es una venta física (tiene sell_by)
+      if (!staff_id) {
+        return { message: 'No es una venta física, no se calcula comisión' }
+      }
+
+      // Obtener todas las boletas físicas vendidas por este staff en este partido
+      const physical_tickets = await TicketModel.find({
+        soccer_game_id: game_id,
+        sell_by: staff_id,
+        $or: [
+          { wompi_transaction_id: { $exists: false } },
+          { wompi_transaction_id: null },
+        ],
+      }).lean()
+
+      if (physical_tickets.length === 0) {
+        // No hay boletas físicas, eliminar registro si existe
+        await StaffCommissionHistoryModel.deleteOne({
+          staff_id: staff_id,
+          soccer_game_id: game_id,
+        })
+        return { message: 'No hay boletas físicas, registro eliminado si existía' }
+      }
+
+      // Obtener información del staff
+      const staff = await UserModel.findById(staff_id).lean()
+      if (!staff) {
+        console.warn(`⚠️ Staff con ID ${staff_id} no encontrado, saltando cálculo de comisiones`)
+        return { message: 'Staff no encontrado' }
+      }
+
+      // Calcular totales
+      const total_tickets_sold = physical_tickets.length
+      const total_amount_sold = physical_tickets.reduce(
+        (sum, ticket) => sum + (Number(ticket.payed_amount) || 0),
+        0
+      )
+
+      // Calcular comisiones por iteración/resultado
+      // La comisión se calcula por cada resultado individual: (monto × 21.5%) + $700
+      let total_commission_amount = 0
+      for (const ticket of physical_tickets) {
+        const payed_amount = Number(ticket.payed_amount) || 0
+        const results_count = Array.isArray(ticket.results_purchased) 
+          ? ticket.results_purchased.length 
+          : 1
+        
+        // Precio por resultado
+        const price_per_result = results_count > 0 ? payed_amount / results_count : payed_amount
+        
+        // Comisión por resultado: (precio × 21.5%) + $700
+        const commission_per_result = (price_per_result * this.STAFF_COMMISSION_PERCENTAGE) / 100 + this.STAFF_FIXED_BONUS
+        
+        // Comisión total de esta boleta (por cada iteración/resultado)
+        const ticket_commission = commission_per_result * results_count
+        
+        total_commission_amount += ticket_commission
+      }
+
+      // Comisión neta (ya incluye el bono fijo)
+      const commission_amount = total_commission_amount
+      const net_commission = commission_amount
+      
+      // Calcular comisión de Wompi por iteración/resultado: 2.65% + $700 + IVA 19% sobre (2.65% + 700)
+      // Por cada resultado: (precio_por_resultado × 2.65%) + 700, luego IVA 19% sobre ese subtotal
+      let total_wompi_commission = 0
+      for (const ticket of physical_tickets) {
+        const payed_amount = Number(ticket.payed_amount) || 0
+        const results_count = Array.isArray(ticket.results_purchased) 
+          ? ticket.results_purchased.length 
+          : 1
+        
+        // Precio por resultado
+        const price_per_result = results_count > 0 ? payed_amount / results_count : payed_amount
+        
+        // Calcular comisión de Wompi por cada resultado
+        for (let i = 0; i < results_count; i++) {
+          // Comisión variable de Wompi (2.65%) por resultado
+          const wompi_variable = (price_per_result * this.WOMPI_COMMISSION_PERCENTAGE) / 100
+          // Subtotal antes de IVA: comisión variable + costo fijo
+          const wompi_subtotal = wompi_variable + this.WOMPI_FIXED_COST
+          // IVA sobre el subtotal
+          const wompi_iva = (wompi_subtotal * this.IVA_PERCENTAGE) / 100
+          // Comisión total de Wompi para este resultado
+          const wompi_total = wompi_subtotal + wompi_iva
+          total_wompi_commission += wompi_total
+        }
+      }
+      const wompi_commission_amount = total_wompi_commission
+
+      // Verificar si ya existe un registro para este staff y partido
+      const existing_commission = await StaffCommissionHistoryModel.findOne({
+        staff_id: staff_id,
+        soccer_game_id: game_id,
+      })
+
+      if (existing_commission) {
+        // Actualizar el registro existente
+        existing_commission.total_tickets_sold = total_tickets_sold
+        existing_commission.total_amount_sold = total_amount_sold
+        existing_commission.commission_amount = commission_amount
+        existing_commission.total_transaction_costs = total_tickets_sold * this.STAFF_FIXED_BONUS // Solo para referencia
+        existing_commission.net_commission = net_commission
+        existing_commission.wompi_commission_percentage = this.WOMPI_COMMISSION_PERCENTAGE
+        existing_commission.wompi_fixed_cost = this.WOMPI_FIXED_COST
+        existing_commission.wompi_iva_percentage = this.IVA_PERCENTAGE
+        existing_commission.wompi_commission_amount = wompi_commission_amount
+        await existing_commission.save()
+        return { message: 'Comisión actualizada', commission: existing_commission.toObject() }
+      } else {
+        // Crear nuevo registro
+        const commission_history = await StaffCommissionHistoryModel.create({
+          staff_id: staff_id,
+          staff_name: staff.name,
+          staff_email: staff.email,
+          soccer_game_id: game_id,
+          total_tickets_sold: total_tickets_sold,
+          total_amount_sold: total_amount_sold,
+          commission_percentage: this.STAFF_COMMISSION_PERCENTAGE,
+          commission_amount: commission_amount,
+          transaction_cost: this.STAFF_FIXED_BONUS,
+          total_transaction_costs: total_tickets_sold * this.STAFF_FIXED_BONUS, // Solo para referencia
+          net_commission: net_commission,
+          wompi_commission_percentage: this.WOMPI_COMMISSION_PERCENTAGE,
+          wompi_fixed_cost: this.WOMPI_FIXED_COST,
+          wompi_iva_percentage: this.IVA_PERCENTAGE,
+          wompi_commission_amount: wompi_commission_amount,
+          game_finished_at: new Date(), // Se actualizará cuando finalice el partido
+        })
+        return { message: 'Comisión creada', commission: commission_history.toObject() }
+      }
+    } catch (err) {
+      console.error('❌ [StaffCommissionHistoryService] Error actualizando comisión:', err)
+      // No lanzar error para no interrumpir la creación del ticket
+      return { message: 'Error al actualizar comisión (no crítico)', error: err }
+    }
+  }
 
   /**
    * Calcular y guardar comisiones de todos los staff para un partido finalizado
+   * (Método mantenido para compatibilidad, pero ya no se usa en tiempo real)
    */
   public async calculate_and_save_commissions_for_game({
     game_id,
@@ -65,11 +218,57 @@ export class StaffCommissionHistoryService {
         const total_tickets_sold = tickets.length
         const total_amount_sold = tickets.reduce((sum, ticket) => sum + (Number(ticket.payed_amount) || 0), 0)
 
-        // Calcular comisiones
-        const commission_amount = (total_amount_sold * this.STAFF_COMMISSION_PERCENTAGE) / 100
-        const total_transaction_costs = total_tickets_sold * this.TRANSACTION_COST
-        const net_commission = commission_amount - total_transaction_costs
-        const wompi_commission_amount = (total_amount_sold * this.WOMPI_COMMISSION_PERCENTAGE) / 100
+        // Calcular comisiones por iteración/resultado
+        // La comisión se calcula por cada resultado individual: (monto × 21.5%) + $700
+        let total_commission_amount = 0
+        for (const ticket of tickets) {
+          const payed_amount = Number(ticket.payed_amount) || 0
+          const results_count = Array.isArray(ticket.results_purchased) 
+            ? ticket.results_purchased.length 
+            : 1
+          
+          // Precio por resultado
+          const price_per_result = results_count > 0 ? payed_amount / results_count : payed_amount
+          
+          // Comisión por resultado: (precio × 21.5%) + $700
+          const commission_per_result = (price_per_result * this.STAFF_COMMISSION_PERCENTAGE) / 100 + this.STAFF_FIXED_BONUS
+          
+          // Comisión total de esta boleta (por cada iteración/resultado)
+          const ticket_commission = commission_per_result * results_count
+          
+          total_commission_amount += ticket_commission
+        }
+
+        // Comisión neta (ya incluye el bono fijo)
+        const commission_amount = total_commission_amount
+        const net_commission = commission_amount
+        
+        // Calcular comisión de Wompi por iteración/resultado: 2.65% + $700 + IVA 19% sobre (2.65% + 700)
+        // Por cada resultado: (precio_por_resultado × 2.65%) + 700, luego IVA 19% sobre ese subtotal
+        let total_wompi_commission = 0
+        for (const ticket of tickets) {
+          const payed_amount = Number(ticket.payed_amount) || 0
+          const results_count = Array.isArray(ticket.results_purchased) 
+            ? ticket.results_purchased.length 
+            : 1
+          
+          // Precio por resultado
+          const price_per_result = results_count > 0 ? payed_amount / results_count : payed_amount
+          
+          // Calcular comisión de Wompi por cada resultado
+          for (let i = 0; i < results_count; i++) {
+            // Comisión variable de Wompi (2.65%) por resultado
+            const wompi_variable = (price_per_result * this.WOMPI_COMMISSION_PERCENTAGE) / 100
+            // Subtotal antes de IVA: comisión variable + costo fijo
+            const wompi_subtotal = wompi_variable + this.WOMPI_FIXED_COST
+            // IVA sobre el subtotal
+            const wompi_iva = (wompi_subtotal * this.IVA_PERCENTAGE) / 100
+            // Comisión total de Wompi para este resultado
+            const wompi_total = wompi_subtotal + wompi_iva
+            total_wompi_commission += wompi_total
+          }
+        }
+        const wompi_commission_amount = total_wompi_commission
 
         // Verificar si ya existe un registro para este staff y partido
         const existing_commission = await StaffCommissionHistoryModel.findOne({
@@ -82,8 +281,11 @@ export class StaffCommissionHistoryService {
           existing_commission.total_tickets_sold = total_tickets_sold
           existing_commission.total_amount_sold = total_amount_sold
           existing_commission.commission_amount = commission_amount
-          existing_commission.total_transaction_costs = total_transaction_costs
+          existing_commission.total_transaction_costs = total_tickets_sold * this.STAFF_FIXED_BONUS // Solo para referencia
           existing_commission.net_commission = net_commission
+          existing_commission.wompi_commission_percentage = this.WOMPI_COMMISSION_PERCENTAGE
+          existing_commission.wompi_fixed_cost = this.WOMPI_FIXED_COST
+          existing_commission.wompi_iva_percentage = this.IVA_PERCENTAGE
           existing_commission.wompi_commission_amount = wompi_commission_amount
           existing_commission.game_finished_at = game_finished_date
           await existing_commission.save()
@@ -99,10 +301,12 @@ export class StaffCommissionHistoryService {
             total_amount_sold: total_amount_sold,
             commission_percentage: this.STAFF_COMMISSION_PERCENTAGE,
             commission_amount: commission_amount,
-            transaction_cost: this.TRANSACTION_COST,
-            total_transaction_costs: total_transaction_costs,
+            transaction_cost: this.STAFF_FIXED_BONUS,
+            total_transaction_costs: total_tickets_sold * this.STAFF_FIXED_BONUS, // Solo para referencia
             net_commission: net_commission,
             wompi_commission_percentage: this.WOMPI_COMMISSION_PERCENTAGE,
+            wompi_fixed_cost: this.WOMPI_FIXED_COST,
+            wompi_iva_percentage: this.IVA_PERCENTAGE,
             wompi_commission_amount: wompi_commission_amount,
             game_finished_at: game_finished_date,
           })
@@ -228,6 +432,28 @@ export class StaffCommissionHistoryService {
     } catch (err) {
       if (err instanceof ResponseError) throw err
       throw new ResponseError(500, 'Error al obtener todas las comisiones')
+    }
+  }
+
+  /**
+   * Actualizar game_finished_at en los registros de comisiones cuando se finaliza un partido
+   */
+  public async update_game_finished_at({
+    game_id,
+    game_finished_at,
+  }: {
+    game_id: string
+    game_finished_at: Date
+  }) {
+    try {
+      await StaffCommissionHistoryModel.updateMany(
+        { soccer_game_id: game_id },
+        { game_finished_at: game_finished_at }
+      )
+      return { message: 'Fecha de finalización actualizada en comisiones' }
+    } catch (err) {
+      console.error('❌ [StaffCommissionHistoryService] Error actualizando game_finished_at:', err)
+      throw new ResponseError(500, 'Error al actualizar fecha de finalización')
     }
   }
 

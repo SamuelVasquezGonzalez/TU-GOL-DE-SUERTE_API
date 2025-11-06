@@ -23,7 +23,9 @@ const StaffCommissionHistorySchema = new Schema<IStaffCommissionHistory>({
   net_commission: { type: Number, required: true },
   
   // Información de Wompi (solo informativa)
-  wompi_commission_percentage: { type: Number, required: true, default: 19 },
+  wompi_commission_percentage: { type: Number, required: true, default: 2.65 },
+  wompi_fixed_cost: { type: Number, required: true, default: 700 },
+  wompi_iva_percentage: { type: Number, required: true, default: 19 },
   wompi_commission_amount: { type: Number, required: true },
   
   // Información temporal

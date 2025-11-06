@@ -371,18 +371,16 @@ export class SoccerGameService {
             soccer_game.status = "finished";
             await soccer_game.save();
 
-            // Calcular y guardar comisiones de staff para este partido
+            // Actualizar game_finished_at en los registros de comisiones existentes
             try {
                 const commission_service = new StaffCommissionHistoryService();
-                const game_finished_at = new Date();
-                await commission_service.calculate_and_save_commissions_for_game({
+                await commission_service.update_game_finished_at({
                     game_id: game_id,
-                    game_finished_at: game_finished_at,
+                    game_finished_at: new Date(),
                 });
-                console.log(`✅ Comisiones calculadas para el partido ${game_id}`);
             } catch (commission_error) {
                 // No fallar el proceso de finalización si hay error en comisiones
-                console.error(`⚠️ Error calculando comisiones para el partido ${game_id}:`, commission_error);
+                console.error(`⚠️ Error actualizando fecha de finalización en comisiones para el partido ${game_id}:`, commission_error);
             }
         }
         catch (err) {
