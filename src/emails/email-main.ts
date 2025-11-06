@@ -2,11 +2,10 @@ import { GLOBAL_ENV } from "@/shared/contants";
 import { Resend } from "resend";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 import { ResponseError } from "@/utils/errors.util";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// En CommonJS, __dirname está disponible globalmente
+declare const __dirname: string;
 
 const resend = new Resend(GLOBAL_ENV.RESEND_API_KEY);
 
