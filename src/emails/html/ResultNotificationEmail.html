@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Resultado de Apuesta - Tu Gol de Suerte</title>
     <style>
-      /* Reset básico para emails */
       body,
       table,
       td,
@@ -32,116 +31,6 @@
         text-decoration: none;
       }
 
-      /* Estilos WOW para emails */
-      .gradient-bg {
-        background: #0f172a;
-        background: -webkit-linear-gradient(
-          135deg,
-          #0f172a 0%,
-          #1e293b 25%,
-          #334155 50%,
-          #1e293b 75%,
-          #0f172a 100%
-        );
-        background: linear-gradient(
-          135deg,
-          #0f172a 0%,
-          #1e293b 25%,
-          #334155 50%,
-          #1e293b 75%,
-          #0f172a 100%
-        );
-      }
-
-      .hero-gradient {
-        background: #1e293b;
-        background: -webkit-linear-gradient(
-          135deg,
-          #1e293b 0%,
-          #334155 50%,
-          #475569 100%
-        );
-        background: linear-gradient(
-          135deg,
-          #1e293b 0%,
-          #334155 50%,
-          #475569 100%
-        );
-      }
-
-      .card-gradient {
-        background: #334155;
-        background: -webkit-linear-gradient(135deg, #334155 0%, #475569 100%);
-        background: linear-gradient(135deg, #334155 0%, #475569 100%);
-      }
-
-      .accent-gradient {
-        background: #3b82f6;
-        background: -webkit-linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-      }
-
-      .success-gradient {
-        background: #10b981;
-        background: -webkit-linear-gradient(135deg, #10b981 0%, #059669 100%);
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      }
-
-      .warning-gradient {
-        background: #f59e0b;
-        background: -webkit-linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      }
-
-      .result-gradient {
-        background: #f59e0b;
-        background: -webkit-linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      }
-
-      .win-gradient {
-        background: #10b981;
-        background: -webkit-linear-gradient(135deg, #10b981 0%, #059669 100%);
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      }
-
-      .lose-gradient {
-        background: #ef4444;
-        background: -webkit-linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      }
-
-      .glow-text {
-        text-shadow: 0 0 20px rgba(59, 130, 246, 0.5),
-          0 2px 4px rgba(0, 0, 0, 0.3);
-      }
-
-      .card-shadow {
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
-          0 8px 16px rgba(0, 0, 0, 0.2);
-      }
-
-      .button-glow {
-        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4),
-          0 4px 16px rgba(59, 130, 246, 0.2);
-      }
-
-      .result-glow {
-        box-shadow: 0 0 30px rgba(245, 158, 11, 0.3),
-          inset 0 0 20px rgba(0, 0, 0, 0.3);
-      }
-
-      .win-glow {
-        box-shadow: 0 0 30px rgba(16, 185, 129, 0.3),
-          inset 0 0 20px rgba(0, 0, 0, 0.3);
-      }
-
-      .lose-glow {
-        box-shadow: 0 0 30px rgba(239, 68, 68, 0.3),
-          inset 0 0 20px rgba(0, 0, 0, 0.3);
-      }
-
-      /* Media queries para responsive */
       @media only screen and (max-width: 600px) {
         .container {
           width: 100% !important;
@@ -176,22 +65,20 @@
     style="
       margin: 0;
       padding: 0;
-      background-color: #0f172a;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f1f5f9;
+      font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     "
   >
-    <!-- Contenedor principal -->
     <table
       role="presentation"
       cellspacing="0"
       cellpadding="0"
       border="0"
       width="100%"
-      class="gradient-bg"
+      style="background-color: #f1f5f9"
     >
       <tr>
         <td align="center" style="padding: 40px 20px">
-          <!-- Contenedor del email -->
           <table
             class="container"
             role="presentation"
@@ -201,112 +88,77 @@
             width="600"
             style="
               max-width: 600px;
-              background-color: #1e293b;
-              border-radius: 20px;
-              box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+              background-color: #ffffff;
+              border-radius: 24px;
+              border: 2px solid #e2e8f0;
+              box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.15);
             "
           >
-            <!-- Header Hero -->
+            <!-- Línea verde decorativa superior -->
             <tr>
               <td
-                class="header-cell hero-gradient"
                 style="
-                  padding: 50px 40px;
+                  height: 4px;
+                  background: linear-gradient(90deg, #4ade80, #22c55e, #16a34a);
+                  border-radius: 24px 24px 0 0;
+                "
+              ></td>
+            </tr>
+
+            <!-- Header -->
+            <tr>
+              <td
+                class="header-cell"
+                style="
+                  padding: 40px;
                   text-align: center;
-                  border-radius: 20px 20px 0 0;
-                  position: relative;
+                  background: linear-gradient(
+                    135deg,
+                    rgba(34, 197, 94, 0.05),
+                    rgba(22, 163, 74, 0.03)
+                  );
+                  border-bottom: 2px solid #e2e8f0;
                 "
               >
-                <!-- Decoración de fondo -->
-                <table
-                  role="presentation"
-                  cellspacing="0"
-                  cellpadding="0"
-                  border="0"
-                  width="100%"
-                  style="position: relative"
+                <h1
+                  style="
+                    margin: 0;
+                    color: #0f172a;
+                    font-size: 32px;
+                    font-weight: 800;
+                    letter-spacing: -0.5px;
+                  "
                 >
-                  <tr>
-                    <td align="center" style="position: relative">
-                      <!-- Icono principal con efecto WOW -->
-                      <div
-                        style="
-                          width: 120px;
-                          height: 120px;
-                          background: rgba(245, 158, 11, 0.1);
-                          border: 3px solid #f59e0b;
-                          border-radius: 50%;
-                          margin: 0 auto 30px auto;
-                          display: table;
-                          text-align: center;
-                          vertical-align: middle;
-                          box-shadow: 0 0 40px rgba(245, 158, 11, 0.3),
-                            inset 0 0 20px rgba(245, 158, 11, 0.1);
-                        "
-                      >
-                        <span
-                          style="
-                            display: table-cell;
-                            vertical-align: middle;
-                            font-size: 48px;
-                            color: #fbbf24;
-                            text-shadow: 0 0 20px rgba(251, 191, 36, 0.8);
-                          "
-                          >🏆</span
-                        >
-                      </div>
-
-                      <h1
-                        class="glow-text"
-                        style="
-                          margin: 0;
-                          color: #f8fafc;
-                          font-size: 42px;
-                          font-weight: 800;
-                          letter-spacing: 2px;
-                          text-transform: uppercase;
-                        "
-                      >
-                        Tu Gol de Suerte
-                      </h1>
-
-                      <!-- Línea decorativa con gradiente -->
-                      <div
-                        style="
-                          width: 100px;
-                          height: 4px;
-                          background: linear-gradient(
-                            90deg,
-                            #f59e0b,
-                            #fbbf24,
-                            #f59e0b
-                          );
-                          margin: 20px auto;
-                          border-radius: 2px;
-                          box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
-                        "
-                      ></div>
-
-                      <p
-                        style="
-                          margin: 0;
-                          color: #cbd5e1;
-                          font-size: 20px;
-                          font-weight: 600;
-                          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-                        "
-                      >
-                        Resultado de tu Apuesta
-                      </p>
-                    </td>
-                  </tr>
-                </table>
+                  Tu Gol de Suerte
+                </h1>
+                <div
+                  style="
+                    width: 60px;
+                    height: 3px;
+                    background: linear-gradient(90deg, #22c55e, #16a34a);
+                    margin: 20px auto;
+                    border-radius: 2px;
+                  "
+                ></div>
+                <p
+                  style="
+                    margin: 0;
+                    color: #ffffff;
+                    font-size: 18px;
+                    font-weight: 500;
+                  "
+                >
+                  Resultado de Apuesta
+                </p>
               </td>
             </tr>
 
             <!-- Contenido principal -->
             <tr>
-              <td class="content-cell" style="padding: 40px">
+              <td
+                class="content-cell"
+                style="padding: 40px; background-color: #ffffff"
+              >
                 <table
                   class="content-table"
                   role="presentation"
@@ -317,43 +169,35 @@
                 >
                   <!-- Saludo -->
                   <tr>
-                    <td style="text-align: center; padding-bottom: 40px">
+                    <td style="text-align: center; padding-bottom: 30px">
                       <h2
                         style="
                           margin: 0;
-                          color: #f8fafc;
-                          font-size: 32px;
+                          color: #0f172a;
+                          font-size: 28px;
                           font-weight: 700;
-                          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
                         "
                       >
-                        ¡Resultado Final!
+                        Resultado Disponible
                       </h2>
                       <p
                         style="
-                          margin: 20px 0 0 0;
-                          color: #cbd5e1;
-                          font-size: 18px;
+                          margin: 15px 0 0 0;
+                          color: #0f172a;
+                          font-size: 16px;
                           line-height: 1.6;
-                          max-width: 500px;
-                          margin: 20px auto 0 auto;
                         "
                       >
-                        ¡Hola
-                        <strong
-                          style="
-                            color: #fbbf24;
-                            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
-                          "
-                          >Peche</strong
-                        >! El partido ha terminado y aquí están los resultados
+                        Hola
+                        <strong style="color: #22c55e">{{user_name}}</strong>,
+                        el resultado de tu apuesta ya está disponible.
                       </p>
                     </td>
                   </tr>
 
                   <!-- Resultado del partido -->
                   <tr>
-                    <td style="padding-bottom: 40px">
+                    <td style="padding-bottom: 30px">
                       <table
                         role="presentation"
                         cellspacing="0"
@@ -361,58 +205,23 @@
                         border="0"
                         width="100%"
                         style="
-                          background: linear-gradient(
-                            135deg,
-                            #1e293b 0%,
-                            #0f172a 100%
-                          );
-                          border-radius: 16px;
-                          border: 2px solid #f59e0b;
-                          position: relative;
-                          box-shadow: 0 0 25px rgba(245, 158, 11, 0.2);
+                          background-color: #1e293b;
+                          border-radius: 8px;
+                          border: 1px solid #22c55e;
                         "
                       >
                         <tr>
-                          <td style="padding: 40px; text-align: center">
-                            <!-- Icono de resultado -->
-                            <div
-                              style="
-                                width: 80px;
-                                height: 80px;
-                                background: rgba(245, 158, 11, 0.2);
-                                border: 2px solid #f59e0b;
-                                border-radius: 50%;
-                                margin: 0 auto 25px auto;
-                                display: table;
-                                text-align: center;
-                                vertical-align: middle;
-                                box-shadow: 0 0 25px rgba(245, 158, 11, 0.3);
-                              "
-                            >
-                              <span
-                                style="
-                                  display: table-cell;
-                                  vertical-align: middle;
-                                  font-size: 32px;
-                                  color: #fbbf24;
-                                "
-                                >⚽</span
-                              >
-                            </div>
-
+                          <td style="padding: 30px; text-align: center">
                             <h3
                               style="
                                 margin: 0 0 25px 0;
-                                color: #fbbf24;
-                                font-size: 24px;
+                                color: #22c55e;
+                                font-size: 22px;
                                 font-weight: 700;
-                                text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
                               "
                             >
-                              Resultado Final del Partido
+                              Resultado del Partido
                             </h3>
-
-                            <!-- Información del partido -->
                             <table
                               role="presentation"
                               cellspacing="0"
@@ -424,30 +233,29 @@
                                 <td
                                   style="
                                     text-align: center;
-                                    padding: 20px 0;
-                                    border-bottom: 1px solid #475569;
+                                    padding: 15px 0;
+                                    border-bottom: 1px solid #e2e8f0;
                                   "
                                 >
                                   <h4
                                     style="
                                       margin: 0;
-                                      color: #f8fafc;
-                                      font-size: 24px;
+                                      color: #fff;
+                                      font-size: 20px;
                                       font-weight: 700;
-                                      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
                                     "
                                   >
-                                    Real Madrid vs Barcelona
+                                    {{team1}} vs {{team2}}
                                   </h4>
                                   <p
                                     style="
                                       margin: 8px 0 0 0;
-                                      color: #cbd5e1;
-                                      font-size: 16px;
-                                      font-weight: 500;
+                                      color: #ffffff;
+                                      font-size: 14px;
+                                      font-weight: 400;
                                     "
                                   >
-                                    Liga Española - Jornada 15
+                                    {{tournament}}
                                   </p>
                                 </td>
                               </tr>
@@ -462,97 +270,81 @@
                                   >
                                     <tr>
                                       <td
-                                        style="text-align: center; width: 33%"
+                                        style="text-align: center; width: 40%"
                                       >
                                         <p
                                           style="
                                             margin: 0;
-                                            color: #f8fafc;
-                                            font-size: 18px;
+                                            color: #ffffff;
+                                            font-size: 16px;
                                             font-weight: 700;
-                                            text-shadow: 0 1px 2px
-                                              rgba(0, 0, 0, 0.3);
                                           "
                                         >
-                                          Real Madrid
+                                          {{team1}}
                                         </p>
                                         <p
                                           style="
                                             margin: 5px 0 0 0;
-                                            color: #cbd5e1;
-                                            font-size: 14px;
-                                            font-weight: 500;
+                                            color: #22c55e;
+                                            font-size: 24px;
+                                            font-weight: 700;
                                           "
                                         >
-                                          Local
+                                          {{team1_score}}
                                         </p>
                                       </td>
                                       <td
-                                        style="text-align: center; width: 34%"
+                                        style="text-align: center; width: 20%"
                                       >
                                         <div
                                           style="
-                                            background: rgba(245, 158, 11, 0.2);
-                                            border: 2px solid #f59e0b;
+                                            background-color: #1e293b;
+                                            border: 2px solid #22c55e;
+                                            box-shadow: 0 4px 16px
+                                              rgba(34, 197, 94, 0.15);
                                             border-radius: 50%;
-                                            width: 80px;
-                                            height: 80px;
+                                            width: 50px;
+                                            height: 50px;
                                             margin: 0 auto;
                                             display: table;
                                             text-align: center;
                                             vertical-align: middle;
-                                            box-shadow: 0 0 20px
-                                              rgba(245, 158, 11, 0.3);
                                           "
                                         >
                                           <span
                                             style="
                                               display: table-cell;
                                               vertical-align: middle;
-                                              color: #fbbf24;
-                                              font-size: 28px;
+                                              color: #22c55e;
+                                              font-size: 14px;
                                               font-weight: 700;
-                                              text-shadow: 0 0 15px
-                                                rgba(251, 191, 36, 0.8);
                                             "
-                                            >2-1</span
+                                            >VS</span
                                           >
                                         </div>
-                                        <p
-                                          style="
-                                            margin: 8px 0 0 0;
-                                            color: #cbd5e1;
-                                            font-size: 14px;
-                                            font-weight: 500;
-                                          "
-                                        >
-                                          Final
-                                        </p>
                                       </td>
                                       <td
-                                        style="text-align: center; width: 33%"
+                                        style="text-align: center; width: 40%"
                                       >
                                         <p
                                           style="
                                             margin: 0;
-                                            color: #f8fafc;
-                                            font-size: 18px;
+                                            color: #ffffff;
+                                            font-size: 16px;
                                             font-weight: 700;
-                                            text-shadow: 0 1px 2px
-                                              rgba(0, 0, 0, 0.3);
                                           "
                                         >
-                                          Barcelona
+                                          {{team2}}
                                         </p>
                                         <p
                                           style="
                                             margin: 5px 0 0 0;
-                                            color: #cbd5e1;
-                                            font-size: 14px;
-                                            font-weight: 500;
+                                            color: #22c55e;
+                                            font-size: 24px;
+                                            font-weight: 700;
                                           "
                                         >
-                                          Visitante
+                                          {{team2_score}}
                                         </p>
                                       </td>
                                     </tr>
@@ -566,272 +358,9 @@
                     </td>
                   </tr>
 
-                  <!-- Resultado de las apuestas -->
+                  <!-- Información del ticket -->
                   <tr>
-                    <td style="padding-bottom: 40px">
-                      <!-- Header de la sección -->
-                      <div style="text-align: center; margin-bottom: 30px">
-                        <div
-                          style="
-                            width: 80px;
-                            height: 80px;
-                            background: rgba(16, 185, 129, 0.2);
-                            border: 3px solid #10b981;
-                            border-radius: 50%;
-                            margin: 0 auto 20px auto;
-                            display: table;
-                            text-align: center;
-                            vertical-align: middle;
-                            box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
-                          "
-                        >
-                          <span
-                            style="
-                              display: table-cell;
-                              vertical-align: middle;
-                              font-size: 32px;
-                              color: #34d399;
-                              text-shadow: 0 0 15px rgba(52, 211, 153, 0.8);
-                            "
-                            >🎯</span
-                          >
-                        </div>
-
-                        <h3
-                          style="
-                            margin: 0;
-                            color: #f8fafc;
-                            font-size: 28px;
-                            font-weight: 700;
-                            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-                          "
-                        >
-                          Resultado de tus Apuestas
-                        </h3>
-
-                        <div
-                          style="
-                            width: 80px;
-                            height: 3px;
-                            background: linear-gradient(
-                              90deg,
-                              #10b981,
-                              #34d399,
-                              #10b981
-                            );
-                            margin: 15px auto;
-                            border-radius: 2px;
-                            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-                          "
-                        ></div>
-                      </div>
-
-                      <table
-                        role="presentation"
-                        cellspacing="0"
-                        cellpadding="0"
-                        border="0"
-                        width="100%"
-                      >
-                        <tr>
-                          <td style="padding: 20px 0">
-                            <table
-                              role="presentation"
-                              cellspacing="0"
-                              cellpadding="0"
-                              border="0"
-                              width="100%"
-                              style="
-                                background: linear-gradient(
-                                  135deg,
-                                  #334155 0%,
-                                  #475569 100%
-                                );
-                                border-radius: 15px;
-                                border: 1px solid #475569;
-                                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-                              "
-                            >
-                              <tr>
-                                <td style="padding: 25px">
-                                  <table
-                                    role="presentation"
-                                    cellspacing="0"
-                                    cellpadding="0"
-                                    border="0"
-                                    width="100%"
-                                  >
-                                    <tr>
-                                      <td
-                                        style="
-                                          color: #cbd5e1;
-                                          font-size: 16px;
-                                          width: 60%;
-                                        "
-                                      >
-                                        <strong
-                                          style="
-                                            color: #f8fafc;
-                                            text-shadow: 0 1px 2px
-                                              rgba(0, 0, 0, 0.3);
-                                          "
-                                          >Ganador del Partido:</strong
-                                        >
-                                        Real Madrid
-                                      </td>
-                                      <td
-                                        style="
-                                          color: #10b981;
-                                          font-size: 16px;
-                                          font-weight: 700;
-                                          text-align: right;
-                                          width: 40%;
-                                        "
-                                      >
-                                        ✅ GANADA
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                            </table>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="padding: 20px 0">
-                            <table
-                              role="presentation"
-                              cellspacing="0"
-                              cellpadding="0"
-                              border="0"
-                              width="100%"
-                              style="
-                                background: linear-gradient(
-                                  135deg,
-                                  #334155 0%,
-                                  #475569 100%
-                                );
-                                border-radius: 15px;
-                                border: 1px solid #475569;
-                                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-                              "
-                            >
-                              <tr>
-                                <td style="padding: 25px">
-                                  <table
-                                    role="presentation"
-                                    cellspacing="0"
-                                    cellpadding="0"
-                                    border="0"
-                                    width="100%"
-                                  >
-                                    <tr>
-                                      <td
-                                        style="
-                                          color: #cbd5e1;
-                                          font-size: 16px;
-                                          width: 60%;
-                                        "
-                                      >
-                                        <strong
-                                          style="
-                                            color: #f8fafc;
-                                            text-shadow: 0 1px 2px
-                                              rgba(0, 0, 0, 0.3);
-                                          "
-                                          >Total de Goles:</strong
-                                        >
-                                        Más de 2.5
-                                      </td>
-                                      <td
-                                        style="
-                                          color: #10b981;
-                                          font-size: 16px;
-                                          font-weight: 700;
-                                          text-align: right;
-                                          width: 40%;
-                                        "
-                                      >
-                                        ✅ GANADA
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                            </table>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="padding: 20px 0">
-                            <table
-                              role="presentation"
-                              cellspacing="0"
-                              cellpadding="0"
-                              border="0"
-                              width="100%"
-                              style="
-                                background: linear-gradient(
-                                  135deg,
-                                  #334155 0%,
-                                  #475569 100%
-                                );
-                                border-radius: 15px;
-                                border: 1px solid #475569;
-                                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-                              "
-                            >
-                              <tr>
-                                <td style="padding: 25px">
-                                  <table
-                                    role="presentation"
-                                    cellspacing="0"
-                                    cellpadding="0"
-                                    border="0"
-                                    width="100%"
-                                  >
-                                    <tr>
-                                      <td
-                                        style="
-                                          color: #cbd5e1;
-                                          font-size: 16px;
-                                          width: 60%;
-                                        "
-                                      >
-                                        <strong
-                                          style="
-                                            color: #f8fafc;
-                                            text-shadow: 0 1px 2px
-                                              rgba(0, 0, 0, 0.3);
-                                          "
-                                          >Ambos Equipos Marcan:</strong
-                                        >
-                                        Sí
-                                      </td>
-                                      <td
-                                        style="
-                                          color: #10b981;
-                                          font-size: 16px;
-                                          font-weight: 700;
-                                          text-align: right;
-                                          width: 40%;
-                                        "
-                                      >
-                                        ✅ GANADA
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                            </table>
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-
-                  <!-- Resumen de ganancias -->
-                  <tr>
-                    <td style="padding-bottom: 40px">
+                    <td style="padding-bottom: 30px">
                       <table
                         role="presentation"
                         cellspacing="0"
@@ -839,57 +368,24 @@
                         border="0"
                         width="100%"
                         style="
-                          background: linear-gradient(
-                            135deg,
-                            #1e293b 0%,
-                            #0f172a 100%
-                          );
+                          background-color: #ffffff;
                           border-radius: 16px;
-                          border: 2px solid #10b981;
-                          position: relative;
-                          box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+                          border: 2px solid #e2e8f0;
+                          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
                         "
                       >
                         <tr>
-                          <td style="padding: 40px; text-align: center">
-                            <!-- Icono de dinero -->
-                            <div
-                              style="
-                                width: 80px;
-                                height: 80px;
-                                background: rgba(16, 185, 129, 0.2);
-                                border: 2px solid #10b981;
-                                border-radius: 50%;
-                                margin: 0 auto 25px auto;
-                                display: table;
-                                text-align: center;
-                                vertical-align: middle;
-                                box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
-                              "
-                            >
-                              <span
-                                style="
-                                  display: table-cell;
-                                  vertical-align: middle;
-                                  font-size: 32px;
-                                  color: #34d399;
-                                "
-                                >💰</span
-                              >
-                            </div>
-
+                          <td style="padding: 25px; background-color: #ffffff">
                             <h3
                               style="
-                                margin: 0 0 25px 0;
-                                color: #34d399;
-                                font-size: 24px;
-                                font-weight: 700;
-                                text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+                                margin: 0 0 20px 0;
+                                color: #0f172a;
+                                font-size: 20px;
+                                font-weight: 600;
                               "
                             >
-                              ¡Felicitaciones! Has Ganado
+                              Detalles del Ticket
                             </h3>
-
                             <table
                               role="presentation"
                               cellspacing="0"
@@ -900,8 +396,8 @@
                               <tr>
                                 <td
                                   style="
-                                    padding: 15px 0;
-                                    border-bottom: 1px solid #475569;
+                                    padding: 12px 0;
+                                    border-bottom: 1px solid #e2e8f0;
                                   "
                                 >
                                   <table
@@ -914,23 +410,22 @@
                                     <tr>
                                       <td
                                         style="
-                                          color: #cbd5e1;
-                                          font-size: 16px;
-                                          width: 60%;
-                                        "
-                                      >
-                                        Apuesta Total:
-                                      </td>
-                                      <td
-                                        style="
-                                          color: #f8fafc;
-                                          font-size: 16px;
-                                          font-weight: 700;
-                                          text-align: right;
+                                          color: #0f172a;
+                                          font-size: 14px;
+                                          font-weight: 500;
                                           width: 40%;
                                         "
                                       >
-                                        $50.00
+                                        ID del Ticket:
+                                      </td>
+                                      <td
+                                        style="
+                                          color: #0f172a;
+                                          font-size: 14px;
+                                          font-weight: 700;
+                                        "
+                                      >
+                                        {{ticket_number}}
                                       </td>
                                     </tr>
                                   </table>
@@ -939,8 +434,8 @@
                               <tr>
                                 <td
                                   style="
-                                    padding: 15px 0;
-                                    border-bottom: 1px solid #475569;
+                                    padding: 12px 0;
+                                    border-bottom: 1px solid #e2e8f0;
                                   "
                                 >
                                   <table
@@ -953,30 +448,29 @@
                                     <tr>
                                       <td
                                         style="
-                                          color: #cbd5e1;
-                                          font-size: 16px;
-                                          width: 60%;
-                                        "
-                                      >
-                                        Ganancia Total:
-                                      </td>
-                                      <td
-                                        style="
-                                          color: #34d399;
-                                          font-size: 16px;
-                                          font-weight: 700;
-                                          text-align: right;
+                                          color: #0f172a;
+                                          font-size: 14px;
+                                          font-weight: 500;
                                           width: 40%;
                                         "
                                       >
-                                        $321.75
+                                        Apuesta:
+                                      </td>
+                                      <td
+                                        style="
+                                          color: #0f172a;
+                                          font-size: 14px;
+                                          font-weight: 700;
+                                        "
+                                      >
+                                        ${{bet_amount}}
                                       </td>
                                     </tr>
                                   </table>
                                 </td>
                               </tr>
                               <tr>
-                                <td style="padding: 15px 0">
+                                <td style="padding: 12px 0">
                                   <table
                                     role="presentation"
                                     cellspacing="0"
@@ -987,23 +481,22 @@
                                     <tr>
                                       <td
                                         style="
-                                          color: #cbd5e1;
-                                          font-size: 16px;
-                                          width: 60%;
-                                        "
-                                      >
-                                        Ganancia Neta:
-                                      </td>
-                                      <td
-                                        style="
-                                          color: #34d399;
-                                          font-size: 16px;
-                                          font-weight: 700;
-                                          text-align: right;
+                                          color: #0f172a;
+                                          font-size: 14px;
+                                          font-weight: 500;
                                           width: 40%;
                                         "
                                       >
-                                        $271.75
+                                        Resultado:
+                                      </td>
+                                      <td
+                                        style="
+                                          color: {{result_color}};
+                                          font-size: 14px;
+                                          font-weight: 700;
+                                        "
+                                      >
+                                        {{bet_result}}
                                       </td>
                                     </tr>
                                   </table>
@@ -1016,9 +509,54 @@
                     </td>
                   </tr>
 
+                  <!-- Ganancia si ganó -->
+                  {{#if is_winner}}
+                  <tr>
+                    <td style="padding-bottom: 30px">
+                      <table
+                        role="presentation"
+                        cellspacing="0"
+                        cellpadding="0"
+                        border="0"
+                        width="100%"
+                        style="
+                          background-color: #1e293b;
+                          border-radius: 8px;
+                          border: 1px solid #22c55e;
+                        "
+                      >
+                        <tr>
+                          <td style="padding: 30px; text-align: center">
+                            <h3
+                              style="
+                                margin: 0 0 15px 0;
+                                color: #22c55e;
+                                font-size: 22px;
+                                font-weight: 700;
+                              "
+                            >
+                              Ganancia
+                            </h3>
+                            <p
+                              style="
+                                margin: 0;
+                                color: #22c55e;
+                                font-size: 32px;
+                                font-weight: 700;
+                              "
+                            >
+                              ${{win_amount}}
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  {{/if}}
+
                   <!-- Botón de acción -->
                   <tr>
-                    <td style="text-align: center; padding-bottom: 40px">
+                    <td style="text-align: center; padding-bottom: 30px">
                       <table
                         role="presentation"
                         cellspacing="0"
@@ -1028,146 +566,31 @@
                       >
                         <tr>
                           <td
-                            class="button button-glow"
+                            class="button"
                             style="
                               background: linear-gradient(
-                                135deg,
-                                #3b82f6 0%,
-                                #1d4ed8 100%
+                                90deg,
+                                #22c55e,
+                                #16a34a
                               );
-                              border-radius: 15px;
+                              border-radius: 8px;
                               text-align: center;
-                              border: 2px solid #60a5fa;
                             "
                           >
                             <a
-                              href="#"
+                              href="{{action_url}}"
                               style="
                                 display: inline-block;
-                                padding: 20px 50px;
-                                color: #ffffff;
+                                padding: 16px 40px;
+                                color: #0f172a;
                                 text-decoration: none;
-                                font-size: 20px;
-                                font-weight: 700;
-                                border-radius: 13px;
-                                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-                                letter-spacing: 1px;
-                                text-transform: uppercase;
-                              "
-                            >
-                              🎯 Apostar de Nuevo
-                            </a>
-                          </td>
-                        </tr>
-                      </table>
-
-                      <!-- Texto adicional debajo del botón -->
-                      <p
-                        style="
-                          margin: 20px 0 0 0;
-                          color: #94a3b8;
-                          font-size: 16px;
-                          text-align: center;
-                          font-weight: 500;
-                        "
-                      >
-                        Haz clic para apostar en nuevos eventos
-                      </p>
-                    </td>
-                  </tr>
-
-                  <!-- Mensaje de felicitación -->
-                  <tr>
-                    <td style="padding-bottom: 0">
-                      <table
-                        role="presentation"
-                        cellspacing="0"
-                        cellpadding="0"
-                        border="0"
-                        width="100%"
-                        style="
-                          background: linear-gradient(
-                            135deg,
-                            #1e293b 0%,
-                            #0f172a 100%
-                          );
-                          border-radius: 16px;
-                          border: 2px solid #10b981;
-                          position: relative;
-                          box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
-                        "
-                      >
-                        <tr>
-                          <td style="padding: 30px; text-align: center">
-                            <!-- Icono de felicitación -->
-                            <div
-                              style="
-                                width: 60px;
-                                height: 60px;
-                                background: rgba(16, 185, 129, 0.2);
-                                border: 2px solid #10b981;
-                                border-radius: 50%;
-                                margin: 0 auto 20px auto;
-                                display: table;
-                                text-align: center;
-                                vertical-align: middle;
-                                box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-                              "
-                            >
-                              <span
-                                style="
-                                  display: table-cell;
-                                  vertical-align: middle;
-                                  font-size: 24px;
-                                  color: #34d399;
-                                "
-                                >🎉</span
-                              >
-                            </div>
-
-                            <h4
-                              style="
-                                margin: 0 0 15px 0;
-                                color: #34d399;
-                                font-size: 20px;
-                                font-weight: 700;
-                                text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
-                              "
-                            >
-                              ¡Excelente Trabajo!
-                            </h4>
-
-                            <div
-                              style="
-                                width: 60px;
-                                height: 3px;
-                                background: linear-gradient(
-                                  90deg,
-                                  #10b981,
-                                  #34d399,
-                                  #10b981
-                                );
-                                margin: 0 auto 20px auto;
-                                border-radius: 2px;
-                                box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-                              "
-                            ></div>
-
-                            <p
-                              style="
-                                margin: 0;
-                                color: #cbd5e1;
                                 font-size: 16px;
-                                line-height: 1.6;
-                                max-width: 450px;
-                                margin: 0 auto;
-                                font-weight: 500;
+                                font-weight: 700;
+                                border-radius: 6px;
                               "
                             >
-                              ¡Felicitaciones! Has ganado todas tus apuestas. Tu
-                              ganancia ha sido acreditada a tu cuenta. ¡Sigue
-                              así!
-                            </p>
+                              Ver Mis Tickets
+                            </a>
                           </td>
                         </tr>
                       </table>
@@ -1184,8 +607,9 @@
                 style="
                   padding: 30px 40px;
                   text-align: center;
-                  background-color: #0f172a;
-                  border-radius: 0 0 20px 20px;
+                  background-color: #f1f5f9;
+                  border-radius: 0 0 24px 24px;
+                  border-top: 2px solid #e2e8f0;
                 "
               >
                 <table
@@ -1199,20 +623,20 @@
                     <td style="text-align: center">
                       <p
                         style="
-                          margin: 0 0 15px 0;
-                          color: #94a3b8;
-                          font-size: 16px;
-                          font-weight: 500;
+                          margin: 0 0 10px 0;
+                          color: #0f172a;
+                          font-size: 14px;
+                          font-weight: 400;
                         "
                       >
-                        Este email fue enviado a peche@ejemplo.com.
+                        Este email fue enviado a {{user_email}}.
                       </p>
                       <p
                         style="
-                          margin: 0 0 15px 0;
-                          color: #94a3b8;
-                          font-size: 16px;
-                          font-weight: 500;
+                          margin: 0 0 10px 0;
+                          color: #0f172a;
+                          font-size: 14px;
+                          font-weight: 400;
                         "
                       >
                         Si tienes alguna pregunta, contacta nuestro soporte.
@@ -1220,12 +644,12 @@
                       <p
                         style="
                           margin: 0;
-                          color: #64748b;
-                          font-size: 14px;
+                          color: #0f172a;
+                          font-size: 12px;
                           font-weight: 400;
                         "
                       >
-                        © 2024 Tu Gol de Suerte. Todos los derechos reservados.
+                        © 2025 Tu Gol de Suerte. Todos los derechos reservados.
                       </p>
                     </td>
                   </tr>

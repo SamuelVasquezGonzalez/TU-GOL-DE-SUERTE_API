@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bienvenido Staff - Tu Gol de Suerte</title>
     <style>
-      /* Reset básico para emails */
       body,
       table,
       td,
@@ -32,99 +31,6 @@
         text-decoration: none;
       }
 
-      /* Estilos WOW para emails */
-      .gradient-bg {
-        background: #0f172a;
-        background: -webkit-linear-gradient(
-          135deg,
-          #0f172a 0%,
-          #1e293b 25%,
-          #334155 50%,
-          #1e293b 75%,
-          #0f172a 100%
-        );
-        background: linear-gradient(
-          135deg,
-          #0f172a 0%,
-          #1e293b 25%,
-          #334155 50%,
-          #1e293b 75%,
-          #0f172a 100%
-        );
-      }
-
-      .hero-gradient {
-        background: #1e293b;
-        background: -webkit-linear-gradient(
-          135deg,
-          #1e293b 0%,
-          #334155 50%,
-          #475569 100%
-        );
-        background: linear-gradient(
-          135deg,
-          #1e293b 0%,
-          #334155 50%,
-          #475569 100%
-        );
-      }
-
-      .card-gradient {
-        background: #334155;
-        background: -webkit-linear-gradient(135deg, #334155 0%, #475569 100%);
-        background: linear-gradient(135deg, #334155 0%, #475569 100%);
-      }
-
-      .staff-gradient {
-        background: #f59e0b;
-        background: -webkit-linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      }
-
-      .accent-gradient {
-        background: #10b981;
-        background: -webkit-linear-gradient(135deg, #10b981 0%, #059669 100%);
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      }
-
-      .warning-gradient {
-        background: #ef4444;
-        background: -webkit-linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      }
-
-      .glow-text {
-        text-shadow: 0 0 20px rgba(245, 158, 11, 0.5),
-          0 2px 4px rgba(0, 0, 0, 0.3);
-      }
-
-      .card-shadow {
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
-          0 8px 16px rgba(0, 0, 0, 0.2);
-      }
-
-      .button-glow {
-        box-shadow: 0 8px 32px rgba(245, 158, 11, 0.4),
-          0 4px 16px rgba(245, 158, 11, 0.2);
-      }
-
-      .pulse-animation {
-        animation: pulse 2s infinite;
-      }
-
-      @keyframes pulse {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.05);
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
-
-      /* Media queries para responsive */
       @media only screen and (max-width: 600px) {
         .container {
           width: 100% !important;
@@ -159,22 +65,20 @@
     style="
       margin: 0;
       padding: 0;
-      background-color: #0f172a;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f1f5f9;
+      font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     "
   >
-    <!-- Contenedor principal -->
     <table
       role="presentation"
       cellspacing="0"
       cellpadding="0"
       border="0"
       width="100%"
-      class="gradient-bg"
+      style="background-color: #f1f5f9"
     >
       <tr>
         <td align="center" style="padding: 40px 20px">
-          <!-- Contenedor del email -->
           <table
             class="container"
             role="presentation"
@@ -184,112 +88,70 @@
             width="600"
             style="
               max-width: 600px;
-              background-color: #1e293b;
-              border-radius: 20px;
-              box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+              background-color: #ffffff;
+              border-radius: 24px;
+              border: 2px solid #e2e8f0;
+              box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.15);
             "
           >
-            <!-- Header Hero -->
+            <!-- Línea verde decorativa superior -->
             <tr>
               <td
-                class="header-cell hero-gradient"
                 style="
-                  padding: 50px 40px;
+                  height: 4px;
+                  background: linear-gradient(90deg, #4ade80, #22c55e, #16a34a);
+                  border-radius: 24px 24px 0 0;
+                "
+              ></td>
+            </tr>
+
+            <!-- Header -->
+            <tr>
+              <td
+                class="header-cell"
+                style="
+                  padding: 40px;
                   text-align: center;
-                  border-radius: 20px 20px 0 0;
-                  position: relative;
+                  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(22, 163, 74, 0.03));
+                  border-bottom: 2px solid #e2e8f0;
                 "
               >
-                <!-- Decoración de fondo -->
-                <table
-                  role="presentation"
-                  cellspacing="0"
-                  cellpadding="0"
-                  border="0"
-                  width="100%"
-                  style="position: relative"
+                <h1
+                  style="
+                    margin: 0;
+                    color: #0f172a;
+                    font-size: 32px;
+                    font-weight: 800;
+                    letter-spacing: -0.5px;
+                  "
                 >
-                  <tr>
-                    <td align="center" style="position: relative">
-                      <!-- Icono principal con efecto WOW -->
-                      <div
-                        style="
-                          width: 120px;
-                          height: 120px;
-                          background: rgba(245, 158, 11, 0.1);
-                          border: 3px solid #f59e0b;
-                          border-radius: 50%;
-                          margin: 0 auto 30px auto;
-                          display: table;
-                          text-align: center;
-                          vertical-align: middle;
-                          box-shadow: 0 0 40px rgba(245, 158, 11, 0.3),
-                            inset 0 0 20px rgba(245, 158, 11, 0.1);
-                        "
-                      >
-                        <span
-                          style="
-                            display: table-cell;
-                            vertical-align: middle;
-                            font-size: 48px;
-                            color: #fbbf24;
-                            text-shadow: 0 0 20px rgba(251, 191, 36, 0.8);
-                          "
-                          >⭐</span
-                        >
-                      </div>
-
-                      <h1
-                        class="glow-text"
-                        style="
-                          margin: 0;
-                          color: #f8fafc;
-                          font-size: 42px;
-                          font-weight: 800;
-                          letter-spacing: 2px;
-                          text-transform: uppercase;
-                        "
-                      >
-                        Tu Gol de Suerte
-                      </h1>
-
-                      <!-- Línea decorativa con gradiente -->
-                      <div
-                        style="
-                          width: 100px;
-                          height: 4px;
-                          background: linear-gradient(
-                            90deg,
-                            #f59e0b,
-                            #fbbf24,
-                            #f59e0b
-                          );
-                          margin: 20px auto;
-                          border-radius: 2px;
-                          box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
-                        "
-                      ></div>
-
-                      <p
-                        style="
-                          margin: 0;
-                          color: #cbd5e1;
-                          font-size: 20px;
-                          font-weight: 600;
-                          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-                        "
-                      >
-                        ¡Bienvenido al Equipo de Staff!
-                      </p>
-                    </td>
-                  </tr>
-                </table>
+                  Tu Gol de Suerte
+                </h1>
+                <div
+                  style="
+                    width: 60px;
+                    height: 3px;
+                    background-color: #22c55e;
+                    margin: 20px auto;
+                    border-radius: 2px;
+                  "
+                ></div>
+                <p
+                  style="
+                    margin: 0;
+                    color: #16a34a;
+                    font-size: 24px;
+                    font-weight: 700;
+                  "
+                >
+                  Bienvenido al Staff
+                </p>
               </td>
             </tr>
 
             <!-- Contenido principal -->
             <tr>
-              <td class="content-cell" style="padding: 40px">
+              <td class="content-cell" style="padding: 40px; background-color: #ffffff">
                 <table
                   class="content-table"
                   role="presentation"
@@ -300,106 +162,58 @@
                 >
                   <!-- Saludo -->
                   <tr>
-                    <td style="text-align: center; padding-bottom: 40px">
+                    <td style="text-align: center; padding-bottom: 30px">
                       <h2
                         style="
                           margin: 0;
-                          color: #f8fafc;
-                          font-size: 32px;
+                          color: #0f172a;
+                          font-size: 28px;
                           font-weight: 700;
-                          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
                         "
                       >
-                        ¡Bienvenido al Staff!
+                        Bienvenido al Staff
                       </h2>
                       <p
                         style="
-                          margin: 20px 0 0 0;
-                          color: #cbd5e1;
-                          font-size: 18px;
+                          margin: 15px 0 0 0;
+                          color: #0f172a;
+                          font-size: 16px;
                           line-height: 1.6;
-                          max-width: 500px;
-                          margin: 20px auto 0 auto;
                         "
                       >
-                        ¡Hola
-                        <strong
-                          style="
-                            color: #fbbf24;
-                            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
-                          "
-                          >{{staff_name}}</strong
-                        >! Te damos la bienvenida como miembro del staff de
-                        la plataforma de apuestas más emocionante
+                        Hola <strong style="color: #22c55e">{{staff_name}}</strong>, te damos la bienvenida como miembro del staff de la plataforma.
                       </p>
                     </td>
                   </tr>
 
                   <!-- Información de cuenta -->
                   <tr>
-                    <td style="padding-bottom: 40px">
+                    <td style="padding-bottom: 30px">
                       <table
                         role="presentation"
                         cellspacing="0"
                         cellpadding="0"
                         border="0"
                         width="100%"
-                        class="card-shadow"
-                        style="border-radius: 16px; overflow: hidden"
+                        style="
+                          background-color: #ffffff;
+                          border-radius: 16px;
+                          border: 2px solid #e2e8f0;
+                          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+                        "
                       >
-                        <!-- Header de la sección -->
                         <tr>
-                          <td
-                            class="card-gradient"
-                            style="
-                              padding: 30px;
-                              text-align: center;
-                              position: relative;
-                            "
-                          >
-                            <!-- Icono decorativo -->
-                            <div
-                              style="
-                                width: 70px;
-                                height: 70px;
-                                background: rgba(245, 158, 11, 0.2);
-                                border: 2px solid #f59e0b;
-                                border-radius: 50%;
-                                margin: 0 auto 20px auto;
-                                display: table;
-                                text-align: center;
-                                vertical-align: middle;
-                                box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
-                              "
-                            >
-                              <span
-                                style="
-                                  display: table-cell;
-                                  vertical-align: middle;
-                                  font-size: 28px;
-                                  color: #fbbf24;
-                                "
-                                >🏷️</span
-                              >
-                            </div>
-
+                          <td style="padding: 25px; background-color: #ffffff">
                             <h3
                               style="
-                                margin: 0;
-                                color: #f8fafc;
-                                font-size: 24px;
-                                font-weight: 700;
-                                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                                margin: 0 0 20px 0;
+                                color: #0f172a;
+                                font-size: 20px;
+                                font-weight: 600;
                               "
                             >
-                              Credenciales de Staff
+                              Información de tu Cuenta
                             </h3>
-                          </td>
-                        </tr>
-
-                        <!-- Contenido de la información -->
-                        <tr>
-                          <td style="padding: 30px; background-color: #334155">
                             <table
                               role="presentation"
                               cellspacing="0"
@@ -410,8 +224,8 @@
                               <tr>
                                 <td
                                   style="
-                                    padding: 15px 0;
-                                    border-bottom: 1px solid #475569;
+                                    padding: 12px 0;
+                                    border-bottom: 1px solid #e2e8f0;
                                   "
                                 >
                                   <table
@@ -424,18 +238,18 @@
                                     <tr>
                                       <td
                                         style="
-                                          color: #94a3b8;
-                                          font-size: 16px;
-                                          font-weight: 600;
-                                          width: 30%;
+                                          color: #0f172a;
+                                          font-size: 14px;
+                                          font-weight: 500;
+                                          width: 40%;
                                         "
                                       >
                                         Nombre:
                                       </td>
                                       <td
                                         style="
-                                          color: #f8fafc;
-                                          font-size: 16px;
+                                          color: #0f172a;
+                                          font-size: 14px;
                                           font-weight: 700;
                                         "
                                       >
@@ -446,12 +260,7 @@
                                 </td>
                               </tr>
                               <tr>
-                                <td
-                                  style="
-                                    padding: 15px 0;
-                                    border-bottom: 1px solid #475569;
-                                  "
-                                >
+                                <td style="padding: 12px 0">
                                   <table
                                     role="presentation"
                                     cellspacing="0"
@@ -462,18 +271,18 @@
                                     <tr>
                                       <td
                                         style="
-                                          color: #94a3b8;
-                                          font-size: 16px;
-                                          font-weight: 600;
-                                          width: 30%;
+                                          color: #0f172a;
+                                          font-size: 14px;
+                                          font-weight: 500;
+                                          width: 40%;
                                         "
                                       >
                                         Email:
                                       </td>
                                       <td
                                         style="
-                                          color: #f8fafc;
-                                          font-size: 16px;
+                                          color: #0f172a;
+                                          font-size: 14px;
                                           font-weight: 700;
                                         "
                                       >
@@ -483,120 +292,50 @@
                                   </table>
                                 </td>
                               </tr>
-                              <tr>
-                                <td style="padding: 15px 0">
-                                  <table
-                                    role="presentation"
-                                    cellspacing="0"
-                                    cellpadding="0"
-                                    border="0"
-                                    width="100%"
-                                  >
-                                    <tr>
-                                      <td
-                                        style="
-                                          color: #94a3b8;
-                                          font-size: 16px;
-                                          font-weight: 600;
-                                          width: 30%;
-                                        "
-                                      >
-                                        Rol:
-                                      </td>
-                                      <td
-                                        style="
-                                          color: #fbbf24;
-                                          font-size: 16px;
-                                          font-weight: 700;
-                                          text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
-                                        "
-                                      >
-                                        ⭐ STAFF
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
                             </table>
 
-                            <!-- Contraseña temporal con diseño especial -->
+                            <!-- Contraseña temporal -->
                             <div
                               style="
                                 margin-top: 25px;
-                                padding: 25px;
-                                background: linear-gradient(
-                                  135deg,
-                                  #1e293b 0%,
-                                  #0f172a 100%
-                                );
-                                border-radius: 12px;
-                                border: 2px solid #f59e0b;
-                                position: relative;
-                                box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+                                padding: 20px;
+                                background-color: #1e293b;
+                                border-radius: 8px;
+                                border: 2px solid #22c55e;
+                                box-shadow: 0 4px 16px rgba(34, 197, 94, 0.1);
                               "
                             >
-                              <!-- Icono de llave -->
-                              <div
-                                style="
-                                  width: 50px;
-                                  height: 50px;
-                                  background: rgba(245, 158, 11, 0.2);
-                                  border: 2px solid #f59e0b;
-                                  border-radius: 50%;
-                                  margin: 0 auto 15px auto;
-                                  display: table;
-                                  text-align: center;
-                                  vertical-align: middle;
-                                  box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
-                                "
-                              >
-                                <span
-                                  style="
-                                    display: table-cell;
-                                    vertical-align: middle;
-                                    font-size: 20px;
-                                    color: #fbbf24;
-                                  "
-                                  >🔑</span
-                                >
-                              </div>
-
                               <p
                                 style="
                                   margin: 0 0 10px 0;
-                                  color: #fbbf24;
-                                  font-size: 16px;
+                                  color: #22c55e;
+                                  font-size: 14px;
                                   font-weight: 700;
                                   text-align: center;
                                   text-transform: uppercase;
-                                  letter-spacing: 1px;
-                                  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
                                 "
                               >
-                                Contraseña Temporal de Staff
+                                Contraseña Temporal
                               </p>
-
                               <div
                                 style="
-                                  background: #0f172a;
+                                  background-color: #f1f5f9;
                                   padding: 15px;
-                                  border-radius: 10px;
-                                  border: 1px solid #f59e0b;
+                                  border-radius: 6px;
+                                  border: 2px solid #22c55e;
+                                box-shadow: 0 4px 16px rgba(34, 197, 94, 0.1);
                                   margin-top: 10px;
-                                  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
                                 "
                               >
                                 <p
                                   style="
                                     margin: 0;
-                                    color: #f8fafc;
+                                    color: #0f172a;
                                     font-size: 18px;
                                     font-weight: 700;
                                     text-align: center;
                                     font-family: 'Courier New', monospace;
                                     letter-spacing: 2px;
-                                    text-shadow: 0 0 10px
-                                      rgba(248, 250, 252, 0.3);
                                   "
                                 >
                                   {{temp_staff_pssw}}
@@ -609,389 +348,9 @@
                     </td>
                   </tr>
 
-                  <!-- Responsabilidades del staff -->
-                  <tr>
-                    <td style="padding-bottom: 40px">
-                      <!-- Header de la sección -->
-                      <div style="text-align: center; margin-bottom: 30px">
-                        <div
-                          style="
-                            width: 80px;
-                            height: 80px;
-                            background: rgba(245, 158, 11, 0.2);
-                            border: 3px solid #f59e0b;
-                            border-radius: 50%;
-                            margin: 0 auto 20px auto;
-                            display: table;
-                            text-align: center;
-                            vertical-align: middle;
-                            box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
-                          "
-                        >
-                          <span
-                            style="
-                              display: table-cell;
-                              vertical-align: middle;
-                              font-size: 32px;
-                              color: #fbbf24;
-                              text-shadow: 0 0 15px rgba(251, 191, 36, 0.8);
-                            "
-                            >🎯</span
-                          >
-                        </div>
-
-                        <h3
-                          style="
-                            margin: 0;
-                            color: #f8fafc;
-                            font-size: 28px;
-                            font-weight: 700;
-                            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-                          "
-                        >
-                          Responsabilidades del Staff
-                        </h3>
-
-                        <div
-                          style="
-                            width: 80px;
-                            height: 3px;
-                            background: linear-gradient(
-                              90deg,
-                              #f59e0b,
-                              #fbbf24,
-                              #f59e0b
-                            );
-                            margin: 15px auto;
-                            border-radius: 2px;
-                            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
-                          "
-                        ></div>
-                      </div>
-
-                      <table
-                        role="presentation"
-                        cellspacing="0"
-                        cellpadding="0"
-                        border="0"
-                        width="100%"
-                      >
-                        <tr>
-                          <td style="padding: 20px 0">
-                            <table
-                              role="presentation"
-                              cellspacing="0"
-                              cellpadding="0"
-                              border="0"
-                              width="100%"
-                              style="
-                                background: linear-gradient(
-                                  135deg,
-                                  #334155 0%,
-                                  #475569 100%
-                                );
-                                border-radius: 15px;
-                                border: 1px solid #475569;
-                                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-                              "
-                            >
-                              <tr>
-                                <td style="padding: 25px">
-                                  <table
-                                    role="presentation"
-                                    cellspacing="0"
-                                    cellpadding="0"
-                                    border="0"
-                                    width="100%"
-                                  >
-                                    <tr>
-                                      <td
-                                        style="
-                                          width: 60px;
-                                          vertical-align: top;
-                                          text-align: center;
-                                        "
-                                      >
-                                        <div
-                                          style="
-                                            width: 45px;
-                                            height: 45px;
-                                            background: rgba(245, 158, 11, 0.2);
-                                            border: 2px solid #f59e0b;
-                                            border-radius: 50%;
-                                            display: table;
-                                            text-align: center;
-                                            vertical-align: middle;
-                                            margin: 0 auto;
-                                            box-shadow: 0 0 15px
-                                              rgba(245, 158, 11, 0.3);
-                                          "
-                                        >
-                                          <span
-                                            style="
-                                              display: table-cell;
-                                              vertical-align: middle;
-                                              color: #fbbf24;
-                                              font-size: 18px;
-                                              font-weight: 700;
-                                            "
-                                            >📞</span
-                                          >
-                                        </div>
-                                      </td>
-                                      <td
-                                        style="
-                                          vertical-align: middle;
-                                          padding-left: 20px;
-                                        "
-                                      >
-                                        <p
-                                          style="
-                                            margin: 0;
-                                            color: #cbd5e1;
-                                            font-size: 17px;
-                                            line-height: 1.5;
-                                          "
-                                        >
-                                          <strong
-                                            style="
-                                              color: #f8fafc;
-                                              font-size: 18px;
-                                              text-shadow: 0 1px 2px
-                                                rgba(0, 0, 0, 0.3);
-                                            "
-                                            >Atención al Cliente</strong
-                                          >
-                                          <br />
-                                          <span
-                                            style="
-                                              color: #94a3b8;
-                                              font-size: 15px;
-                                            "
-                                            >Brindar soporte a usuarios y resolver consultas</span
-                                          >
-                                        </p>
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                            </table>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="padding: 20px 0">
-                            <table
-                              role="presentation"
-                              cellspacing="0"
-                              cellpadding="0"
-                              border="0"
-                              width="100%"
-                              style="
-                                background: linear-gradient(
-                                  135deg,
-                                  #334155 0%,
-                                  #475569 100%
-                                );
-                                border-radius: 15px;
-                                border: 1px solid #475569;
-                                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-                              "
-                            >
-                              <tr>
-                                <td style="padding: 25px">
-                                  <table
-                                    role="presentation"
-                                    cellspacing="0"
-                                    cellpadding="0"
-                                    border="0"
-                                    width="100%"
-                                  >
-                                    <tr>
-                                      <td
-                                        style="
-                                          width: 60px;
-                                          vertical-align: top;
-                                          text-align: center;
-                                        "
-                                      >
-                                        <div
-                                          style="
-                                            width: 45px;
-                                            height: 45px;
-                                            background: rgba(245, 158, 11, 0.2);
-                                            border: 2px solid #f59e0b;
-                                            border-radius: 50%;
-                                            display: table;
-                                            text-align: center;
-                                            vertical-align: middle;
-                                            margin: 0 auto;
-                                            box-shadow: 0 0 15px
-                                              rgba(245, 158, 11, 0.3);
-                                          "
-                                        >
-                                          <span
-                                            style="
-                                              display: table-cell;
-                                              vertical-align: middle;
-                                              color: #fbbf24;
-                                              font-size: 18px;
-                                              font-weight: 700;
-                                            "
-                                            >🎫</span
-                                          >
-                                        </div>
-                                      </td>
-                                      <td
-                                        style="
-                                          vertical-align: middle;
-                                          padding-left: 20px;
-                                        "
-                                      >
-                                        <p
-                                          style="
-                                            margin: 0;
-                                            color: #cbd5e1;
-                                            font-size: 17px;
-                                            line-height: 1.5;
-                                          "
-                                        >
-                                          <strong
-                                            style="
-                                              color: #f8fafc;
-                                              font-size: 18px;
-                                              text-shadow: 0 1px 2px
-                                                rgba(0, 0, 0, 0.3);
-                                            "
-                                            >Gestión de Boletas</strong
-                                          >
-                                          <br />
-                                          <span
-                                            style="
-                                              color: #94a3b8;
-                                              font-size: 15px;
-                                            "
-                                            >Verificar boletas y procesar reembolsos</span
-                                          >
-                                        </p>
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                            </table>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="padding: 20px 0">
-                            <table
-                              role="presentation"
-                              cellspacing="0"
-                              cellpadding="0"
-                              border="0"
-                              width="100%"
-                              style="
-                                background: linear-gradient(
-                                  135deg,
-                                  #334155 0%,
-                                  #475569 100%
-                                );
-                                border-radius: 15px;
-                                border: 1px solid #475569;
-                                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-                              "
-                            >
-                              <tr>
-                                <td style="padding: 25px">
-                                  <table
-                                    role="presentation"
-                                    cellspacing="0"
-                                    cellpadding="0"
-                                    border="0"
-                                    width="100%"
-                                  >
-                                    <tr>
-                                      <td
-                                        style="
-                                          width: 60px;
-                                          vertical-align: top;
-                                          text-align: center;
-                                        "
-                                      >
-                                        <div
-                                          style="
-                                            width: 45px;
-                                            height: 45px;
-                                            background: rgba(245, 158, 11, 0.2);
-                                            border: 2px solid #f59e0b;
-                                            border-radius: 50%;
-                                            display: table;
-                                            text-align: center;
-                                            vertical-align: middle;
-                                            margin: 0 auto;
-                                            box-shadow: 0 0 15px
-                                              rgba(245, 158, 11, 0.3);
-                                          "
-                                        >
-                                          <span
-                                            style="
-                                              display: table-cell;
-                                              vertical-align: middle;
-                                              color: #fbbf24;
-                                              font-size: 18px;
-                                              font-weight: 700;
-                                            "
-                                            >📋</span
-                                          >
-                                        </div>
-                                      </td>
-                                      <td
-                                        style="
-                                          vertical-align: middle;
-                                          padding-left: 20px;
-                                        "
-                                      >
-                                        <p
-                                          style="
-                                            margin: 0;
-                                            color: #cbd5e1;
-                                            font-size: 17px;
-                                            line-height: 1.5;
-                                          "
-                                        >
-                                          <strong
-                                            style="
-                                              color: #f8fafc;
-                                              font-size: 18px;
-                                              text-shadow: 0 1px 2px
-                                                rgba(0, 0, 0, 0.3);
-                                            "
-                                            >Monitoreo de Eventos</strong
-                                          >
-                                          <br />
-                                          <span
-                                            style="
-                                              color: #94a3b8;
-                                              font-size: 15px;
-                                            "
-                                            >Supervisar eventos y reportar incidencias</span
-                                          >
-                                        </p>
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                            </table>
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-
                   <!-- Botón de acción -->
                   <tr>
-                    <td style="text-align: center; padding-bottom: 40px">
+                    <td style="text-align: center; padding-bottom: 30px">
                       <table
                         role="presentation"
                         cellspacing="0"
@@ -1001,51 +360,31 @@
                       >
                         <tr>
                           <td
-                            class="button button-glow"
+                            class="button"
                             style="
-                              background: linear-gradient(
-                                135deg,
-                                #f59e0b 0%,
-                                #d97706 100%
-                              );
-                              border-radius: 15px;
+                              background: linear-gradient(135deg, #22c55e, #16a34a);
+                              border-radius: 12px;
                               text-align: center;
-                              border: 2px solid #fbbf24;
+                              box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
                             "
                           >
                             <a
-                              href="#"
+                              href="{{action_url}}"
                               style="
                                 display: inline-block;
-                                padding: 20px 50px;
-                                color: #ffffff;
+                                padding: 16px 40px;
+                                color: #0f172a;
                                 text-decoration: none;
-                                font-size: 20px;
+                                font-size: 16px;
                                 font-weight: 700;
-                                border-radius: 13px;
-                                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-                                letter-spacing: 1px;
-                                text-transform: uppercase;
+                                border-radius: 6px;
                               "
                             >
-                              ⭐ Acceder al Panel Staff
+                              Iniciar Sesión
                             </a>
                           </td>
                         </tr>
                       </table>
-
-                      <!-- Texto adicional debajo del botón -->
-                      <p
-                        style="
-                          margin: 20px 0 0 0;
-                          color: #94a3b8;
-                          font-size: 16px;
-                          text-align: center;
-                          font-weight: 500;
-                        "
-                      >
-                        Haz clic para acceder a tu área de trabajo
-                      </p>
                     </td>
                   </tr>
 
@@ -1059,87 +398,33 @@
                         border="0"
                         width="100%"
                         style="
-                          background: linear-gradient(
-                            135deg,
-                            #1e293b 0%,
-                            #0f172a 100%
-                          );
-                          border-radius: 16px;
-                          border: 2px solid #10b981;
-                          position: relative;
-                          box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+                          background-color: #1e293b;
+                          border-radius: 8px;
+                          border: 1px solid #22c55e;
                         "
                       >
                         <tr>
-                          <td style="padding: 30px; text-align: center">
-                            <!-- Icono de seguridad -->
-                            <div
-                              style="
-                                width: 60px;
-                                height: 60px;
-                                background: rgba(16, 185, 129, 0.2);
-                                border: 2px solid #10b981;
-                                border-radius: 50%;
-                                margin: 0 auto 20px auto;
-                                display: table;
-                                text-align: center;
-                                vertical-align: middle;
-                                box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-                              "
-                            >
-                              <span
-                                style="
-                                  display: table-cell;
-                                  vertical-align: middle;
-                                  font-size: 24px;
-                                  color: #34d399;
-                                "
-                                >🤝</span
-                              >
-                            </div>
-
+                          <td style="padding: 25px; text-align: center">
                             <h4
                               style="
                                 margin: 0 0 15px 0;
-                                color: #34d399;
-                                font-size: 20px;
+                                color: #22c55e;
+                                font-size: 18px;
                                 font-weight: 700;
-                                text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
                               "
                             >
-                              Compromiso del Staff
+                              Importante
                             </h4>
-
-                            <div
-                              style="
-                                width: 60px;
-                                height: 3px;
-                                background: linear-gradient(
-                                  90deg,
-                                  #10b981,
-                                  #34d399,
-                                  #10b981
-                                );
-                                margin: 0 auto 20px auto;
-                                border-radius: 2px;
-                                box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-                              "
-                            ></div>
-
                             <p
                               style="
                                 margin: 0;
-                                color: #cbd5e1;
-                                font-size: 16px;
+                                color: #ffffff;
+                                font-size: 14px;
                                 line-height: 1.6;
-                                max-width: 450px;
-                                margin: 0 auto;
-                                font-weight: 500;
+                                font-weight: 400;
                               "
                             >
-                              Como miembro del staff, eres parte esencial de nuestro equipo. 
-                              Cambia tu contraseña temporal inmediatamente y mantén siempre 
-                              la confidencialidad de la información de los usuarios.
+                              Por seguridad, cambia tu contraseña temporal lo antes posible. Mantén tus credenciales seguras y nunca las compartas.
                             </p>
                           </td>
                         </tr>
@@ -1157,8 +442,9 @@
                 style="
                   padding: 30px 40px;
                   text-align: center;
-                  background-color: #0f172a;
-                  border-radius: 0 0 20px 20px;
+                  background-color: #f1f5f9;
+                  border-radius: 0 0 24px 24px;
+                  border-top: 2px solid #e2e8f0;
                 "
               >
                 <table
@@ -1172,33 +458,33 @@
                     <td style="text-align: center">
                       <p
                         style="
-                          margin: 0 0 15px 0;
-                          color: #94a3b8;
-                          font-size: 16px;
-                          font-weight: 500;
+                          margin: 0 0 10px 0;
+                          color: #0f172a;
+                          font-size: 14px;
+                          font-weight: 400;
                         "
                       >
                         Este email fue enviado a {{staff_email}}.
                       </p>
                       <p
                         style="
-                          margin: 0 0 15px 0;
-                          color: #94a3b8;
-                          font-size: 16px;
-                          font-weight: 500;
-                        "
-                      >
-                        Si tienes alguna pregunta, contacta a tu supervisor.
-                      </p>
-                      <p
-                        style="
-                          margin: 0;
-                          color: #64748b;
+                          margin: 0 0 10px 0;
+                          color: #0f172a;
                           font-size: 14px;
                           font-weight: 400;
                         "
                       >
-                        © 2024 Tu Gol de Suerte. Todos los derechos reservados.
+                        Si tienes alguna pregunta, contacta nuestro soporte.
+                      </p>
+                      <p
+                        style="
+                          margin: 0;
+                          color: #0f172a;
+                          font-size: 12px;
+                          font-weight: 400;
+                        "
+                      >
+                        © 2025 Tu Gol de Suerte. Todos los derechos reservados.
                       </p>
                     </td>
                   </tr>
@@ -1211,12 +497,3 @@
     </table>
   </body>
 </html>
-
-
-
-
-
-
-
-
-
