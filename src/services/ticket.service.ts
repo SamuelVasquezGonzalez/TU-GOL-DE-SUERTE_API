@@ -8,6 +8,7 @@ import { invalidateUserStatsCache, invalidateStaffStatsCache } from '@/config/re
 import { StaffCommissionHistoryService } from './staff-commission-history.service'
 import dayjs from 'dayjs'
 import { SoccerTeamModel } from '@/models/soccer_team.model'
+import { generate_auto_email, generate_random_password, generate_recover_code } from '@/utils/generate.util'
 
 export class TicketService {
   // methods
@@ -122,7 +123,6 @@ export class TicketService {
     quantity: number
     user?: {
       name: string
-      email: string
       phone?: string
     }
     sell_by?: string
@@ -139,7 +139,19 @@ export class TicketService {
       if (customer_id) {
         customer_info = await user_service.get_user_by_id({ id: customer_id })
       } else {
-        let try_find = await user_service.get_users_by_param({ param: user?.email || '' })
+        // Generar email automáticamente
+        const auto_email = generate_auto_email({ name: user?.name || 'usuario' })
+        
+        // Buscar por nombre y teléfono si están disponibles
+        let try_find: any[] = []
+        if (user?.name) {
+          try_find = await user_service.get_users_by_param({ param: user.name })
+          // Filtrar por teléfono si está disponible
+          if (user.phone && try_find.length > 0) {
+            try_find = try_find.filter((u) => u.phone === user.phone)
+          }
+        }
+        
         if (try_find.length > 0) {
           customer_info = try_find[0]
         } else {
@@ -147,12 +159,12 @@ export class TicketService {
             name: user?.name || '',
             identity: {
               type_document: 'CC',
-              number_document: 'W',
+              number_document: generate_recover_code({ length: 10 }).toString(),
             },
             phone: user?.phone || '',
             role: 'customer',
-            email: user?.email || '',
-            password: '1',
+            email: auto_email,
+            password: generate_random_password({ length: 10 }),
           })
         }
       }

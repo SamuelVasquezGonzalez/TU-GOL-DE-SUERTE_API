@@ -14,6 +14,7 @@ export const ALLOWED_ORIGINS = [
   'https://www.tugoldesuerte.com',
   'https://tugoldesuerte.com',
   'https://api.tugoldesuerte.com', // Para webhooks de Wompi
+  "https://m3ps90bg-3000.use.devtunnels.ms"
 ]
 export const ALLOWED_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 

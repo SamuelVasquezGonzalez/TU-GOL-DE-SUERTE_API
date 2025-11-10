@@ -84,11 +84,7 @@ export class WompiWebhookService {
           const ticketData = await this.ticketService.create_new_ticket({
             game_id: gameId,
             customer_id: userId,
-            quantity: quantity,
-            user: customer_email ? {
-              name: transaction.customer_data?.full_name || 'Cliente',
-              email: customer_email
-            } : undefined
+            quantity: quantity
           })
 
           // Obtener el ticket actualizado

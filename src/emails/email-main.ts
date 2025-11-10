@@ -248,14 +248,12 @@ const send_ticket_purchase_email = async ({
       html: replaced_content,
     });
 
-    console.log("envie el email");
-
     if (!response)
       throw new ResponseError(
         400,
         "Error al enviar el correo de compra de boleta"
       );
-    console.log(response);
+      
 
     return response;
   } catch (error) {

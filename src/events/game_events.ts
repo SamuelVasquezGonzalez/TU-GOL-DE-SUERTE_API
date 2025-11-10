@@ -134,14 +134,12 @@ const create_ticket_event = (socket: Socket) => {
       quantity: number
       user?: {
         name: string
-        email: string
         phone?: string
       },
       sell_by?: string
     }) => {
       try {
         const { game_id, customer_id, curva_id, quantity, user, sell_by } = data
-        console.log(sell_by)
         const ticket_service = new TicketService()
         const new_ticket = await ticket_service.create_new_ticket({
           game_id,

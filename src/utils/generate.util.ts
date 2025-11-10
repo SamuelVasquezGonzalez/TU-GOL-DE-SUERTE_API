@@ -22,3 +22,12 @@ export const hash_password = (password: string) => {
 export const compare_password = (password: string, hashed_password: string) => {
     return bcrypt.compare(password, hashed_password);
 }
+
+export const generate_auto_email = ({ name }: { name: string }): string => {
+    // Obtener el primer nombre (si tiene espacios, solo el primero)
+    const first_name = name.trim().split(' ')[0].toLowerCase();
+    const random_code = generate_recover_code({ length: 6 });
+    
+    // Formato: nombre-tugol(timestamp y codigo aleatorio)@tugoldesuerte.com
+    return `${first_name}-${random_code}@tugoldesuerte.com`;
+}
