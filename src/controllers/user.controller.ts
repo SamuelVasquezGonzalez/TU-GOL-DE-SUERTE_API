@@ -119,14 +119,16 @@ export class UserController {
 
   public create_user = async (req: Request, res: Response) => {
     try {
-      const { user_data } = req.body
-      await this.user_service.create_new_user(user_data)
+      const { name, email, password, identity, phone, role } = req.body
+      console.log(req.body)
+      await this.user_service.create_new_user({ name, email, password, identity, phone, role })
 
       res.status(201).json({
         success: true,
         message: 'Usuario creado exitosamente',
       })
     } catch (err) {
+      console.log(err)
       if (err instanceof ResponseError) {
         res.status(err.statusCode).json({
           success: false,
