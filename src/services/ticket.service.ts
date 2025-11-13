@@ -26,7 +26,7 @@ export class TicketService {
         game_id: ticket.soccer_game_id,
       })
 
-      const game_info = await game_service.get_soccer_game_by_id({ id: ticket.soccer_game_id })
+      const game_info = await game_service.get_soccer_game_by_id({ id: ticket.soccer_game_id, parse_ids: true })
 
       const user_service = new UserService()
       const customer_info = await user_service.get_user_by_id({ id: ticket.user_id })
@@ -364,6 +364,11 @@ export class TicketService {
       const teamTwo = await SoccerTeamModel.findById(game_info.soccer_teams[1])
       if (!teamTwo) throw new ResponseError(404, 'No se encontró el equipo')
 
+      // Obtener el nombre del torneo
+      const TournamentModel = (await import('@/models/tournament.model')).TournamentModel
+      const tournament = await TournamentModel.findById(game_info.tournament).lean()
+      const tournament_name = tournament ? tournament.name : game_info.tournament
+
       await send_ticket_purchase_email({
         user_name: customer_info.name,
         user_email: customer_info.email,
@@ -372,7 +377,7 @@ export class TicketService {
           team1: teamOne.name,
           team2: teamTwo.name,
           date: dayjs(game_info.start_date).format('DD/MM/YYYY hh:mm A'),
-          tournament: game_info.tournament,
+          tournament: tournament_name,
         },
         results_purchased: selected_results,
         total_amount: payed_amount,
@@ -451,7 +456,7 @@ export class TicketService {
       const game_service = new SoccerGameService()
 
       const customer_info = await user_service.get_user_by_id({ id: ticket.user_id })
-      const game_info = await game_service.get_soccer_game_by_id({ id: ticket.soccer_game_id })
+      const game_info = await game_service.get_soccer_game_by_id({ id: ticket.soccer_game_id, parse_ids: true })
 
       // Enviar correo de actualización de estado
       await send_ticket_status_update_email({
@@ -461,8 +466,8 @@ export class TicketService {
         old_status: old_status,
         new_status: status,
         game_info: {
-          team1: game_info.soccer_teams[0],
-          team2: game_info.soccer_teams[1],
+          team1: game_info.soccer_teams[0] as string,
+          team2: game_info.soccer_teams[1] as string,
           date: dayjs(game_info.start_date).format('DD/MM/YYYY hh:mm A'),
         },
       })

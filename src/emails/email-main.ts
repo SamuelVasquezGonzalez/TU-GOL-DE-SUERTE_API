@@ -51,7 +51,6 @@ export interface SendEventConfirmationEmailProps {
   user_name: string;
   user_email: string;
   event_info: {
-    id: string;
     team1: string;
     team2: string;
     date: string;
@@ -277,7 +276,6 @@ const send_event_confirmation_email = async ({
     const replaced_content = loaded_html
       .replace(/{{user_name}}/g, user_name)
       .replace(/{{user_email}}/g, user_email)
-      .replace(/{{event_id}}/g, event_info.id)
       .replace(/{{team1}}/g, event_info.team1)
       .replace(/{{team2}}/g, event_info.team2)
       .replace(/{{event_date}}/g, event_info.date)

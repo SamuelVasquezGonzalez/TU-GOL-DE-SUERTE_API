@@ -251,15 +251,16 @@ export class WompiWebhookService {
       const game = await this.ticketService.get_ticket_by_id({ id: ticket._id })
 
       if (game && game.game) {
+        const dayjs = (await import('dayjs')).default
         await send_ticket_purchase_email({
           user_name: ticket.customer_name || 'Cliente',
           user_email: ticket.customer_email || '',
           ticket_number: ticket.ticket_number,
           game_info: {
-            team1: game.game.soccer_teams[0],
-            team2: game.game.soccer_teams[1],
-            date: game.game.start_date.toISOString(),
-            tournament: game.game.tournament,
+            team1: game.game.soccer_teams[0] as string,
+            team2: game.game.soccer_teams[1] as string,
+            date: dayjs(game.game.start_date).format('DD/MM/YYYY hh:mm A'),
+            tournament: game.game.tournament as string,
           },
           results_purchased: ticket.results_purchased,
           total_amount: ticket.payed_amount,

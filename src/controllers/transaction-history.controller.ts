@@ -64,16 +64,3 @@ export class TransactionHistoryController {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
