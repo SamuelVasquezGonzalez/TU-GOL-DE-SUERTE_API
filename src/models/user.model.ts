@@ -8,7 +8,7 @@ const UserSchema = new Schema<IUser>({
     identity: {type: mongoose.Schema.Types.Mixed, required: true},
     phone: {type: String, required: false},
     recover_code: {type: Number, required: true},
-    created_at: {type: Date, default: new Date()},
+    created_at: {type: Date, default: Date.now},
     role: {type: String, required: true, enum: ["admin", "customer", "staff"]},
     avatar: {type: mongoose.Schema.Types.Mixed, required: false, default: null},
 })

@@ -25,7 +25,12 @@ export class SoccerGameService {
             const soccer_teams_service = new SoccerTeamsService();
             const soccer_teams = await soccer_teams_service.get_all_soccer_teams();
 
-            for(const soccer_game of soccer_games) {;
+            // N+1 resuelto: se cargan TODOS los torneos una sola vez y se indexan por id,
+            // en lugar de hacer un findById por cada partido dentro del bucle.
+            const tournaments = await TournamentModel.find().lean();
+            const tournament_map = new Map(tournaments.map((t: any) => [t._id.toString(), t.name]));
+
+            for(const soccer_game of soccer_games) {
 
                 const soccer_team = soccer_teams.find((soccer_team: ISoccerTeam) => soccer_team.id === soccer_game.soccer_teams[0]);
                 if(soccer_team) {
@@ -35,9 +40,9 @@ export class SoccerGameService {
                 if(soccer_team_two) {
                     soccer_game.soccer_teams[1] = soccer_team_two.name;
                 }
-                const find_tournament = await TournamentModel.findById(soccer_game.tournament).lean();
-                if(!find_tournament) throw new ResponseError(404, "No se encontró el torneo");
-                soccer_game.tournament = find_tournament.name;
+                const tournament_name = tournament_map.get(soccer_game.tournament);
+                if(!tournament_name) throw new ResponseError(404, "No se encontró el torneo");
+                soccer_game.tournament = tournament_name;
             }
             return soccer_games;
         } catch (err) {
@@ -324,6 +329,80 @@ export class SoccerGameService {
             if(err instanceof ResponseError) throw err;
             throw new ResponseError(500, "Error al actualizar los resultados de la curva");
         }
+    }
+
+    /**
+     * Reclama de forma ATÓMICA un resultado aleatorio de una curva.
+     *
+     * Resuelve la condición de carrera del flujo anterior (leer -> elegir en memoria ->
+     * reescribir todo el array), que permitía vender el MISMO número a dos compras
+     * concurrentes. Aquí cada número se mueve de `avaliable_results` a `sold_results`
+     * con una sola operación condicionada: si otra compra ya tomó ese número, la
+     * actualización no afecta documentos y se reintenta con otro número.
+     *
+     * @returns el resultado reclamado (ej. "3.5") o `null` si la curva ya no tiene
+     *          resultados disponibles (o hubo demasiados conflictos de concurrencia).
+     */
+    public async claim_random_result_atomic({game_id, curva_id}: {game_id: string, curva_id: string}): Promise<string | null> {
+        const MAX_RETRIES = 100;
+
+        for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+            const game = await SoccerGameModel.findById(game_id).select("curvas_open").lean();
+            if(!game) throw new ResponseError(404, "No se encontró el partido de futbol");
+
+            const curva = game.curvas_open.find((c: CurvaEntity) => c.id === curva_id);
+            if(!curva) throw new ResponseError(404, "No se encontró la curva");
+
+            const available = curva.avaliable_results || [];
+            if(available.length === 0) {
+                // La curva está agotada: asegurarse de que quede marcada como sold_out
+                await this.mark_curva_sold_out({game_id, curva_id});
+                return null;
+            }
+
+            const random_result = available[Math.floor(Math.random() * available.length)];
+
+            // Operación atómica condicionada: sólo aplica si la curva AÚN tiene ese resultado disponible.
+            // Dos compras concurrentes que elijan el mismo número: sólo una verá el documento (la otra
+            // recibe update_result === null y reintenta con otro número).
+            const update_result = await SoccerGameModel.findOneAndUpdate(
+                {
+                    _id: game_id,
+                    curvas_open: { $elemMatch: { id: curva_id, avaliable_results: random_result } },
+                },
+                {
+                    $pull: { "curvas_open.$[c].avaliable_results": random_result },
+                    $push: { "curvas_open.$[c].sold_results": random_result },
+                },
+                {
+                    arrayFilters: [{ "c.id": curva_id }],
+                    new: true,
+                }
+            ).select("curvas_open").lean();
+
+            if(!update_result) {
+                // Conflicto de concurrencia: otro proceso tomó ese número. Reintentar.
+                continue;
+            }
+
+            // Si la curva quedó vacía tras el reclamo, marcarla como sold_out
+            const updated_curva = update_result.curvas_open.find((c: CurvaEntity) => c.id === curva_id);
+            if(updated_curva && (updated_curva.avaliable_results?.length ?? 0) === 0) {
+                await this.mark_curva_sold_out({game_id, curva_id});
+            }
+
+            return random_result;
+        }
+
+        // Demasiados conflictos de concurrencia consecutivos
+        return null;
+    }
+
+    private async mark_curva_sold_out({game_id, curva_id}: {game_id: string, curva_id: string}) {
+        await SoccerGameModel.updateOne(
+            { _id: game_id, "curvas_open.id": curva_id },
+            { $set: { "curvas_open.$.status": "sold_out" } }
+        );
     }
 
     public async update_game_status({game_id, status}: {game_id: string, status: SoccerGameStatus}) {

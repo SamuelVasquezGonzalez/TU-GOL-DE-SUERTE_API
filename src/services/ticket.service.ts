@@ -8,6 +8,7 @@ import { invalidateUserStatsCache, invalidateStaffStatsCache } from '@/config/re
 import { StaffCommissionHistoryService } from './staff-commission-history.service'
 import dayjs from 'dayjs'
 import { SoccerTeamModel } from '@/models/soccer_team.model'
+import { SoccerGameModel } from '@/models/soccer_games.model'
 import { generate_auto_email, generate_random_password, generate_recover_code } from '@/utils/generate.util'
 
 export class TicketService {
@@ -21,15 +22,17 @@ export class TicketService {
       if (!ticket) throw new ResponseError(404, 'No se encontró la boleta')
 
       const game_service = new SoccerGameService()
-      const curva_info = await game_service.get_curva_by_id({
-        id: ticket.curva_id,
-        game_id: ticket.soccer_game_id,
-      })
-
-      const game_info = await game_service.get_soccer_game_by_id({ id: ticket.soccer_game_id, parse_ids: true })
-
       const user_service = new UserService()
-      const customer_info = await user_service.get_user_by_id({ id: ticket.user_id })
+
+      // Las tres consultas son independientes entre sí: ejecutarlas en paralelo
+      const [curva_info, game_info, customer_info] = await Promise.all([
+        game_service.get_curva_by_id({
+          id: ticket.curva_id,
+          game_id: ticket.soccer_game_id,
+        }),
+        game_service.get_soccer_game_by_id({ id: ticket.soccer_game_id, parse_ids: true }),
+        user_service.get_user_by_id({ id: ticket.user_id }),
+      ])
 
       return {
         ticket,
@@ -74,11 +77,25 @@ export class TicketService {
     }
   }
 
-  public async get_tickets_by_user_id({ user_id }: { user_id: string }) {
+  public async get_tickets_by_user_id({
+    user_id,
+    page = 1,
+    limit = 20,
+  }: {
+    user_id: string
+    page?: number
+    limit?: number
+  }) {
     try {
-      const tickets = await TicketModel.find({ user_id }).lean()
-      if (!tickets) throw new ResponseError(404, 'No se encontraron boletas para este usuario')
-      return tickets
+      const filter = { user_id }
+      const skip = (page - 1) * limit
+
+      const [tickets, total] = await Promise.all([
+        TicketModel.find(filter).sort({ created_date: -1 }).skip(skip).limit(limit).lean(),
+        TicketModel.countDocuments(filter),
+      ])
+
+      return { data: tickets, total }
     } catch (err) {
       if (err instanceof ResponseError) throw err
       throw new ResponseError(500, 'Error al obtener las boletas del usuario')
@@ -96,11 +113,22 @@ export class TicketService {
     }
   }
 
-  public async get_all_tickets() {
+  public async get_all_tickets({
+    page = 1,
+    limit = 20,
+  }: {
+    page?: number
+    limit?: number
+  } = {}) {
     try {
-      const tickets = await TicketModel.find().lean()
-      if (!tickets) throw new ResponseError(404, 'No se encontraron boletas')
-      return tickets
+      const skip = (page - 1) * limit
+
+      const [tickets, total] = await Promise.all([
+        TicketModel.find().sort({ created_date: -1 }).skip(skip).limit(limit).lean(),
+        TicketModel.countDocuments(),
+      ])
+
+      return { data: tickets, total }
     } catch (err) {
       if (err instanceof ResponseError) throw err
       throw new ResponseError(500, 'Error al obtener todas las boletas')
@@ -173,6 +201,7 @@ export class TicketService {
       let selected_results: string[] = []
       let remaining_quantity = quantity
       let first_curva_id: string | null = null // Se establecerá en el primer bucle
+      let tried_specified_curva = false // Para priorizar la curva indicada sólo una vez
 
       // Si se especifica una curva_id, validar que existe (pero no requerir que tenga suficientes resultados)
       if (curva_id) {
@@ -183,133 +212,67 @@ export class TicketService {
         // No lanzar error si no tiene suficientes resultados, el bucle while lo manejará
       }
 
-      // Bucle para comprar todos los tickets, abriendo nuevas curvas si es necesario
+      // Cota de seguridad para evitar bucles infinitos ante alta concurrencia / agotamiento
+      let safety_counter = 0
+      const SAFETY_MAX = quantity * 50 + 200
+
+      // Bucle de compra: reclama un número a la vez de forma ATÓMICA, abriendo nuevas curvas si hace falta.
+      // Cada reclamo es atómico (ver SoccerGameService.claim_random_result_atomic), por lo que dos compras
+      // concurrentes no pueden quedarse con el mismo número.
       while (remaining_quantity > 0) {
-        // Obtener el juego actualizado para tener las curvas más recientes
-        const current_game_info = await game_service.get_soccer_game_by_id({
-          id: game_id,
-          parse_ids: false,
-        })
+        safety_counter++
+        if (safety_counter > SAFETY_MAX) {
+          throw new ResponseError(
+            500,
+            'No se pudieron asignar todos los resultados (agotamiento o concurrencia muy alta)'
+          )
+        }
 
-        // Encontrar una curva disponible con resultados suficientes
-        let current_curva = current_game_info.curvas_open.find(
-          (curva: any) => curva.status === 'open' && curva.avaliable_results.length > 0
-        )
+        // Lectura ligera de las curvas más recientes (sólo el campo necesario, sin joins de equipos/torneo)
+        const current_game = await SoccerGameModel.findById(game_id).select('curvas_open').lean()
+        if (!current_game) throw new ResponseError(404, 'No se encontró el partido de futbol')
 
-        // Si no hay curva disponible, crear una nueva
-        if (!current_curva) {
+        // Elegir la curva objetivo
+        let target_curva: any = null
+
+        // En el primer intento, si se especificó una curva y aún tiene cupo, priorizarla
+        if (!tried_specified_curva && curva_id) {
+          target_curva = current_game.curvas_open.find(
+            (c: any) => c.id === curva_id && c.status === 'open' && c.avaliable_results.length > 0
+          )
+          tried_specified_curva = true
+        }
+
+        // Si no, buscar cualquier curva abierta con resultados disponibles
+        if (!target_curva) {
+          target_curva = current_game.curvas_open.find(
+            (c: any) => c.status === 'open' && c.avaliable_results.length > 0
+          )
+        }
+
+        // Si no hay ninguna curva disponible, abrir una nueva y reintentar
+        if (!target_curva) {
           const new_curva_result = await game_service.open_new_curva({ game_id })
           if (!new_curva_result.status || !new_curva_result.curva) {
             throw new ResponseError(500, 'Error al abrir nueva curva')
           }
-
-          // Obtener el juego actualizado nuevamente después de abrir la curva
-          const updated_game_info = await game_service.get_soccer_game_by_id({
-            id: game_id,
-            parse_ids: false,
-          })
-
-          current_curva = updated_game_info.curvas_open.find(
-            (curva: any) => curva.id === new_curva_result.curva.id
-          )
-
-          if (!current_curva) {
-            throw new ResponseError(500, 'No se pudo encontrar la nueva curva creada')
-          }
+          continue
         }
 
-        // Si es la primera iteración y se especificó una curva_id, usar esa curva primero si está disponible
-        if (first_curva_id === null && curva_id) {
-          const specified_curva = current_game_info.curvas_open.find(
-            (curva: any) =>
-              curva.id === curva_id && curva.status === 'open' && curva.avaliable_results.length > 0
-          )
-          if (specified_curva) {
-            current_curva = specified_curva
-          }
+        // Reclamar UN resultado de forma atómica de la curva objetivo
+        const claimed = await game_service.claim_random_result_atomic({
+          game_id,
+          curva_id: target_curva.id,
+        })
+
+        if (!claimed) {
+          // La curva se agotó (por concurrencia u otra compra): reintentar con otra curva
+          continue
         }
 
-        // Guardar la primera curva_id para el ticket
-        if (first_curva_id === null) {
-          first_curva_id = current_curva.id
-        }
-
-        // Validar que la curva tenga id
-        if (!current_curva.id) {
-          console.error(`❌ [TicketService] La curva no tiene id. Curva completa:`, current_curva)
-          throw new ResponseError(500, 'La curva no tiene un ID válido')
-        }
-
-        // Validar que la curva tenga resultados disponibles
-        if (!current_curva.avaliable_results || !Array.isArray(current_curva.avaliable_results)) {
-          console.error(
-            `❌ [TicketService] Curva ${current_curva.id} no tiene avaliable_results válidos`
-          )
-          throw new ResponseError(
-            500,
-            `La curva ${current_curva.id} no tiene resultados disponibles válidos`
-          )
-        }
-
-        // Calcular cuántos tickets podemos comprar de esta curva
-        const available_in_curva = current_curva.avaliable_results.length
-        const tickets_to_buy_from_curva = Math.min(remaining_quantity, available_in_curva)
-
-        // Comprar los tickets de esta curva
-        // Crear copias profundas de los arrays para evitar mutaciones
-        // Asegurarse de copiar explícitamente el id y status
-        const updated_curva = {
-          id: current_curva.id, // Mantener el id original
-          status: current_curva.status || 'open',
-          avaliable_results: [...(current_curva.avaliable_results || [])],
-          sold_results: [...(current_curva.sold_results || [])],
-        }
-
-        for (let i = 0; i < tickets_to_buy_from_curva; i++) {
-          // Validar que aún hay resultados disponibles
-          if (!updated_curva.avaliable_results || updated_curva.avaliable_results.length === 0) {
-            console.warn(
-              `⚠️ [TicketService] No hay más resultados disponibles en la curva ${updated_curva.id}`
-            )
-            break
-          }
-
-          const random_result =
-            updated_curva.avaliable_results[
-              Math.floor(Math.random() * updated_curva.avaliable_results.length)
-            ]
-
-          selected_results.push(random_result)
-
-          // Remover el resultado de disponibles y agregarlo a vendidos
-          updated_curva.avaliable_results = updated_curva.avaliable_results.filter(
-            (result) => result !== random_result
-          )
-          updated_curva.sold_results.push(random_result)
-        }
-
-        // Si la curva se agotó, marcarla como sold_out
-        if (updated_curva.avaliable_results.length === 0) {
-          updated_curva.status = 'sold_out'
-        }
-
-        // Actualizar la curva en la base de datos
-        try {
-          await game_service.update_curva_results({
-            game_id,
-            curva_id: updated_curva.id,
-            curva_updated: updated_curva as any, // Cast para compatibilidad con UUID type
-          })
-        } catch (curvaError) {
-          console.error(
-            `❌ [TicketService] Error actualizando curva ${updated_curva.id}:`,
-            curvaError
-          )
-          throw curvaError
-        }
-
-        // Reducir la cantidad restante
-        remaining_quantity -= tickets_to_buy_from_curva
+        selected_results.push(claimed)
+        if (first_curva_id === null) first_curva_id = target_curva.id
+        remaining_quantity -= 1
       }
 
       const payed_amount = game_info.soccer_price * quantity

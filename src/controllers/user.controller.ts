@@ -3,6 +3,7 @@ import { UserService } from '@/services/user.service'
 import { ResponseError } from '@/utils/errors.util'
 import { RequestUser } from '@/contracts/types/global.type'
 import { UserRole } from '@/contracts/types/user.type'
+import { get_pagination_params, build_pagination_meta } from '@/utils/pagination.util'
 
 export class UserController {
   private user_service = new UserService()
@@ -12,14 +13,19 @@ export class UserController {
   public get_all_users = async (req: Request, res: Response) => {
     try {
       const { type_user } = req.query
-      const users = await this.user_service.get_all_users({
+      const { page, limit } = get_pagination_params(req.query)
+
+      const { data, total } = await this.user_service.get_all_users({
         type_user: type_user as UserRole,
+        page,
+        limit,
       })
 
       res.status(200).json({
         success: true,
         message: 'Usuarios obtenidos exitosamente',
-        data: users,
+        data,
+        pagination: build_pagination_meta({ total, page, limit }),
       })
     } catch (err) {
       if (err instanceof ResponseError) {
@@ -117,9 +123,50 @@ export class UserController {
 
   // ==================== POST ENDPOINTS ====================
 
+  // Registro público: el rol SIEMPRE se fuerza a "customer".
+  // Se ignora cualquier "role" enviado en el body para evitar escalada de privilegios.
   public create_user = async (req: Request, res: Response) => {
     try {
+      const { name, email, password, identity, phone } = req.body
+      await this.user_service.create_new_user({
+        name,
+        email,
+        password,
+        identity,
+        phone,
+        role: 'customer',
+      })
+
+      res.status(201).json({
+        success: true,
+        message: 'Usuario creado exitosamente',
+      })
+    } catch (err) {
+      if (err instanceof ResponseError) {
+        res.status(err.statusCode).json({
+          success: false,
+          message: err.message,
+        })
+      } else {
+        res.status(500).json({
+          success: false,
+          message: 'Error al crear usuario',
+        })
+      }
+    }
+  }
+
+  // Creación de usuarios con rol explícito (admin/staff/customer).
+  // Protegido por admin_auth en la ruta. El rol se valida contra la lista permitida.
+  public create_user_by_admin = async (req: Request, res: Response) => {
+    try {
       const { name, email, password, identity, phone, role } = req.body
+
+      const allowed_roles: UserRole[] = ['admin', 'staff', 'customer']
+      if (!role || !allowed_roles.includes(role)) {
+        throw new ResponseError(400, 'Rol inválido. Debe ser admin, staff o customer')
+      }
+
       await this.user_service.create_new_user({ name, email, password, identity, phone, role })
 
       res.status(201).json({

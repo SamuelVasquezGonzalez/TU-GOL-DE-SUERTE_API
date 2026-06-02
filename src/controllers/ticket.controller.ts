@@ -3,6 +3,7 @@ import { TicketService } from "@/services/ticket.service";
 import { ResponseError } from "@/utils/errors.util";
 import { RequestUser } from "@/contracts/types/global.type";
 import { TicketStatus } from "@/contracts/types/ticket.type";
+import { get_pagination_params, build_pagination_meta } from "@/utils/pagination.util";
 
 export class TicketController {
     private ticket_service = new TicketService();
@@ -37,12 +38,15 @@ export class TicketController {
     public get_tickets_by_user = async (req: Request, res: Response) => {
         try {
             const { user_id } = req.params;
-            const tickets = await this.ticket_service.get_tickets_by_user_id({ user_id });
+            const { page, limit } = get_pagination_params(req.query);
+
+            const { data, total } = await this.ticket_service.get_tickets_by_user_id({ user_id, page, limit });
 
             res.status(200).json({
                 success: true,
                 message: "Tickets del usuario obtenidos exitosamente",
-                data: tickets,
+                data,
+                pagination: build_pagination_meta({ total, page, limit }),
             });
         } catch (err) {
             if (err instanceof ResponseError) {
@@ -62,12 +66,15 @@ export class TicketController {
     public get_my_tickets = async (req: Request, res: Response) => {
         try {
             const user_id = (req as RequestUser).user._id;
-            const tickets = await this.ticket_service.get_tickets_by_user_id({ user_id });
+            const { page, limit } = get_pagination_params(req.query);
+
+            const { data, total } = await this.ticket_service.get_tickets_by_user_id({ user_id, page, limit });
 
             res.status(200).json({
                 success: true,
                 message: "Mis tickets obtenidos exitosamente",
-                data: tickets,
+                data,
+                pagination: build_pagination_meta({ total, page, limit }),
             });
         } catch (err) {
             if (err instanceof ResponseError) {
@@ -136,12 +143,15 @@ export class TicketController {
 
     public get_all_tickets = async (req: Request, res: Response) => {
         try {
-            const tickets = await this.ticket_service.get_all_tickets();
+            const { page, limit } = get_pagination_params(req.query);
+
+            const { data, total } = await this.ticket_service.get_all_tickets({ page, limit });
 
             res.status(200).json({
                 success: true,
                 message: "Todos los tickets obtenidos exitosamente",
-                data: tickets,
+                data,
+                pagination: build_pagination_meta({ total, page, limit }),
             });
         } catch (err) {
             if (err instanceof ResponseError) {

@@ -21,11 +21,25 @@ export class UserService {
   // methods
 
   // GET
-  public async get_all_users({ type_user }: { type_user?: UserRole }) {
+  public async get_all_users({
+    type_user,
+    page = 1,
+    limit = 20,
+  }: {
+    type_user?: UserRole
+    page?: number
+    limit?: number
+  }) {
     try {
-      const users = await UserModel.find(type_user ? { role: type_user } : {})
-      if (!users) throw new ResponseError(404, 'No se encontraron usuarios')
-      return users
+      const filter = type_user ? { role: type_user } : {}
+      const skip = (page - 1) * limit
+
+      const [users, total] = await Promise.all([
+        UserModel.find(filter).sort({ created_at: -1 }).skip(skip).limit(limit).lean(),
+        UserModel.countDocuments(filter),
+      ])
+
+      return { data: users, total }
     } catch (err) {
       if (err instanceof ResponseError) throw err
       throw new ResponseError(500, 'Error al obtener los usuarios')
