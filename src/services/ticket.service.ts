@@ -199,6 +199,10 @@ export class TicketService {
 
       // Acumulador para todos los resultados seleccionados (puede cruzar múltiples curvas)
       let selected_results: string[] = []
+      // Acumulador paralelo de reclamos CON su curva de origen, para poder revertirlos
+      // (rollback) si la compra falla antes de crear el ticket. Cada entrada corresponde
+      // a un número que ya se movió de avaliable_results -> sold_results de forma atómica.
+      const claimed: Array<{ curva_id: string; result: string }> = []
       let remaining_quantity = quantity
       let first_curva_id: string | null = null // Se establecerá en el primer bucle
       let tried_specified_curva = false // Para priorizar la curva indicada sólo una vez
@@ -216,90 +220,104 @@ export class TicketService {
       let safety_counter = 0
       const SAFETY_MAX = quantity * 50 + 200
 
-      // Bucle de compra: reclama un número a la vez de forma ATÓMICA, abriendo nuevas curvas si hace falta.
-      // Cada reclamo es atómico (ver SoccerGameService.claim_random_result_atomic), por lo que dos compras
-      // concurrentes no pueden quedarse con el mismo número.
-      while (remaining_quantity > 0) {
-        safety_counter++
-        if (safety_counter > SAFETY_MAX) {
-          throw new ResponseError(
-            500,
-            'No se pudieron asignar todos los resultados (agotamiento o concurrencia muy alta)'
-          )
-        }
-
-        // Lectura ligera de las curvas más recientes (sólo el campo necesario, sin joins de equipos/torneo)
-        const current_game = await SoccerGameModel.findById(game_id).select('curvas_open').lean()
-        if (!current_game) throw new ResponseError(404, 'No se encontró el partido de futbol')
-
-        // Elegir la curva objetivo
-        let target_curva: any = null
-
-        // En el primer intento, si se especificó una curva y aún tiene cupo, priorizarla
-        if (!tried_specified_curva && curva_id) {
-          target_curva = current_game.curvas_open.find(
-            (c: any) => c.id === curva_id && c.status === 'open' && c.avaliable_results.length > 0
-          )
-          tried_specified_curva = true
-        }
-
-        // Si no, buscar cualquier curva abierta con resultados disponibles
-        if (!target_curva) {
-          target_curva = current_game.curvas_open.find(
-            (c: any) => c.status === 'open' && c.avaliable_results.length > 0
-          )
-        }
-
-        // Si no hay ninguna curva disponible, abrir una nueva y reintentar
-        if (!target_curva) {
-          const new_curva_result = await game_service.open_new_curva({ game_id })
-          if (!new_curva_result.status || !new_curva_result.curva) {
-            throw new ResponseError(500, 'Error al abrir nueva curva')
-          }
-          continue
-        }
-
-        // Reclamar UN resultado de forma atómica de la curva objetivo
-        const claimed = await game_service.claim_random_result_atomic({
-          game_id,
-          curva_id: target_curva.id,
-        })
-
-        if (!claimed) {
-          // La curva se agotó (por concurrencia u otra compra): reintentar con otra curva
-          continue
-        }
-
-        selected_results.push(claimed)
-        if (first_curva_id === null) first_curva_id = target_curva.id
-        remaining_quantity -= 1
-      }
-
       const payed_amount = game_info.soccer_price * quantity
 
-      const ticket_number = await this.generate_ticket_number()
-
+      let ticket_number: number
       // Convertir sell_by a string si existe para asegurar consistencia
       const sell_by_str = sell_by ? String(sell_by) : undefined
 
-      // Validar que tenemos una curva_id antes de crear el ticket
-      if (!first_curva_id) {
-        throw new ResponseError(500, 'Error: No se pudo determinar la curva para el ticket')
-      }
+      // Sección crítica con ROLLBACK: si algo falla DESPUÉS de haber reclamado ≥1 número
+      // pero ANTES (o DURANTE) la creación del ticket, devolvemos todos los números
+      // reclamados al inventario para no perderlos. Importante: el rollback NO debe
+      // ejecutarse para fallos posteriores a la creación del ticket (email/comisión/socket).
+      try {
+        // Bucle de compra: reclama un número a la vez de forma ATÓMICA, abriendo nuevas curvas si hace falta.
+        // Cada reclamo es atómico (ver SoccerGameService.claim_random_result_atomic), por lo que dos compras
+        // concurrentes no pueden quedarse con el mismo número.
+        while (remaining_quantity > 0) {
+          safety_counter++
+          if (safety_counter > SAFETY_MAX) {
+            throw new ResponseError(
+              500,
+              'No se pudieron asignar todos los resultados (agotamiento o concurrencia muy alta)'
+            )
+          }
 
-      // Crear un solo ticket con todos los resultados (pueden venir de múltiples curvas)
-      await TicketModel.create({
-        ticket_number: ticket_number,
-        soccer_game_id: game_id,
-        user_id: customer_info._id,
-        results_purchased: selected_results,
-        payed_amount: payed_amount,
-        status: 'pending',
-        curva_id: first_curva_id, // Usar la primera curva como referencia
-        created_date: new Date(),
-        sell_by: sell_by_str,
-        reward_amount: game_info.soccer_reward,
-      })
+          // Lectura ligera de las curvas más recientes (sólo el campo necesario, sin joins de equipos/torneo)
+          const current_game = await SoccerGameModel.findById(game_id).select('curvas_open').lean()
+          if (!current_game) throw new ResponseError(404, 'No se encontró el partido de futbol')
+
+          // Elegir la curva objetivo
+          let target_curva: any = null
+
+          // En el primer intento, si se especificó una curva y aún tiene cupo, priorizarla
+          if (!tried_specified_curva && curva_id) {
+            target_curva = current_game.curvas_open.find(
+              (c: any) => c.id === curva_id && c.status === 'open' && c.avaliable_results.length > 0
+            )
+            tried_specified_curva = true
+          }
+
+          // Si no, buscar cualquier curva abierta con resultados disponibles
+          if (!target_curva) {
+            target_curva = current_game.curvas_open.find(
+              (c: any) => c.status === 'open' && c.avaliable_results.length > 0
+            )
+          }
+
+          // Si no hay ninguna curva disponible, abrir una nueva y reintentar
+          if (!target_curva) {
+            const new_curva_result = await game_service.open_new_curva({ game_id })
+            if (!new_curva_result.status || !new_curva_result.curva) {
+              throw new ResponseError(500, 'Error al abrir nueva curva')
+            }
+            continue
+          }
+
+          // Reclamar UN resultado de forma atómica de la curva objetivo
+          const claimed_result = await game_service.claim_random_result_atomic({
+            game_id,
+            curva_id: target_curva.id,
+          })
+
+          if (!claimed_result) {
+            // La curva se agotó (por concurrencia u otra compra): reintentar con otra curva
+            continue
+          }
+
+          selected_results.push(claimed_result)
+          // Registrar el reclamo con su curva de origen para un eventual rollback
+          claimed.push({ curva_id: target_curva.id, result: claimed_result })
+          if (first_curva_id === null) first_curva_id = target_curva.id
+          remaining_quantity -= 1
+        }
+
+        ticket_number = await this.generate_ticket_number()
+
+        // Validar que tenemos una curva_id antes de crear el ticket
+        if (!first_curva_id) {
+          throw new ResponseError(500, 'Error: No se pudo determinar la curva para el ticket')
+        }
+
+        // Crear un solo ticket con todos los resultados (pueden venir de múltiples curvas)
+        await TicketModel.create({
+          ticket_number: ticket_number,
+          soccer_game_id: game_id,
+          user_id: customer_info._id,
+          results_purchased: selected_results,
+          payed_amount: payed_amount,
+          status: 'pending',
+          curva_id: first_curva_id, // Usar la primera curva como referencia
+          created_date: new Date(),
+          sell_by: sell_by_str,
+          reward_amount: game_info.soccer_reward,
+        })
+      } catch (purchase_error) {
+        // Fallo ANTES/DURANTE la creación del ticket: revertir los números ya reclamados
+        // para no perder inventario, y re-lanzar el error original para que la API lo exponga.
+        await game_service.release_claimed_results({ game_id, claimed })
+        throw purchase_error
+      }
 
       // Invalidar cache de stats del usuario y staff (si existe)
       await invalidateUserStatsCache(String(customer_info._id))

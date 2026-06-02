@@ -4,6 +4,7 @@ import { ResponseError } from '@/utils/errors.util'
 import { RequestUser } from '@/contracts/types/global.type'
 import { UserRole } from '@/contracts/types/user.type'
 import { get_pagination_params, build_pagination_meta } from '@/utils/pagination.util'
+import { as_string } from '@/utils/query.util'
 
 export class UserController {
   private user_service = new UserService()
@@ -45,7 +46,7 @@ export class UserController {
   public get_user_by_id = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
-      const user = await this.user_service.get_user_by_id({ id })
+      const user = await this.user_service.get_user_by_id({ id: as_string(id) })
 
       res.status(200).json({
         success: true,
@@ -418,7 +419,7 @@ export class UserController {
     try {
       const { id } = req.params
 
-      await this.user_service.delete_user({ user_id: id })
+      await this.user_service.delete_user({ user_id: as_string(id) })
 
       res.status(200).json({
         success: true,

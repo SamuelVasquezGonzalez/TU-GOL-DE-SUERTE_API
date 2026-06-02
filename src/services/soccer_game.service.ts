@@ -405,6 +405,44 @@ export class SoccerGameService {
         );
     }
 
+    /**
+     * Revierte (compensa) reclamos de resultados previamente tomados de forma atómica
+     * por `claim_random_result_atomic`. Se usa como ROLLBACK cuando la compra falla
+     * DESPUÉS de haber reclamado uno o más números pero ANTES de crear el ticket: sin
+     * esto, esos números quedarían fuera de `avaliable_results` sin ticket asociado
+     * (inventario perdido permanentemente).
+     *
+     * Para cada reclamo devuelve el resultado a `avaliable_results`, lo saca de
+     * `sold_results` y, si la curva había quedado marcada como `sold_out`, la reabre
+     * (status `open`), ya que vuelve a tener cupo.
+     *
+     * Es BEST-EFFORT y resiliente: captura errores por elemento y los registra, de modo
+     * que la limpieza nunca enmascare ni reemplace el error original de la compra.
+     */
+    public async release_claimed_results({game_id, claimed}: {game_id: string, claimed: Array<{curva_id: string, result: string}>}) {
+        if (!claimed || claimed.length === 0) return;
+
+        for (const {curva_id, result} of claimed) {
+            try {
+                await SoccerGameModel.findOneAndUpdate(
+                    { _id: game_id, "curvas_open.id": curva_id },
+                    {
+                        $push: { "curvas_open.$[c].avaliable_results": result },
+                        $pull: { "curvas_open.$[c].sold_results": result },
+                        // Si la curva había quedado agotada, reabrirla: vuelve a tener cupo.
+                        $set: { "curvas_open.$[c].status": "open" },
+                    },
+                    {
+                        arrayFilters: [{ "c.id": curva_id }],
+                    }
+                );
+            } catch (release_error) {
+                // Best-effort: no propagar para no enmascarar el error original de la compra.
+                console.error(`⚠️ [SoccerGameService] Error liberando resultado ${result} en curva ${curva_id} (game ${game_id}):`, release_error);
+            }
+        }
+    }
+
     public async update_game_status({game_id, status}: {game_id: string, status: SoccerGameStatus}) {
         try {
             // Verificar que el juego existe sin modificar el documento

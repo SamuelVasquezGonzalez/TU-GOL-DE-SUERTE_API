@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { StatsService } from '@/services/stats.service'
 import { ResponseError } from '@/utils/errors.util'
 import { RequestUser } from '@/contracts/types/global.type'
+import { as_string } from '@/utils/query.util'
 
 export class StatsController {
   private stats_service = new StatsService()
@@ -45,7 +46,7 @@ export class StatsController {
     try {
       const { user_id } = req.params
 
-      const stats = await this.stats_service.getUserStats(user_id)
+      const stats = await this.stats_service.getUserStats(as_string(user_id))
 
       res.status(200).json({
         success: true,
@@ -106,7 +107,7 @@ export class StatsController {
     try {
       const { staff_id } = req.params
 
-      const stats = await this.stats_service.getStaffStats(staff_id)
+      const stats = await this.stats_service.getStaffStats(as_string(staff_id))
 
       res.status(200).json({
         success: true,

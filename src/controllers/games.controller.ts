@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { SoccerGameService } from "@/services/soccer_game.service";
 import { ResponseError } from "@/utils/errors.util";
 import { SoccerGameStatus, CurvaEntity } from "@/contracts/types/soccer_games.type";
+import { as_string } from "@/utils/query.util";
 
 export class GamesController {
     private games_service = new SoccerGameService();
@@ -36,7 +37,7 @@ export class GamesController {
     public get_game_by_id = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const game = await this.games_service.get_soccer_game_by_id({ id });
+            const game = await this.games_service.get_soccer_game_by_id({ id: as_string(id) });
 
             res.status(200).json({
                 success: true,
@@ -61,7 +62,7 @@ export class GamesController {
     public get_game_by_tournament = async (req: Request, res: Response) => {
         try {
             const { tournament } = req.params;
-            const game = await this.games_service.get_soccer_game_by_tournament({ tournament });
+            const game = await this.games_service.get_soccer_game_by_tournament({ tournament: as_string(tournament) });
 
             res.status(200).json({
                 success: true,
@@ -118,8 +119,8 @@ export class GamesController {
             const { include_game } = req.query;
 
             const curva = await this.games_service.get_curva_by_id({
-                id: curva_id,
-                game_id,
+                id: as_string(curva_id),
+                game_id: as_string(game_id),
                 include_game: include_game === "true",
             });
 
@@ -192,7 +193,7 @@ export class GamesController {
         try {
             const { game_id } = req.params;
 
-            await this.games_service.open_new_curva({ game_id });
+            await this.games_service.open_new_curva({ game_id: as_string(game_id) });
 
             res.status(201).json({
                 success: true,
@@ -225,7 +226,7 @@ export class GamesController {
             }
 
             await this.games_service.update_soccer_game_score({
-                game_id,
+                game_id: as_string(game_id),
                 score: score as [number, number],
             });
 
@@ -258,8 +259,8 @@ export class GamesController {
             }
 
             await this.games_service.update_curva_results({
-                game_id,
-                curva_id,
+                game_id: as_string(game_id),
+                curva_id: as_string(curva_id),
                 curva_updated: curva_updated as CurvaEntity,
             });
 
@@ -286,7 +287,7 @@ export class GamesController {
         try {
             const { game_id, curva_id } = req.params;
 
-            await this.games_service.close_curva({ game_id, curva_id });
+            await this.games_service.close_curva({ game_id: as_string(game_id), curva_id: as_string(curva_id) });
 
             res.status(200).json({
                 success: true,
@@ -311,7 +312,7 @@ export class GamesController {
         try {
             const { game_id } = req.params;
 
-            await this.games_service.end_soccer_game({ game_id });
+            await this.games_service.end_soccer_game({ game_id: as_string(game_id) });
 
             res.status(200).json({
                 success: true,

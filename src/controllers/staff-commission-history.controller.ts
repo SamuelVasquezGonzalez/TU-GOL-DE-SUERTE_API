@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { StaffCommissionHistoryService } from '@/services/staff-commission-history.service'
 import { ResponseError } from '@/utils/errors.util'
 import { RequestUser } from '@/contracts/types/global.type'
+import { as_string } from '@/utils/query.util'
 
 export class StaffCommissionHistoryController {
   private commission_service = new StaffCommissionHistoryService()
@@ -58,7 +59,7 @@ export class StaffCommissionHistoryController {
 
       const commission = await this.commission_service.get_staff_commission_by_game({
         staff_id: user._id,
-        game_id: game_id,
+        game_id: as_string(game_id),
       })
 
       res.status(200).json({
@@ -124,7 +125,7 @@ export class StaffCommissionHistoryController {
       }
 
       const result = await this.commission_service.get_commissions_by_game({
-        game_id: game_id,
+        game_id: as_string(game_id),
       })
 
       res.status(200).json({
@@ -159,7 +160,7 @@ export class StaffCommissionHistoryController {
       }
 
       const result = await this.commission_service.get_staff_commissions({
-        staff_id: staff_id,
+        staff_id: as_string(staff_id),
       })
 
       res.status(200).json({

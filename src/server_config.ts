@@ -178,3 +178,15 @@ app.use((req: Request, res: Response) => {
     requested: req.ip,
   })
 })
+
+// Manejador de errores global (DEBE ir al final y tener exactamente 4 parámetros).
+// Las middlewares de auth legadas (src/auth/*.auth.ts) lanzan errores; sin este
+// handler Express devolvería un 500 HTML. Aquí respondemos siempre en JSON con el
+// statusCode del error (p. ej. 401) cuando esté disponible.
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  const status = err?.statusCode ?? err?.status ?? 500
+  res.status(status).json({
+    success: false,
+    message: err?.message ?? 'Error interno del servidor',
+  })
+})

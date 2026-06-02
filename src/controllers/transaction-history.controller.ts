@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { TransactionHistoryService } from '@/services/transaction-history.service'
 import { ResponseError } from '@/utils/errors.util'
+import { as_string } from '@/utils/query.util'
 
 export class TransactionHistoryController {
   private transaction_history_service = new TransactionHistoryService()
@@ -43,7 +44,7 @@ export class TransactionHistoryController {
         throw new ResponseError(400, 'El ID de la transacción es requerido')
       }
 
-      const result = await this.transaction_history_service.delete_transaction_by_id({ id })
+      const result = await this.transaction_history_service.delete_transaction_by_id({ id: as_string(id) })
 
       res.status(200).json({
         success: true,

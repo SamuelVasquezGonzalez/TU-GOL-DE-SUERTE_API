@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { PlayerService } from "@/services/player.service";
 import { ResponseError } from "@/utils/errors.util";
+import { as_string } from "@/utils/query.util";
 
 export class PlayerController {
     private player_service = new PlayerService();
@@ -34,7 +35,7 @@ export class PlayerController {
     public get_player_by_id = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const player = await this.player_service.get_player_by_id({ id });
+            const player = await this.player_service.get_player_by_id({ id: as_string(id) });
 
             res.status(200).json({
                 success: true,
@@ -59,7 +60,7 @@ export class PlayerController {
     public get_players_by_team = async (req: Request, res: Response) => {
         try {
             const { team_id } = req.params;
-            const players = await this.player_service.get_players_by_team({ team_id });
+            const players = await this.player_service.get_players_by_team({ team_id: as_string(team_id) });
 
             res.status(200).json({
                 success: true,
@@ -157,7 +158,7 @@ export class PlayerController {
             }
 
             const updated_player = await this.player_service.update_player({
-                id,
+                id: as_string(id),
                 name,
                 team_id,
             });
@@ -188,7 +189,7 @@ export class PlayerController {
         try {
             const { id } = req.params;
 
-            await this.player_service.delete_player_by_id({ id });
+            await this.player_service.delete_player_by_id({ id: as_string(id) });
 
             res.status(200).json({
                 success: true,
@@ -213,7 +214,7 @@ export class PlayerController {
         try {
             const { team_id } = req.params;
 
-            const result = await this.player_service.delete_players_by_team({ team_id });
+            const result = await this.player_service.delete_players_by_team({ team_id: as_string(team_id) });
 
             res.status(200).json({
                 success: true,

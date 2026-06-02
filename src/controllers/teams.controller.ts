@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { SoccerTeamsService } from "@/services/soccer_teams.service";
 import { ResponseError } from "@/utils/errors.util";
+import { as_string } from "@/utils/query.util";
 
 export class TeamsController {
     private teams_service = new SoccerTeamsService();
@@ -34,7 +35,7 @@ export class TeamsController {
     public get_team_by_id = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const team = await this.teams_service.get_soccer_team_by_id({ id });
+            const team = await this.teams_service.get_soccer_team_by_id({ id: as_string(id) });
 
             res.status(200).json({
                 success: true,
@@ -135,7 +136,7 @@ export class TeamsController {
             const avatar_file = req.file;
 
             const updated_team = await this.teams_service.update_soccer_team_by_id({
-                id,
+                id: as_string(id),
                 name: update_data.name,
                 avatar: avatar_file as Express.Multer.File,
                 color: update_data.color,
@@ -167,7 +168,7 @@ export class TeamsController {
         try {
             const { id } = req.params;
 
-            await this.teams_service.delete_soccer_team_by_id({ id });
+            await this.teams_service.delete_soccer_team_by_id({ id: as_string(id) });
 
             res.status(200).json({
                 success: true,

@@ -4,6 +4,7 @@ import { ResponseError } from "@/utils/errors.util";
 import { RequestUser } from "@/contracts/types/global.type";
 import { TicketStatus } from "@/contracts/types/ticket.type";
 import { get_pagination_params, build_pagination_meta } from "@/utils/pagination.util";
+import { as_string } from "@/utils/query.util";
 
 export class TicketController {
     private ticket_service = new TicketService();
@@ -13,7 +14,7 @@ export class TicketController {
     public get_ticket_by_id = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const ticket = await this.ticket_service.get_ticket_by_id({ id });
+            const ticket = await this.ticket_service.get_ticket_by_id({ id: as_string(id) });
 
             res.status(200).json({
                 success: true,
@@ -40,7 +41,7 @@ export class TicketController {
             const { user_id } = req.params;
             const { page, limit } = get_pagination_params(req.query);
 
-            const { data, total } = await this.ticket_service.get_tickets_by_user_id({ user_id, page, limit });
+            const { data, total } = await this.ticket_service.get_tickets_by_user_id({ user_id: as_string(user_id), page, limit });
 
             res.status(200).json({
                 success: true,
@@ -94,7 +95,7 @@ export class TicketController {
     public get_tickets_by_game = async (req: Request, res: Response) => {
         try {
             const { game_id } = req.params;
-            const tickets = await this.ticket_service.get_tickets_by_game_id({ game_id });
+            const tickets = await this.ticket_service.get_tickets_by_game_id({ game_id: as_string(game_id) });
 
             res.status(200).json({
                 success: true,
@@ -119,7 +120,7 @@ export class TicketController {
     public get_tickets_by_curva = async (req: Request, res: Response) => {
         try {
             const { curva_id } = req.params;
-            const tickets = await this.ticket_service.get_tickets_by_curva_id({ curva_id });
+            const tickets = await this.ticket_service.get_tickets_by_curva_id({ curva_id: as_string(curva_id) });
 
             res.status(200).json({
                 success: true,
@@ -280,7 +281,7 @@ export class TicketController {
             if (!status) throw new ResponseError(400, "Estado es requerido");
 
             await this.ticket_service.change_ticket_status({
-                ticket_id: id,
+                ticket_id: as_string(id),
                 status: status as TicketStatus,
             });
 
