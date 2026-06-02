@@ -125,7 +125,7 @@ app.use(
   swaggerUi.serve,
   swaggerUi.setup(swaggerSpec, {
     customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'TU GOL DE SUERTE API Docs',
+    customSiteTitle: 'La Banda de Crisma API Docs',
     swaggerOptions: {
       persistAuthorization: true,
     },
@@ -140,7 +140,7 @@ app.get('/api-docs.json', (req: Request, res: Response) => {
 
 app.get('/', (req: Request, res: Response) => {
   res.json({
-    name: 'TU GOL DE SUERTE API',
+    name: 'La Banda de Crisma API',
     version: '1.0.0',
     access: 'private',
     ok: true,
@@ -152,7 +152,7 @@ app.get('/', (req: Request, res: Response) => {
 app.get(`${API_VERSION}/health`, (req: Request, res: Response) => {
   res.status(200).json({
     success: true,
-    message: 'API TU-GOL-DE-SUERTE funcionando correctamente',
+    message: 'API La Banda de Crisma funcionando correctamente',
     version: 'v1.0.0',
     timestamp: new Date().toISOString(),
   })

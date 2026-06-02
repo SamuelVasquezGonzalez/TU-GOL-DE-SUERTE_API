@@ -8,7 +8,7 @@
 module.exports = {
   apps: [
     {
-      name: 'tu-gol-de-suerte-api',
+      name: 'banda-de-crisma-api',
       script: './dist/index.js',
       // Modo 'fork' para Windows (más estable)
       // En Linux/Mac producción, puedes usar 'cluster' con múltiples instancias

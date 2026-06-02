@@ -19,7 +19,7 @@
  *                   example: true
  *                 message:
  *                   type: string
- *                   example: "API TU-GOL-DE-SUERTE funcionando correctamente"
+ *                   example: "API La Banda de Crisma funcionando correctamente"
  *                 version:
  *                   type: string
  *                   example: "v1.0.0"

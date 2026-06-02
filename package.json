@@ -1,5 +1,5 @@
 {
-  "name": "TU-GOL-DE-SUERTE_API",
+  "name": "banda-de-crisma-api",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -15,10 +15,10 @@
     "start:pm2": "pm2 start ecosystem.config.js",
     "start:pm2:single": "pm2 start ecosystem.config.js --instances 1",
     "start:pm2:prod": "pm2 start ecosystem.config.js --instances max",
-    "stop:pm2": "pm2 stop tu-gol-de-suerte-api",
-    "delete:pm2": "pm2 delete tu-gol-de-suerte-api",
-    "restart:pm2": "pm2 restart tu-gol-de-suerte-api",
-    "logs:pm2": "pm2 logs tu-gol-de-suerte-api",
+    "stop:pm2": "pm2 stop banda-de-crisma-api",
+    "delete:pm2": "pm2 delete banda-de-crisma-api",
+    "restart:pm2": "pm2 restart banda-de-crisma-api",
+    "logs:pm2": "pm2 logs banda-de-crisma-api",
     "status:pm2": "pm2 status"
   },
   "keywords": [],

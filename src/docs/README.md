@@ -1,4 +1,4 @@
-# 📚 Documentación TU GOL DE SUERTE API
+# 📚 Documentación La Banda de Crisma API
 
 Esta carpeta contiene toda la documentación relacionada con la API.
 

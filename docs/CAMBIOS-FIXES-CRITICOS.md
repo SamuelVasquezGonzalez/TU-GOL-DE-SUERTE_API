@@ -6,7 +6,7 @@
 
 ## Contexto
 
-`TU-GOL-DE-SUERTE_API` es una API de lotería deportiva de fútbol (Express 5 + TypeScript +
+`La Banda de Crisma API` es una API de lotería deportiva de fútbol (Express 5 + TypeScript +
 Mongoose/MongoDB, Redis + Bull para colas, Socket.io tiempo real, pagos vía Wompi). El usuario
 compra boletas con resultados aleatorios (marcadores `0.0`–`7.7`) tomados de "curvas" (lotes de
 64 resultados). Al finalizar el partido el marcador real define ganadores; si el marcador es >7

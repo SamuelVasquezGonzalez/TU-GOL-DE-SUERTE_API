@@ -4,12 +4,12 @@ import { GLOBAL_ENV } from '../shared/contants'
 const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
-    title: 'TU GOL DE SUERTE API',
+    title: 'La Banda de Crisma API',
     version: '1.0.0',
     description: 'API para sistema de apuestas deportivas',
     contact: {
-      name: 'TU GOL DE SUERTE',
-      email: 'support@tugoldesuerte.com',
+      name: 'La Banda de Crisma',
+      email: 'support@polladecrisma.com',
     },
   },
   servers: [

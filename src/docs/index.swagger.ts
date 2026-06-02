@@ -1,4 +1,4 @@
-// Documentación completa de Swagger para TU GOL DE SUERTE API
+// Documentación completa de Swagger para La Banda de Crisma API
 // Este archivo importa todas las definiciones de documentación
 
 // Health endpoints

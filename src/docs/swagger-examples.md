@@ -1,4 +1,4 @@
-# 📖 Ejemplos de Uso - TU GOL DE SUERTE API
+# 📖 Ejemplos de Uso - La Banda de Crisma API
 
 ## 🔐 Autenticación
 
