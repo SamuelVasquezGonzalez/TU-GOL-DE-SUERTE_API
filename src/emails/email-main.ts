@@ -100,9 +100,9 @@ const send_welcome_email = async ({
       .replace(/{{temp_user_pssw}}/g, temp_pssw || "");
 
     const response = await resend.emails.send({
-      from: "Bienvenido <partidos@tugoldesuerte.com>",
+      from: "Bienvenido <partidos@polladecrisma.com>",
       to: email,
-      subject: "Bienvenido a TU-GOL-DE-SUERTE",
+      subject: "Bienvenido a La Banda de Crisma",
       html: replaced_content,
     });
 
@@ -130,9 +130,9 @@ const send_welcome_admin_email = async ({
       .replace(/{{temp_admin_pssw}}/g, temp_admin_pssw);
 
     const response = await resend.emails.send({
-      from: "Administración <partidos@tugoldesuerte.com>",
+      from: "Administración <partidos@polladecrisma.com>",
       to: admin_email,
-      subject: "Bienvenido Administrador - TU-GOL-DE-SUERTE",
+      subject: "Bienvenido Administrador - La Banda de Crisma",
       html: replaced_content,
     });
 
@@ -166,9 +166,9 @@ const send_welcome_staff_email = async ({
       .replace(/{{temp_staff_pssw}}/g, temp_staff_pssw);
 
     const response = await resend.emails.send({
-      from: "Staff <partidos@tugoldesuerte.com>",
+      from: "Staff <partidos@polladecrisma.com>",
       to: staff_email,
-      subject: "Bienvenido al Staff - TU-GOL-DE-SUERTE",
+      subject: "Bienvenido al Staff - La Banda de Crisma",
       html: replaced_content,
     });
 
@@ -202,9 +202,9 @@ const send_recovery_email = async ({
       .replace(/{{recover_code}}/g, recover_code.toString());
 
     const response = await resend.emails.send({
-      from: "Soporte <partidos@tugoldesuerte.com>",
+      from: "Soporte <partidos@polladecrisma.com>",
       to: user_email,
-      subject: "Recuperación de Contraseña - TU-GOL-DE-SUERTE",
+      subject: "Recuperación de Contraseña - La Banda de Crisma",
       html: replaced_content,
     });
 
@@ -241,9 +241,9 @@ const send_ticket_purchase_email = async ({
       .replace(/{{total_amount}}/g, total_amount.toString());
 
     const response = await resend.emails.send({
-      from: "Compras <partidos@tugoldesuerte.com>",
+      from: "Compras <partidos@polladecrisma.com>",
       to: user_email,
-      subject: "Confirmación de Compra de Boleta - TU-GOL-DE-SUERTE",
+      subject: "Confirmación de Compra de Boleta - La Banda de Crisma",
       html: replaced_content,
     });
 
@@ -282,9 +282,9 @@ const send_event_confirmation_email = async ({
       .replace(/{{tournament}}/g, event_info.tournament);
 
     const response = await resend.emails.send({
-      from: "Eventos <partidos@tugoldesuerte.com>",
+      from: "Eventos <partidos@polladecrisma.com>",
       to: user_email,
-      subject: "Confirmación de Evento - TU-GOL-DE-SUERTE",
+      subject: "Confirmación de Evento - La Banda de Crisma",
       html: replaced_content,
     });
 
@@ -331,11 +331,11 @@ const send_result_notification_email = async ({
       );
 
     const response = await resend.emails.send({
-      from: "Resultados <partidos@tugoldesuerte.com>",
+      from: "Resultados <partidos@polladecrisma.com>",
       to: user_email,
       subject: is_winner
-        ? "¡FELICIDADES! Has ganado - TU-GOL-DE-SUERTE"
-        : "Resultado de tu Apuesta - TU-GOL-DE-SUERTE",
+        ? "¡FELICIDADES! Has ganado - La Banda de Crisma"
+        : "Resultado de tu Apuesta - La Banda de Crisma",
       html: replaced_content,
     });
 
@@ -377,9 +377,9 @@ const send_ticket_status_update_email = async ({
       .replace(/{{game_date}}/g, game_info.date);
 
     const response = await resend.emails.send({
-      from: "Estado Boletas <partidos@tugoldesuerte.com>",
+      from: "Estado Boletas <partidos@polladecrisma.com>",
       to: user_email,
-      subject: "Estado de Boleta Actualizado - TU-GOL-DE-SUERTE",
+      subject: "Estado de Boleta Actualizado - La Banda de Crisma",
       html: replaced_content,
     });
 
