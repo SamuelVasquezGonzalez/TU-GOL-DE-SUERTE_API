@@ -13,7 +13,7 @@ export const ALLOWED_ORIGINS = [
   'https://polladecrisma.com',
   'https://m3ps90bg-3000.use.devtunnels.ms'
 ]
-export const ALLOWED_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+export const ALLOWED_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH']
 
 export const GLOBAL_ENV = {
   MONGODB_URI: process.env.MONGODB_URI as string,

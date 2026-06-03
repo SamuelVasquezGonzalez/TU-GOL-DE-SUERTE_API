@@ -85,15 +85,6 @@ const generalLimiter = rateLimit({
   legacyHeaders: false,
 })
 
-// Rate Limiting - Más estricto para endpoints críticos (reservado para uso futuro)
-// const strictLimiter = rateLimit({
-//   windowMs: 15 * 60 * 1000,
-//   max: 100, // 100 requests por IP por ventana
-//   message: 'Demasiadas peticiones desde esta IP, por favor intenta más tarde',
-//   standardHeaders: true,
-//   legacyHeaders: false,
-// })
-
 // Rate Limiting - Webhooks (más permisivo, pero con límite)
 const webhookLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minuto
